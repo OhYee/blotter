@@ -1,4 +1,4 @@
-package main
+package markdown
 
 import (
 	"github.com/OhYee/goldmark-dot"
@@ -10,7 +10,8 @@ import (
 	"bytes"
 )
 
-func renderMarkdown(source string) (html string, err error) {
+// RenderMarkdown to HTML from source
+func RenderMarkdown(source string) (html string, err error) {
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,

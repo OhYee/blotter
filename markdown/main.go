@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/OhYee/blotter/markdown/proto"
+	"github.com/OhYee/blotter/markdown/markdown"
 	"github.com/micro/go-micro"
 )
 
@@ -15,7 +16,7 @@ type Markdown struct{}
 
 // RenderMarkdown from markdown to html
 func (g *Markdown) RenderMarkdown(ctx context.Context, req *proto.RenderMarkdownRequest, rsp *proto.RenderMarkdownResponse) (err error) {
-	rsp.Html, err = renderMarkdown(req.Source)
+	rsp.Html, err = markdown.RenderMarkdown(req.Source)
 	return
 }
 
