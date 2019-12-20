@@ -21,9 +21,11 @@ func SendHandshake(w io.Writer) (err error) {
 }
 
 // VarifyHandshake varify the handshake data
-func VarifyHandshake(r io.Reader) (valid bool, err error) {
+func VarifyHandshake(r io.Reader) (valid bool) {
 	var b []byte
+	var err error
 	if b, err = bytes.ReadNBytes(r, 32); err != nil {
+		valid = false
 		return
 	}
 	valid = goutils.Equal(b, Handshake)

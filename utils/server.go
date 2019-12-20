@@ -54,12 +54,12 @@ func ParseFlag() (laddr string, verbose bool, err error) {
 	return
 }
 
-func RunServer(laddr string, handler func(id int, listener net.Listener)) (err error) {
+func RunServer(laddr string, threadNum int, handler func(id int, listener net.Listener)) (err error) {
 	listener, err := kcp.Listen(laddr)
 	if err != nil {
 		return err
 	}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < threadNum; i++ {
 		go handler(i, listener)
 	}
 	c := make(chan os.Signal)

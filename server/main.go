@@ -1,8 +1,11 @@
 package main
 
 import (
+	"time"
 	"github.com/OhYee/blotter/utils"
+	"github.com/OhYee/blotter/utils/protocol"
 	"github.com/OhYee/rainbow/color"
+	"github.com/OhYee/rainbow/errors"
 	"github.com/OhYee/rainbow/log"
 	"net"
 )
@@ -12,6 +15,19 @@ var (
 	errLogger   = log.New().SetColor(color.New().SetFrontRed())
 )
 
+func server(conn net.Conn) (err error) {
+	conn.SetDeadline(time.Now().Add(5 * time.Second))
+
+	if !proto.VarifyHandshake(conn) {
+		return errors.New("Handshake error")
+	}
+	if err = proto.SendHandshake(conn); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func handler(id int, listener net.Listener) {
 	debugLogger.Printf("Start thread %d\n", id)
 	for {
@@ -20,8 +36,11 @@ func handler(id int, listener net.Listener) {
 		if err != nil {
 			errLogger.Println(err)
 		} else {
-
+			if err = server(conn); err != nil {
+				errLogger.Println(err)
+			}
 		}
+		debugLogger.Printf("Thread %d connection %v from %v closed\n", id, &conn, conn.RemoteAddr())
 	}
 }
 
@@ -35,7 +54,7 @@ func main() {
 		debugLogger.SetOutputToNil()
 	}
 	debugLogger.Printf("Start server at %s\n", laddr)
-	if err = utils.RunServer(laddr, handler); err != nil {
+	if err = utils.RunServer(laddr, 10, handler); err != nil {
 		errLogger.Println(err)
 	}
 }
