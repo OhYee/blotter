@@ -13,6 +13,7 @@ var Handshake = []byte{
 	0x15, 0xd2, 0x47, 0x3a, 0x25, 0x2d, 0xf5, 0x5e,
 	0xbf, 0xd7, 0xa7, 0x78, 0x1d, 0x85, 0x09, 0xc9,
 }
+var handshakeLength = len(Handshake)
 
 // SendHandshake Send the handshake data to the remote
 func SendHandshake(w io.Writer) (err error) {
@@ -24,7 +25,7 @@ func SendHandshake(w io.Writer) (err error) {
 func VarifyHandshake(r io.Reader) (valid bool) {
 	var b []byte
 	var err error
-	if b, err = bytes.ReadNBytes(r, 32); err != nil {
+	if b, err = bytes.ReadNBytes(r, handshakeLength); err != nil {
 		valid = false
 		return
 	}
