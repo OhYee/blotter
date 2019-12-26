@@ -20,7 +20,7 @@ func Test_Client(t *testing.T) {
 	}()
 
 	var err error
-	var conn, conn2 net.Conn
+	var conn net.Conn
 
 	conn, err = kcp.Dial(laddr)
 	conn.SetDeadline(time.Now().Add(5 * time.Second))
@@ -33,15 +33,17 @@ func Test_Client(t *testing.T) {
 	if valid := proto.VarifyHandshake(conn); valid == false {
 		t.Errorf("Client handshark error\n")
 	}
+	conn.Close()
 
-	conn2, err = kcp.Dial(laddr)
-	conn2.SetDeadline(time.Now().Add(5 * time.Second))
+	conn, err = kcp.Dial(laddr)
+	conn.SetDeadline(time.Now().Add(5 * time.Second))
 	if err != nil {
 		t.Errorf("%v\n", err)
 	}
-	conn2.Write([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+	conn.Write([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
 	if proto.VarifyHandshake(conn) == true {
 		t.Errorf("Unexcepted connection\n")
 	}
+	conn.Close()
 
 }
