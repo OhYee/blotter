@@ -1,6 +1,8 @@
 package proto
 
 import (
+	"bytes"
+	gb "github.com/OhYee/goutils/bytes"
 	"time"
 )
 
@@ -50,4 +52,12 @@ func NewValue(t string, d string) Value {
 		Type:        t,
 		Description: d,
 	}
+}
+
+// ToBytes transfer Value to []byte
+func (v *Value) ToBytes() []byte {
+	buf := bytes.NewBuffer([]byte{})
+	gb.WriteWithLength32(buf, gb.FromString(v.Type))
+	gb.WriteWithLength32(buf, gb.FromString(v.Description))
+	return buf.Bytes()
 }
