@@ -54,6 +54,21 @@ func NewValue(t string, d string) Value {
 	}
 }
 
+// NewValueFromBytes initial a value data from bytes
+func NewValueFromBytes(b []byte) (v Value, err error) {
+	buf := bytes.NewBuffer(b)
+	t, err := gb.ReadWithLength32(buf)
+	if err != nil {
+		return
+	}
+	d, err := gb.ReadWithLength32(buf)
+	if err != nil {
+		return
+	}
+	v = NewValue(string(t), string(d))
+	return
+}
+
 // ToBytes transfer Value to []byte
 func (v *Value) ToBytes() []byte {
 	buf := bytes.NewBuffer([]byte{})
