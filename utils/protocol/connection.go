@@ -40,6 +40,85 @@ func NewAPI(url string, d string, in map[string]Value, out map[string]Value) API
 	}
 }
 
+// NewAPIFromBytes initial a API data from bytes
+func NewAPIFromBytes(r io.Reader) (api API, err error) {
+	var url, description []byte
+
+	url, err = gb.ReadWithLength32(r)
+	if err != nil {
+		return
+	}
+
+	description, err = gb.ReadWithLength32(r)
+	if err != nil {
+		return
+	}
+
+	inSize, err := gb.ReadUint32(r)
+	if err != nil {
+		return
+	}
+	in := make(map[string]Value)
+	for i := 0; i < int(inSize); i++ {
+		var key []byte
+		var value Value
+
+		key, err = gb.ReadWithLength32(r)
+		if err != nil {
+			return
+		}
+		value, err = NewValueFromBytes(r)
+		if err != nil {
+			return
+		}
+		in[string(key)] = value
+	}
+
+	outSize, err := gb.ReadUint32(r)
+	if err != nil {
+		return
+	}
+	out := make(map[string]Value)
+	for i := 0; i < int(outSize); i++ {
+		var key []byte
+		var value Value
+
+		key, err = gb.ReadWithLength32(r)
+		if err != nil {
+			return
+		}
+		value, err = NewValueFromBytes(r)
+		if err != nil {
+			return
+		}
+		out[string(key)] = value
+	}
+
+	api = NewAPI(string(url), string(description), in, out)
+	return
+}
+
+// ToBytes transfer API to []byte
+func (api API) ToBytes() []byte {
+	buf := bytes.NewBuffer([]byte{})
+	gb.WriteWithLength32(buf, gb.FromString(api.URL))
+	gb.WriteWithLength32(buf, gb.FromString(api.Description))
+
+	buf.Write(gb.FromInt32(int32(len(api.Input))))
+	for key, value := range api.Input {
+		gb.WriteWithLength32(buf, gb.FromString(key))
+		buf.Write(value.ToBytes())
+	}
+
+	buf.Write(gb.FromInt32(int32(len(api.Output))))
+	for key, value := range api.Output {
+		gb.WriteWithLength32(buf, gb.FromString(key))
+		buf.Write(value.ToBytes())
+	}
+
+	return buf.Bytes()
+}
+
 // Value of the input/output
 type Value struct {
 	Type        string // Type of the value
