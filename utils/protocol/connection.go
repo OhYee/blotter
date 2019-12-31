@@ -3,6 +3,7 @@ package proto
 import (
 	"bytes"
 	gb "github.com/OhYee/goutils/bytes"
+	"io"
 	"time"
 )
 
@@ -134,13 +135,12 @@ func NewValue(t string, d string) Value {
 }
 
 // NewValueFromBytes initial a value data from bytes
-func NewValueFromBytes(b []byte) (v Value, err error) {
-	buf := bytes.NewBuffer(b)
-	t, err := gb.ReadWithLength32(buf)
+func NewValueFromBytes(r io.Reader) (v Value, err error) {
+	t, err := gb.ReadWithLength32(r)
 	if err != nil {
 		return
 	}
-	d, err := gb.ReadWithLength32(buf)
+	d, err := gb.ReadWithLength32(r)
 	if err != nil {
 		return
 	}
