@@ -23,6 +23,19 @@ func NewConnection(d string, apis []API) Connection {
 	}
 }
 
+// ToBytes transfer Connection to []byte
+func (conn Connection) ToBytes() []byte {
+	buf := bytes.NewBuffer([]byte{})
+	gb.WriteWithLength32(buf, gb.FromString(conn.Description))
+
+	apiSize := len(conn.APIList)
+	buf.Write(gb.FromUint32(uint32(apiSize)))
+	for _, api := range conn.APIList {
+		buf.Write(api.ToBytes())
+	}
+	return buf.Bytes()
+}
+
 // API of the sub-server
 type API struct {
 	URL         string           // URL of the api
