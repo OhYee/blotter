@@ -4,22 +4,23 @@ import (
 	"bytes"
 	gb "github.com/OhYee/goutils/bytes"
 	"io"
-	"time"
 )
 
 // Connection from a sub-server
 type Connection struct {
-	Description string    // Description of the connection
-	APIList     []API     // APIList list of the sub-server api
-	KeepAlive   time.Time // KeepAlive the last connect time of the sub-server
+	Description string // Description of the connection
+	APIList     []API  // APIList list of the sub-server api
+	SendTime    int64  // Send time of connection
+	RecvTime    int64  // Receive time of connection
 }
 
 // NewConnection initial a Connection data
-func NewConnection(d string, apis []API) Connection {
+func NewConnection(d string, apis []API, sendTime int64, recvTime int64) Connection {
 	return Connection{
 		Description: d,
 		APIList:     apis,
-		KeepAlive:   time.Now(),
+		SendTime:    sendTime,
+		RecvTime:    recvTime,
 	}
 }
 
@@ -40,7 +41,15 @@ func NewConnectionFromBytes(r io.Reader) (conn Connection, err error) {
 		apiList[i] = api
 	}
 
-	conn = NewConnection(string(d), apiList)
+	var sendTime, recvTime int64
+	if sendTime, err = gb.ReadInt64(r); err != nil {
+		return
+	}
+	if recvTime, err = gb.ReadInt64(r); err != nil {
+		return
+	}
+
+	conn = NewConnection(string(d), apiList, sendTime, recvTime)
 	return
 }
 
@@ -54,6 +63,10 @@ func (conn Connection) ToBytes() []byte {
 	for _, api := range conn.APIList {
 		buf.Write(api.ToBytes())
 	}
+
+	buf.Write(gb.FromInt64(conn.SendTime))
+	buf.Write(gb.FromInt64(conn.RecvTime))
+
 	return buf.Bytes()
 }
 
