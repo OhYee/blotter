@@ -23,6 +23,27 @@ func NewConnection(d string, apis []API) Connection {
 	}
 }
 
+// NewConnectionFromBytes initial a API data from bytes
+func NewConnectionFromBytes(r io.Reader) (conn Connection, err error) {
+	d, err := gb.ReadWithLength32(r)
+	apiSize, err := gb.ReadUint32(r)
+	if err != nil {
+		return
+	}
+
+	apiList := make([]API, apiSize)
+	for i := uint32(0); i < apiSize; i++ {
+		var api API
+		if api, err = NewAPIFromBytes(r); err != nil {
+			return
+		}
+		apiList[i] = api
+	}
+
+	conn = NewConnection(string(d), apiList)
+	return
+}
+
 // ToBytes transfer Connection to []byte
 func (conn Connection) ToBytes() []byte {
 	buf := bytes.NewBuffer([]byte{})
