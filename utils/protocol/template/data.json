@@ -1,0 +1,22 @@
+{
+    "variable": {},
+    "files": [
+        {
+            "package": "proto",
+            "output": "../message_type.go",
+            "import": [],
+            "body": [
+                {
+                    "template": "./type.tpl",
+                    "args": [
+                        [
+                            "HeartBeat",
+                            "Request",
+                            "Response"
+                        ]
+                    ]
+                }
+            ]
+        }
+    ]
+}
