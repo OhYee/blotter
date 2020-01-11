@@ -25,13 +25,28 @@ type Server struct {
 
 // NewServer initial the Server
 func NewServer(serverInfo *ServerInfo) *Server {
-	return &Server{
+	server := &Server{
 		Info:            serverInfo,
 		APIMap:          make(map[string]HandleFunc),
 		SubServerStatus: make(map[string]Status),
 		DeadTime:        60,
 		Mutex:           new(sync.Mutex),
 	}
+	server.Register("/heartbeat", server.handleHeartBeat)
+	return server
+}
+
+// Register API function
+func (server *Server) Register(address string, f HandleFunc) (err error) {
+	if ff, exist := server.APIMap[address]; exist {
+		err = errors.New(
+			"Address %v has already registered by %v, can not register again",
+			address, ff,
+		)
+		return
+	}
+	server.APIMap[address] = f
+	return
 }
 
 // Handle search handle function in API map
