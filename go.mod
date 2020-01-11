@@ -15,6 +15,7 @@ require (
 	github.com/templexxx/xor v0.0.0-20181023030647-4e92f724b73b // indirect
 	github.com/tjfoc/gmsm v1.0.1 // indirect
 	github.com/xtaci/kcp-go v5.4.19+incompatible
+	github.com/xtaci/lossyconn v0.0.0-20190602105132-8df528c0c9ae // indirect
 	github.com/yuin/goldmark v1.1.1
 	github.com/yuin/goldmark-highlighting v0.0.0-20190830074347-93c30623ac23
 	gopkg.in/yaml.v2 v2.2.2
