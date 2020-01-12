@@ -38,6 +38,7 @@ func NewServer(serverInfo *ServerInfo) *Server {
 
 // Register API function
 func (server *Server) Register(address string, f HandleFunc) (err error) {
+	server.Mutex.Lock()
 	if ff, exist := server.APIMap[address]; exist {
 		err = errors.New(
 			"Address %v has already registered by %v, can not register again",
@@ -46,6 +47,7 @@ func (server *Server) Register(address string, f HandleFunc) (err error) {
 		return
 	}
 	server.APIMap[address] = f
+	server.Mutex.Unlock()
 	return
 }
 
