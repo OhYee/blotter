@@ -1,15 +1,16 @@
 package ms
 
 import (
-	"os/signal"
-	"os"
 	"encoding/json"
 	gb "github.com/OhYee/goutils/bytes"
 	"github.com/OhYee/rainbow/errors"
 	"github.com/xtaci/kcp-go"
 	"io"
 	"net"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -17,6 +18,9 @@ type any = interface{}
 
 // HandleFunc handle function for api
 type HandleFunc = func(request []byte) (response []byte, err error)
+
+// HandleFuncWithServer handdle function for api with server argument
+type HandleFuncWithServer = func(server *Server, request []byte) (response []byte, err error)
 
 // Server object
 type Server struct {
@@ -41,6 +45,8 @@ func NewServer(serverInfo *ServerInfo, threadNumber int) (server *Server) {
 		threadNumber:    threadNumber,
 	}
 	server.Register("/heartbeat", server.handleHeartBeat)
+	server.Register("/status", server.handleStatus)
+	// server.Register("/api", server.handleAPI)
 	return
 }
 
@@ -59,6 +65,19 @@ func (server *Server) Register(address string, f HandleFunc) (err error) {
 	return
 }
 
+// RegisterWithServer register API function with server argument
+func (server *Server) RegisterWithServer(address string, f HandleFuncWithServer) (err error) {
+	outer := func(request []byte) (response []byte, err error) {
+		response, err = f(server, request)
+		return
+	}
+
+	if err = server.Register(address, outer); err != nil {
+		return
+	}
+	return
+}
+
 // Start server listener
 func (server *Server) Start() (err error) {
 	server.mutex.Lock()
@@ -67,7 +86,7 @@ func (server *Server) Start() (err error) {
 	if err != nil {
 		return
 	}
-	
+
 	for i := 0; i < server.threadNumber; i++ {
 		go func(threadID int) {
 			for {
@@ -78,9 +97,9 @@ func (server *Server) Start() (err error) {
 		}(i)
 	}
 
-    c := make(chan os.Signal)
-    signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGUSR1, syscall.SIGUSR2)
-    s := <-c
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGUSR1, syscall.SIGUSR2)
+	<-c
 
 	return
 }
@@ -148,3 +167,17 @@ func (server *Server) handleHeartBeat(request []byte) (response []byte, err erro
 
 	return
 }
+
+func (server *Server) handleStatus(request []byte) (response []byte, err error) {
+	server.mutex.Lock()
+	response, err = json.Marshal(server.subServerStatus)
+	server.mutex.Unlock()
+	return
+}
+
+// func (server *Server) handleAPI(request []byte) (response []byte, err error) {
+// 	server.mutex.Lock()
+// 	response, err = json.Marshal(server.info.APIList)
+// 	server.mutex.Unlock()
+// 	return
+// }
