@@ -2,6 +2,7 @@ package ms
 
 import (
 	"encoding/json"
+	"github.com/OhYee/blotter/micro_server/protocol"
 	gb "github.com/OhYee/goutils/bytes"
 	"github.com/OhYee/rainbow/errors"
 	"github.com/xtaci/kcp-go"
@@ -24,6 +25,7 @@ type HandleFuncWithServer = func(server *Server, request []byte) (response []byt
 
 // Server object
 type Server struct {
+	gateway         *ServerInfo
 	info            *ServerInfo
 	listener        net.Listener
 	apiMap          map[string]HandleFunc
@@ -32,22 +34,32 @@ type Server struct {
 	mutex           *sync.Mutex
 	threadNumber    int
 	errorCallback   func(threadID int, err error)
+	close           bool
 }
 
 // NewServer initial the Server
-func NewServer(serverInfo *ServerInfo, threadNumber int) (server *Server) {
+func NewServer(gateway *ServerInfo, serverInfo *ServerInfo, threadNumber int) (server *Server) {
 	server = &Server{
+		gateway:         gateway,
 		info:            serverInfo,
 		apiMap:          make(map[string]HandleFunc),
 		subServerStatus: make(map[string]Status),
 		deadTime:        60,
 		mutex:           new(sync.Mutex),
 		threadNumber:    threadNumber,
+		close:           true,
 	}
 	server.Register("/heartbeat", server.handleHeartBeat)
 	server.Register("/status", server.handleStatus)
 	// server.Register("/api", server.handleAPI)
 	return
+}
+
+// Closed return the server is closed
+func (server *Server) Closed() bool {
+	server.mutex.Lock()
+	defer server.mutex.Unlock()
+	return server.close
 }
 
 // Register API function
@@ -89,13 +101,20 @@ func (server *Server) Start() (err error) {
 
 	for i := 0; i < server.threadNumber; i++ {
 		go func(threadID int) {
-			for {
+			for !server.Closed() {
 				if err := server.loop(listener); err != nil {
 					server.errorCallback(threadID, err)
 				}
 			}
 		}(i)
 	}
+
+	go func() {
+		for !server.Closed() {
+			time.After(time.Second * time.Duration(server.deadTime))
+
+		}
+	}()
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGUSR1, syscall.SIGUSR2)
@@ -181,3 +200,13 @@ func (server *Server) handleStatus(request []byte) (response []byte, err error) 
 // 	server.mutex.Unlock()
 // 	return
 // }
+
+// Send a message to the server
+func (server *Server) Send(target *ServerInfo, msg *proto.Message) (err error) {
+	conn, err := kcp.Dial(target.Address)
+	if err != nil {
+		return
+	}
+	conn.Write(msg.ToBytes())
+	return
+}
