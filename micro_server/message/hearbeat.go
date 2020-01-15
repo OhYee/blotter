@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/OhYee/blotter/micro_server"
 	gb "github.com/OhYee/goutils/bytes"
+	"io"
 	"time"
 )
 
@@ -14,14 +15,34 @@ type HeartBeat struct {
 	RecvTime int64
 }
 
-// NewHeartBeatMessage initial a HeartBeat message
-func NewHeartBeatMessage(info *ms.ServerInfo) Message {
-	heartbeat := &HeartBeat{
+// NewHeartBeat initial a HeartBeat message
+func NewHeartBeat(info *ms.ServerInfo) *HeartBeat {
+	return &HeartBeat{
 		Info:     info,
 		SendTime: time.Now().Unix(),
 		RecvTime: 0,
 	}
-	return NewMessage(MessageTypeHeartBeat, heartbeat.ToBytes())
+}
+
+// NewHeartBeatFromBytes initial a HeartBeat from bytes
+func NewHeartBeatFromBytes(r io.Reader) (heartbeat *HeartBeat, err error) {
+	var info *ms.ServerInfo
+	var sendTime, recvTime int64
+	if info, err = ms.NewServerInfoFromBytes(r); err != nil {
+		return
+	}
+	if sendTime, err = gb.ReadInt64(r); err != nil {
+		return
+	}
+	if recvTime, err = gb.ReadInt64(r); err != nil {
+		return
+	}
+	heartbeat = &HeartBeat{
+		Info:     info,
+		SendTime: sendTime,
+		RecvTime: recvTime,
+	}
+	return
 }
 
 // ToBytes transfer HeartBeat to []byte
@@ -31,4 +52,9 @@ func (heartbeat *HeartBeat) ToBytes() []byte {
 	buf.Write(gb.FromInt64(heartbeat.SendTime))
 	buf.Write(gb.FromInt64(heartbeat.RecvTime))
 	return buf.Bytes()
+}
+
+// ToMessage initial a HeartBeat message
+func (heartbeat *HeartBeat) ToMessage() *Message {
+	return NewMessage(MessageTypeHeartBeat, heartbeat)
 }
