@@ -57,6 +57,8 @@ github.com/OhYee/goutils v0.0.0-20191103124231-baf873b5256a h1:G8LNoddWNJ5wJRKfD
 github.com/OhYee/goutils v0.0.0-20191103124231-baf873b5256a/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/goutils v0.0.0-20191204050123-4891fd89d899 h1:52OEpkVeYqZzteOyylzq4i4skQ+3sb587BBMUl9LEsQ=
 github.com/OhYee/goutils v0.0.0-20191204050123-4891fd89d899/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
+github.com/OhYee/goutils v0.0.0-20200115145902-c060ad24f75b h1:TPDtZ7/9OeGyCia22EnVAkTo4tKpW03SjQyrRko+AGY=
+github.com/OhYee/goutils v0.0.0-20200115145902-c060ad24f75b/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/rainbow v0.0.0-20191204122206-e95daba3592d h1:AOGd4trK26XJ06BVx0TX/d9JB9UyG9XKGgh0ul5te0M=
 github.com/OhYee/rainbow v0.0.0-20191204122206-e95daba3592d/go.mod h1:N7lMsUEVv57QF4Epb5Tmj4reIFtPoXzp6tACrUHmlb4=
 github.com/OhYee/rainbow v0.0.0-20191215125244-69b2ac8a2996 h1:Q7QrPRsClXIvLqLqE+DAmFPTSdqu3/ijqIUgZWoIBdA=

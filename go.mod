@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/OhYee/goldmark-dot v0.0.0-20191005034355-67d0b6c97906
 	github.com/OhYee/gosql v0.0.0-20191206161251-adf498d24219
-	github.com/OhYee/goutils v0.0.0-20191204050123-4891fd89d899
+	github.com/OhYee/goutils v0.0.0-20200115145902-c060ad24f75b
 	github.com/OhYee/rainbow v0.0.0-20191216131638-b29c73c1cc83
 	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/golang/protobuf v1.3.2
