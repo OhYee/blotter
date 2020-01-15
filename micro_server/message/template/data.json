@@ -2,7 +2,7 @@
     "variable": {},
     "files": [
         {
-            "package": "proto",
+            "package": "msg",
             "output": "../message_type.go",
             "import": [],
             "body": [
@@ -12,7 +12,9 @@
                         [
                             "HeartBeat",
                             "Request",
-                            "Response"
+                            "Response",
+                            "Set",
+                            "Close"
                         ]
                     ]
                 }

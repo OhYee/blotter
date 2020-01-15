@@ -1,12 +1,14 @@
-package proto
+package msg
 
 import (
 	"bytes"
 	gb "github.com/OhYee/goutils/bytes"
 	"github.com/OhYee/rainbow/errors"
 	"io"
-	"time"
+	// "time"
 )
+
+//go:generate gcg ./template/data.json
 
 // Message type of the protocol
 type Message struct {
@@ -38,13 +40,6 @@ func NewMessageFromBytes(r io.Reader) (msg Message, err error) {
 
 	msg = NewMessage(MessageType(t), b)
 	return
-}
-
-// NewHeartBeatMessage initial a HeartBeat message
-func NewHeartBeatMessage(conn Connection) Message {
-	conn.SendTime = time.Now().Unix()
-	conn.RecvTime = 0
-	return NewMessage(MessageTypeHeartBeat, conn.ToBytes())
 }
 
 // ToBytes transfer Message to []byte
