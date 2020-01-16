@@ -1,8 +1,7 @@
 package ms
 
 import (
-	"bytes"
-	gb "github.com/OhYee/goutils/bytes"
+	"github.com/OhYee/goutils/bytes"
 	"io"
 )
 
@@ -27,14 +26,14 @@ func NewServerInfo(address string, name string, description string,
 
 // NewServerInfoFromBytes initial the ServerInfo from bytes
 func NewServerInfoFromBytes(r io.Reader) (info *ServerInfo, err error) {
-	var address, name, description []byte
-	if address, err = gb.ReadWithLength32(r); err != nil {
+	var address, name, description string
+	if address, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
-	if address, err = gb.ReadWithLength32(r); err != nil {
+	if name, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
-	if address, err = gb.ReadWithLength32(r); err != nil {
+	if description, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
 	// var size uint32
@@ -49,17 +48,17 @@ func NewServerInfoFromBytes(r io.Reader) (info *ServerInfo, err error) {
 	// 	}
 	// 	apiList[i] = api
 	// }
-	info = NewServerInfo(string(address), string(name), string(description),
+	info = NewServerInfo(address, name, description,
 	/*apiList*/)
 	return
 }
 
 // ToBytes transfer ServerInfo to []byte
 func (info *ServerInfo) ToBytes() []byte {
-	buf := bytes.NewBuffer([]byte{})
-	gb.WriteWithLength32(buf, gb.FromString(info.Address))
-	gb.WriteWithLength32(buf, gb.FromString(info.Name))
-	gb.WriteWithLength32(buf, gb.FromString(info.Description))
+	buf := bytes.NewBuffer()
+	bytes.FromStringWithLength32(info.Address)
+	bytes.FromStringWithLength32(info.Name)
+	bytes.FromStringWithLength32(info.Description)
 	// buf.Write(gb.FromUint32(uint32(len(info.APIList))))
 	// for _, api := range info.APIList {
 	// 	buf.Write(api.ToBytes())

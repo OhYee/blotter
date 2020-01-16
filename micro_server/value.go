@@ -1,8 +1,7 @@
 package ms
 
 import (
-	"bytes"
-	gb "github.com/OhYee/goutils/bytes"
+	"github.com/OhYee/goutils/bytes"
 	"io"
 )
 
@@ -24,32 +23,32 @@ func NewValue(n string, t string, d string) Value {
 
 // NewValueFromBytes initial a value data from bytes
 func NewValueFromBytes(r io.Reader) (v Value, err error) {
-	var n, t, d []byte
-	if n, err = gb.ReadWithLength32(r); err != nil {
+	var n, t, d string
+	if n, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
-	if t, err = gb.ReadWithLength32(r); err != nil {
+	if t, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
-	if d, err = gb.ReadWithLength32(r); err != nil {
+	if d, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
-	v = NewValue(string(n), string(t), string(d))
+	v = NewValue(n, t, d)
 	return
 }
 
 // ToBytes transfer Value to []byte
 func (v *Value) ToBytes() []byte {
-	buf := bytes.NewBuffer([]byte{})
-	gb.WriteWithLength32(buf, gb.FromString(v.Name))
-	gb.WriteWithLength32(buf, gb.FromString(v.Type))
-	gb.WriteWithLength32(buf, gb.FromString(v.Description))
+	buf := bytes.NewBuffer()
+	buf.Write(bytes.FromStringWithLength32(v.Name))
+	buf.Write(bytes.FromStringWithLength32(v.Type))
+	buf.Write(bytes.FromStringWithLength32(v.Description))
 	return buf.Bytes()
 }
 
 func readValueSlice(r io.Reader) (ret []Value, err error) {
 	var size uint32
-	if size, err = gb.ReadUint32(r); err != nil {
+	if size, err = bytes.ReadUint32(r); err != nil {
 		return
 	}
 
@@ -66,7 +65,7 @@ func readValueSlice(r io.Reader) (ret []Value, err error) {
 }
 
 func writeValueSlice(w io.Writer, values []Value) {
-	w.Write(gb.FromInt32(int32(len(values))))
+	w.Write(bytes.FromInt32(int32(len(values))))
 	for _, value := range values {
 		w.Write(value.ToBytes())
 	}

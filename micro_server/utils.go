@@ -21,7 +21,6 @@ func ParseFlag() (laddr string, verbose bool, err error) {
 
 	flag.BoolVar(&verbose, "verbose", false, "show debug information")
 	flag.BoolVar(&verbose, "v", false, "show debug information")
-
 	flag.Parse()
 
 	var ipRe, portRe, fullRe *regexp.Regexp

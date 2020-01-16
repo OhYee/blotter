@@ -1,8 +1,7 @@
 package ms
 
 import (
-	"bytes"
-	gb "github.com/OhYee/goutils/bytes"
+	"github.com/OhYee/goutils/bytes"
 	"io"
 )
 
@@ -26,15 +25,13 @@ func NewAPIInfo(address string, d string, in []Value, out []Value) APIInfo {
 
 // NewAPIInfoFromBytes initial a APIInfo data from bytes
 func NewAPIInfoFromBytes(r io.Reader) (apiInfo APIInfo, err error) {
-	var url, description []byte
+	var url, description string
 
-	url, err = gb.ReadWithLength32(r)
-	if err != nil {
+	if url, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
 
-	description, err = gb.ReadWithLength32(r)
-	if err != nil {
+	if description, err = bytes.ReadStringWithLength32(r); err != nil {
 		return
 	}
 
@@ -52,9 +49,9 @@ func NewAPIInfoFromBytes(r io.Reader) (apiInfo APIInfo, err error) {
 
 // ToBytes transfer API to []byte
 func (api APIInfo) ToBytes() []byte {
-	buf := bytes.NewBuffer([]byte{})
-	gb.WriteWithLength32(buf, gb.FromString(api.Address))
-	gb.WriteWithLength32(buf, gb.FromString(api.Description))
+	buf := bytes.NewBuffer()
+	buf.Write(bytes.FromStringWithLength32(api.Address))
+	buf.Write(bytes.FromStringWithLength32(api.Description))
 
 	writeValueSlice(buf, api.Input)
 	writeValueSlice(buf, api.Output)
