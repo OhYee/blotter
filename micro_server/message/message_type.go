@@ -19,19 +19,19 @@ const (
 )
 
 // MessageTypeHeartBeatHandle function to solve HeartBeat type message
-type MessageTypeHeartBeatHandle func(data HeartBeat) (err error)
+type MessageTypeHeartBeatHandle func(data *HeartBeat) (err error)
 
 // MessageTypeRequestHandle function to solve Request type message
-type MessageTypeRequestHandle func(data Request) (err error)
+type MessageTypeRequestHandle func(data *Request) (err error)
 
 // MessageTypeResponseHandle function to solve Response type message
-type MessageTypeResponseHandle func(data Response) (err error)
+type MessageTypeResponseHandle func(data *Response) (err error)
 
 // MessageTypeSetHandle function to solve Set type message
-type MessageTypeSetHandle func(data Set) (err error)
+type MessageTypeSetHandle func(data *Set) (err error)
 
 // MessageTypeCloseHandle function to solve Close type message
-type MessageTypeCloseHandle func(data Close) (err error)
+type MessageTypeCloseHandle func(data *Close) (err error)
 
 var typeName = [...]string{
 	"Unknown",

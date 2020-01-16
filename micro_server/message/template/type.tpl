@@ -11,7 +11,7 @@ const (
 
 {{range $operator := . -}}
 // MessageType{{$operator}}Handle function to solve {{$operator}} type message
-type MessageType{{$operator}}Handle func (data {{$operator}}) (err error)
+type MessageType{{$operator}}Handle func (data *{{$operator}}) (err error)
 {{end}}
 
 var typeName = [...]string{

@@ -2,7 +2,7 @@ package msg
 
 import (
 	"bytes"
-	"github.com/OhYee/goutils"
+	gb "github.com/OhYee/goutils"
 	"testing"
 	"time"
 )
