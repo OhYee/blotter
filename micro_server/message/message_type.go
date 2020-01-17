@@ -11,15 +11,10 @@ type MessageType uint8
 // operator constant
 const (
 	_ MessageType = iota
-	MessageTypeHeartBeat
 	MessageTypeRequest
 	MessageTypeResponse
-	MessageTypeSet
 	MessageTypeClose
 )
-
-// MessageTypeHeartBeatHandle function to solve HeartBeat type message
-type MessageTypeHeartBeatHandle func(data *HeartBeat) (err error)
 
 // MessageTypeRequestHandle function to solve Request type message
 type MessageTypeRequestHandle func(data *Request) (err error)
@@ -27,18 +22,13 @@ type MessageTypeRequestHandle func(data *Request) (err error)
 // MessageTypeResponseHandle function to solve Response type message
 type MessageTypeResponseHandle func(data *Response) (err error)
 
-// MessageTypeSetHandle function to solve Set type message
-type MessageTypeSetHandle func(data *Set) (err error)
-
 // MessageTypeCloseHandle function to solve Close type message
 type MessageTypeCloseHandle func(data *Close) (err error)
 
 var typeName = [...]string{
 	"Unknown",
-	"HeartBeat",
 	"Request",
 	"Response",
-	"Set",
 	"Close",
 }
 

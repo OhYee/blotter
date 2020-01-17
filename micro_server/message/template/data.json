@@ -10,10 +10,8 @@
                     "template": "./type.tpl",
                     "args": [
                         [
-                            "HeartBeat",
                             "Request",
                             "Response",
-                            "Set",
                             "Close"
                         ]
                     ]
