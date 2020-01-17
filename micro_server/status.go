@@ -1,10 +1,8 @@
 package ms
 
 import (
-	"bytes"
-	gb "github.com/OhYee/goutils/bytes"
+	"github.com/OhYee/goutils/bytes"
 	"io"
-	"time"
 )
 
 // Status of the sub-server
@@ -15,36 +13,43 @@ type Status struct {
 }
 
 // NewStatus initial Status
-func NewStatus(info *ServerInfo) *Status {
+func NewStatus(serverInfo *ServerInfo, sendTime int64, recvTime int64) *Status {
 	return &Status{
-		Info:     info,
-		SendTime: time.Now().Unix(),
-		RecvTime: 0,
+		Info:     serverInfo,
+		SendTime: sendTime,
+		RecvTime: recvTime,
 	}
 }
 
 // NewStatusFromBytes initial Status from []byte
 func NewStatusFromBytes(r io.Reader) (status *Status, err error) {
-	var info *ServerInfo
-	if info, err = NewServerInfoFromBytes(r); err != nil {
+	var serverInfo *ServerInfo
+	if serverInfo, err = NewServerInfoFromBytes(r); err != nil {
 		return
 	}
 	var sendTime int64
-	if sendTime, err = gb.ReadInt64(r); err != nil {
+	if sendTime, err = bytes.ReadInt64(r); err != nil {
 		return
 	}
+
+	var recvTime int64
+	if recvTime, err = bytes.ReadInt64(r); err != nil {
+		return
+	}
+
 	status = &Status{
-		Info:     info,
+		Info:     serverInfo,
 		SendTime: sendTime,
-		RecvTime: time.Now().Unix(),
+		RecvTime: recvTime,
 	}
 	return
 }
 
 // ToBytes transfer Status to []byte
 func (status *Status) ToBytes() []byte {
-	buf := bytes.NewBuffer([]byte{})
+	buf := bytes.NewBuffer()
 	buf.Write(status.Info.ToBytes())
-	buf.Write(gb.FromInt64(status.SendTime))
+	buf.Write(bytes.FromInt64(status.SendTime))
+	buf.Write(bytes.FromInt64(status.RecvTime))
 	return buf.Bytes()
 }

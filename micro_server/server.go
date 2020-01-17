@@ -2,7 +2,7 @@ package ms
 
 import (
 	"encoding/json"
-	"github.com/OhYee/blotter/micro_server/message"
+	// "github.com/OhYee/blotter/micro_server/message"
 	"github.com/OhYee/goutils/bytes"
 	"github.com/OhYee/rainbow/errors"
 	"github.com/xtaci/kcp-go"
@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"reflect"
 	"sync"
 	"syscall"
 	"time"
@@ -18,10 +19,12 @@ import (
 type any = interface{}
 
 // HandleFunc handle function for api
-type HandleFunc = func(request []byte) (response []byte, err error)
-
-// HandleFuncWithServer handdle function for api with server argument
-type HandleFuncWithServer = func(server *Server, request []byte) (response []byte, err error)
+//
+// Simple:
+//     - `Sum(server *Server, req SumRequest, threadID int) (rep SumResponse)`
+//     - `Sum(server *Server, req SumRequest) (rep SumResponse)`
+//     - `Sum(req SumRequest) (rep SumResponse)`
+type HandleFunc interface{}
 
 // Server object
 type Server struct {
@@ -29,11 +32,11 @@ type Server struct {
 	info            *ServerInfo
 	listener        net.Listener
 	apiMap          map[string]HandleFunc
-	subServerStatus map[string]Status // SubServerStatus status of this server
+	subServerStatus map[string]*Status // SubServerStatus status of this server
 	deadTime        int64
 	mutex           *sync.Mutex
 	threadNumber    int
-	logCallback     func(threadID int, msg string)
+	logCallback     func(threadID int, format string, args ...interface{})
 	errorCallback   func(threadID int, err error)
 	close           bool
 }
@@ -44,7 +47,7 @@ func NewServer(gateway string, serverInfo *ServerInfo, threadNumber int) (server
 		gateway:         gateway,
 		info:            serverInfo,
 		apiMap:          make(map[string]HandleFunc),
-		subServerStatus: make(map[string]Status),
+		subServerStatus: make(map[string]*Status),
 		deadTime:        60,
 		mutex:           new(sync.Mutex),
 		threadNumber:    threadNumber,
@@ -63,6 +66,20 @@ func (server *Server) IsClosed() bool {
 
 // Register API function
 func (server *Server) Register(address string, f HandleFunc) (err error) {
+	value := reflect.ValueOf(f)
+	numIn := value.Type().NumIn()
+	numOut := value.Type().NumOut()
+	if !((numIn == 1 || numIn == 2 || numIn == 3) && (numOut == 2)) || value.Type().Out(1).Elem().String() != "error" {
+		err = errors.New(
+			"%v can not be register, want function like:\n"+
+				"    - Sum(req SumRequest) (rep Response, err error)\n"+
+				"    - Sum(server *Server, req SumRequest) (rep Response, err error)\n",
+			"    - Sum(server *Server, req SumRequest, threadID int) (rep SumResponse)\n",
+			value.Interface(),
+		)
+		return
+	}
+
 	server.mutex.Lock()
 	if ff, exist := server.apiMap[address]; exist {
 		err = errors.New(
@@ -76,24 +93,9 @@ func (server *Server) Register(address string, f HandleFunc) (err error) {
 	return
 }
 
-// RegisterWithServer register API function with server argument
-func (server *Server) RegisterWithServer(address string, f HandleFuncWithServer) (err error) {
-	outer := func(request []byte) (response []byte, err error) {
-		response, err = f(server, request)
-		return
-	}
-
-	if err = server.Register(address, outer); err != nil {
-		return
-	}
-	return
-}
-
 // StartGateway start gateway server listener
 func (server *Server) StartGateway() (err error) {
-	server.Register("/heartbeat", server.handleHeartBeat)
-	server.Register("/status", server.handleStatus)
-	// server.Register("/api", server.handleAPI)
+	server.Register("/heartbeat", HeartBeatHandle)
 	err = server.startServer()
 	return
 }
@@ -111,7 +113,7 @@ func (server *Server) Start() (err error) {
 				server.errorCallback(-1, err)
 			} else {
 				server.mutex.Lock()
-				conn.Write(msg.NewHeartBeat(server.info).ToBytes())
+				conn.Write([]byte{})
 				server.mutex.Unlock()
 			}
 		}
@@ -131,7 +133,7 @@ func (server *Server) startServer() (err error) {
 	for i := 0; i < server.threadNumber; i++ {
 		go func(threadID int) {
 			for !server.IsClosed() {
-				if err := server.loop(listener); err != nil {
+				if err := server.loop(threadID, listener); err != nil {
 					server.errorCallback(threadID, err)
 				}
 			}
@@ -144,26 +146,28 @@ func (server *Server) startServer() (err error) {
 	return
 }
 
-func (server *Server) loop(listener net.Listener) (err error) {
+func (server *Server) loop(threadID int, listener net.Listener) (err error) {
 	conn, err := server.listener.Accept()
 	if err != nil {
 		return
 	}
-	server.handle(conn)
+	server.handle(threadID, conn)
 	return
 }
 
 // Handle search handle function in API map
-func (server *Server) handle(rw io.ReadWriter) (err error) {
+func (server *Server) handle(threadID int, rw io.ReadWriter) (err error) {
 	var address string
-	var request, response []byte
 	var handleFunc HandleFunc
 	var exist bool
+	var req, rep []byte
 
+	// got the function address
 	if address, err = bytes.ReadStringWithLength32(rw); err != nil {
 		return
 	}
 
+	// search the function
 	server.mutex.Lock()
 	if handleFunc, exist = server.apiMap[string(address)]; !exist {
 		err = errors.New("No such API")
@@ -171,64 +175,61 @@ func (server *Server) handle(rw io.ReadWriter) (err error) {
 	}
 	server.mutex.Unlock()
 
-	if request, err = bytes.ReadBytesWithLength32(rw); err != nil {
-		return
-	}
-	if response, err = handleFunc(request); err != nil {
-		return
-	}
-	if _, err = rw.Write(response); err != nil {
-		return
-	}
-	return
-}
+	// using reflect to call the function
+	function := reflect.ValueOf(handleFunc)
+	request := reflect.New(function.Type().In(0)).Interface()
+	response := reflect.New(function.Type().Out(0)).Interface()
 
-func (server *Server) handleHeartBeat(request []byte) (response []byte, err error) {
-	var status Status
-	now := time.Now().Unix()
-
-	if err = json.Unmarshal(request, &status); err != nil {
+	// read []byte type request
+	if req, err = bytes.ReadBytesWithLength32(rw); err != nil {
 		return
 	}
-	status.RecvTime = now
+	// transfer request data to `request`
+	if err = json.Unmarshal(req, &request); err != nil {
+		return
+	}
 
-	server.mutex.Lock()
-	server.subServerStatus[status.Info.Address] = status
-	// delete over-time status
-	for k, v := range server.subServerStatus {
-		if now-v.RecvTime >= server.deadTime {
-			delete(server.subServerStatus, k)
+	var in = make([]reflect.Value, 0)
+	switch n := function.Type().NumIn(); n {
+	case 1:
+		in = []reflect.Value{
+			reflect.ValueOf(request),
 		}
+	case 2:
+		in = []reflect.Value{
+			reflect.ValueOf(server),
+			reflect.ValueOf(request),
+		}
+	case 3:
+		in = []reflect.Value{
+			reflect.ValueOf(server),
+			reflect.ValueOf(request),
+			reflect.ValueOf(threadID),
+		}
+	default:
+		err = errors.New(
+			"Function with %d input arguments, want (request interface{}) or (server *Server, req interface{})",
+			n,
+		)
+		return
 	}
-	server.mutex.Unlock()
 
-	if response, err = json.Marshal(map[string]string{"info": "ok"}); err != nil {
+	// call the function
+	out := function.Call(in)
+
+	// got response and error data
+	response = out[0].Interface()
+	err = out[1].Interface().(error)
+
+	// transfer response to []byte
+	if rep, err = json.Marshal(response); err != nil {
+		return
+	}
+
+	// write data to the connection
+	if _, err = rw.Write(rep); err != nil {
 		return
 	}
 
 	return
 }
-
-func (server *Server) handleStatus(request []byte) (response []byte, err error) {
-	server.mutex.Lock()
-	response, err = json.Marshal(server.subServerStatus)
-	server.mutex.Unlock()
-	return
-}
-
-// func (server *Server) handleAPI(request []byte) (response []byte, err error) {
-// 	server.mutex.Lock()
-// 	response, err = json.Marshal(server.info.APIList)
-// 	server.mutex.Unlock()
-// 	return
-// }
-
-// Send a message to the server
-// func (server *Server) Send(target *ServerInfo, msg *proto.Message) (err error) {
-// 	conn, err := kcp.Dial(target.Address)
-// 	if err != nil {
-// 		return
-// 	}
-// 	conn.Write(msg.ToBytes())
-// 	return
-// }
