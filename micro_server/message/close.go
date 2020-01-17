@@ -1,6 +1,8 @@
 package msg
 
-import ()
+import (
+	"io"
+)
 
 // Close message body
 type Close struct {
@@ -12,7 +14,7 @@ func NewClose() *Close {
 }
 
 // NewCloseFromBytes initial a Close from []byte
-func NewCloseFromBytes() (close *Close, err error) {
+func NewCloseFromBytes(r io.Reader) (close *Close, err error) {
 	return new(Close), nil
 }
 

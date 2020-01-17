@@ -33,8 +33,24 @@ func NewMessageFromBytes(r io.Reader) (msg *Message, err error) {
 	}
 
 	switch MessageType(t) {
-	case MessageTypeHeartBeat:
-		body, err = NewHeartBeatFromBytes(r)
+	case MessageTypeRequest:
+		var req *Request
+		if req, err = NewRequestFromBytes(r); err != nil {
+			return
+		}
+		msg = req.ToMessage()
+	case MessageTypeResponse:
+		var rep *Response
+		if rep, err = NewResponseFromBytes(r); err != nil {
+			return
+		}
+		msg = rep.ToMessage()
+	case MessageTypeClose:
+		var close *Close
+		if close, err = NewCloseFromBytes(r); err != nil {
+			return
+		}
+		msg = close.ToMessage()
 	default:
 		err = errors.New("Unknow type message: %v", msg.Type)
 	}
@@ -56,16 +72,22 @@ func (msg *Message) ToBytes() []byte {
 
 // Handle of different message type
 func (msg *Message) Handle(
-	heartBeatHandle MessageTypeHeartBeatHandle,
 	requestHandle MessageTypeRequestHandle,
 	responseHandle MessageTypeResponseHandle,
-	setHandle MessageTypeSetHandle,
 	closeHandle MessageTypeCloseHandle,
 ) error {
 	switch msg.Type {
-	case MessageTypeHeartBeat:
-		if heartBeatHandle != nil {
-			return heartBeatHandle(msg.Body.(*HeartBeat))
+	case MessageTypeRequest:
+		if requestHandle != nil {
+			return requestHandle(msg.Body.(*Request))
+		}
+	case MessageTypeResponse:
+		if responseHandle != nil {
+			return responseHandle(msg.Body.(*Response))
+		}
+	case MessageTypeClose:
+		if closeHandle != nil {
+			return closeHandle(msg.Body.(*Close))
 		}
 	default:
 		return errors.New("Unknow type message: %v", msg.Type)
