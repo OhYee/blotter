@@ -3,6 +3,7 @@ package ms
 import (
 	"encoding/json"
 	// "github.com/OhYee/blotter/micro_server/message"
+	msg "github.com/OhYee/blotter/micro_server/message"
 	"github.com/OhYee/goutils/bytes"
 	"github.com/OhYee/rainbow/errors"
 	"github.com/xtaci/kcp-go"
@@ -231,5 +232,73 @@ func (server *Server) handle(threadID int, rw io.ReadWriter) (err error) {
 		return
 	}
 
+	return
+}
+
+// Call api of server, req should be a pointer
+func (server *Server) Call(serverName string, apiName string, req interface{}, rep interface{}) (err error) {
+	server.mutex.Lock()
+	status, exist := server.subServerStatus[serverName]
+	server.mutex.Unlock()
+	if !exist {
+		err = errors.New("Do not have %s server", serverName)
+		return
+	}
+
+	var request *msg.Request
+	var response *msg.Response
+
+	requestBytes, err := json.Marshal(req)
+	if err != nil {
+		return
+	}
+	request = msg.NewRequest(apiName, requestBytes)
+
+	if response, err = server.Send(status.Info.Address, request); err != nil {
+		return
+	}
+
+	err = json.Unmarshal(response.Arguments, rep)
+	return
+}
+
+// Send a request to address
+func (server *Server) Send(address string, req *msg.Request) (response *msg.Response, err error) {
+	var conn net.Conn
+	if conn, err = kcp.Dial(address); err != nil {
+		return
+	}
+	if conn.SetDeadline(time.Now().Add(time.Second*5)) != nil {
+		return
+	}
+
+	if _, err = conn.Write(req.ToBytes()); err != nil {
+		return
+	}
+
+	close := make(chan bool, 1)
+	for {
+		select {
+		case <-close:
+			break
+		default:
+			message, err := msg.NewMessageFromBytes(conn)
+			if err != nil {
+				break
+			}
+			message.Handle(
+				nil,
+				func(req *msg.Response) (err error) {
+					response = req
+					return
+				},
+				func(rep *msg.Close) (err error) {
+					close <- true
+					return
+				},
+			)
+		}
+
+	}
 	return
 }
