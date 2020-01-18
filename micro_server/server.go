@@ -276,29 +276,23 @@ func (server *Server) Send(address string, req *msg.Request) (response *msg.Resp
 		return
 	}
 
-	close := make(chan bool, 1)
-	for {
-		select {
-		case <-close:
+	close := false
+	for !close {
+		message, err := msg.NewMessageFromBytes(conn)
+		if err != nil {
 			break
-		default:
-			message, err := msg.NewMessageFromBytes(conn)
-			if err != nil {
-				break
-			}
-			message.Handle(
-				nil,
-				func(req *msg.Response) (err error) {
-					response = req
-					return
-				},
-				func(rep *msg.Close) (err error) {
-					close <- true
-					return
-				},
-			)
 		}
-
+		message.Handle(
+			nil,
+			func(req *msg.Response) (err error) {
+				response = req
+				return
+			},
+			func(rep *msg.Close) (err error) {
+				close = true
+				return
+			},
+		)
 	}
 	return
 }
