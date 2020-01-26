@@ -3,7 +3,6 @@ package mongo
 import (
 	"context"
 	"github.com/OhYee/rainbow/errors"
-	"github.com/OhYee/blotter/output"
 
 	// "go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,7 +11,8 @@ import (
 
 var clientOptions = options.Client().ApplyURI("mongodb://127.0.0.1:27017")
 
-func Query(databaseName string, collectionName string, filter interface{}, res interface{}) (err error) {
+func Find(databaseName string, collectionName string, filter interface{},
+	options *options.FindOptions, res interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			err = errors.NewErr(err)
@@ -31,13 +31,13 @@ func Query(databaseName string, collectionName string, filter interface{}, res i
 	}
 
 	collection := client.Database(databaseName).Collection(collectionName)
-	cur, err := collection.Find(context.TODO(), filter)
+	cur, err := collection.Find(context.TODO(), filter, options)
+
 	if err != nil {
 		return
 	}
 	defer cur.Close(context.TODO())
 
 	cur.All(context.TODO(), res)
-	output.Debug("query result: %+v",res)
 	return
 }

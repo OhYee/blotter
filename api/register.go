@@ -9,4 +9,12 @@ func Register() {
 		"friends",
 		friends,
 	)
+	register.Register(
+		"menu",
+		getMenu,
+	)
+	register.Register(
+		"post",
+		getPost,
+	)
 }
