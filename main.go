@@ -22,8 +22,9 @@ func (handle Handle) ServeHTTP(rep http.ResponseWriter, req *http.Request) {
 	// CORS
 	rep.Header().Set("Access-Control-Allow-Origin", "*")
 
-	if hasPrefix(req.RequestURI, "/api/") {
-		err := register.Call(req.RequestURI[5:], req, rep)
+	path := req.URL.Path
+	if hasPrefix(path, "/api/") {
+		err := register.Call(path[5:], req, rep)
 		if err != nil {
 			output.Err(err)
 			PageNotFound(rep, req)
@@ -56,7 +57,7 @@ func ServerError(rep http.ResponseWriter, req *http.Request) {
 
 func main() {
 	api.Register()
-	output.Log("Server will start at %s", addr)
+	output.Log("Server will start at http://%s", addr)
 	if err := http.ListenAndServe(addr, Handle{}); err != nil {
 		output.Err(err)
 	}

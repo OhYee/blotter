@@ -24,7 +24,8 @@ func Register(name string, f HandleFunc) {
 
 // Call function
 func Call(name string, req *http.Request, rep http.ResponseWriter) (err error) {
-	output.Debug("Call api %s", name)
+	output.Debug("Call api %s, %s, %s", name, req.URL.Path, req.URL.Query())
+
 	output.Debug("%+v", apiMap)
 	api, exist := apiMap[name]
 	if !exist {
