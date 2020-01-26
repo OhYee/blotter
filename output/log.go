@@ -1,8 +1,10 @@
 package output
 
 import (
+	"fmt"
 	"github.com/OhYee/rainbow/color"
 	"github.com/OhYee/rainbow/log"
+	"runtime"
 )
 
 var (
@@ -11,7 +13,7 @@ var (
 	// LogOutput message output
 	LogOutput = log.New().SetSuffix(withNewLine)
 	// DebugOutput debug message output
-	DebugOutput = log.New().SetColor(color.New().SetFrontYellow()).SetSuffix(withNewLine)
+	DebugOutput = log.New().SetColor(color.New().SetFrontYellow()).SetSuffix(withNewLine).SetPrefix(withInfo)
 )
 
 // Err meage output
@@ -31,4 +33,15 @@ func Debug(format string, args ...interface{}) {
 
 func withNewLine(s string) string {
 	return "\n"
+}
+
+func withInfo(s string) string {
+
+	_, file, line, ok := runtime.Caller(4)
+	if ok {
+		return color.New().SetFontBold().Colorful(
+			fmt.Sprintf("%s:%d\n\t", file, line),
+		)
+	}
+	return ""
 }
