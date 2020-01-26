@@ -13,5 +13,5 @@ for d in new_data:
     print(d)
 
 document = utils.mydb["tags"]
-
+document.delete_many({})
 ids = document.insert_many(new_data)
