@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func getMenu(context register.HandleContext) (err error) {
+func getMenu(context *register.HandleContext) (err error) {
 	output.Debug("call Menu")
 	res := make([]Menu, 0)
 	err = mongo.Find("blotter", "pages", bson.M{}, options.Find().SetSort(bson.D{{"index", 1}}), &res)

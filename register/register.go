@@ -11,7 +11,7 @@ var (
 )
 
 // HandleFunc handle function type
-type HandleFunc func(context HandleContext) (err error)
+type HandleFunc func(context *HandleContext) (err error)
 
 // Register api
 func Register(name string, f HandleFunc) {
@@ -32,6 +32,6 @@ func Call(name string, req *http.Request, rep http.ResponseWriter) (err error) {
 		err = errors.New("Can not find api %s", name)
 		return
 	}
-	err = api(HandleContext{req, rep})
+	err = api(&HandleContext{req, rep})
 	return
 }

@@ -11,7 +11,7 @@ type getPostRequest struct {
 	URL string `json:"url"`
 }
 
-func getPost(context register.HandleContext) (err error) {
+func getPost(context *register.HandleContext) (err error) {
 	output.Debug("call friends")
 	args := getPostRequest{}
 	context.RequestArgs(&args)
