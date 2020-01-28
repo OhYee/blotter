@@ -3,7 +3,6 @@ package register
 import (
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/rainbow/errors"
-	"net/http"
 )
 
 var (
@@ -23,8 +22,8 @@ func Register(name string, f HandleFunc) {
 }
 
 // Call function
-func Call(name string, req *http.Request, rep http.ResponseWriter) (err error) {
-	output.Debug("Call api %s, %s, %s", name, req.URL.Path, req.URL.Query())
+func Call(name string, context *HandleContext) (err error) {
+	output.Debug("Call api %s, %s, %s", name, context.Request.URL.Path, context.Request.URL.Query())
 
 	output.Debug("%+v", apiMap)
 	api, exist := apiMap[name]
@@ -32,6 +31,6 @@ func Call(name string, req *http.Request, rep http.ResponseWriter) (err error) {
 		err = errors.New("Can not find api %s", name)
 		return
 	}
-	err = api(&HandleContext{req, rep})
+	err = api(context)
 	return
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/OhYee/blotter/api"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
@@ -19,18 +18,21 @@ type Handle struct {
 func (handle Handle) ServeHTTP(rep http.ResponseWriter, req *http.Request) {
 	output.Debug("connection begin")
 
+	context := register.NewHandleContext(req, rep)
+
 	// CORS
-	rep.Header().Set("Access-Control-Allow-Origin", "*")
+	context.AddHeader("Access-Control-Allow-Origin", "*")
 
 	path := req.URL.Path
 	if hasPrefix(path, "/api/") {
-		err := register.Call(path[5:], req, rep)
+		err := register.Call(path[5:], context)
 		if err != nil {
-			output.Err(err)
-			PageNotFound(rep, req)
+			context.ServerError(err)
+		} else {
+			context.Success()
 		}
 	} else {
-		PageNotFound(rep, req)
+		context.NotImplemented()
 	}
 	output.Debug("connection end")
 }
@@ -40,19 +42,6 @@ func hasPrefix(s string, prefix string) bool {
 		return false
 	}
 	return s[0:len(prefix)] == prefix
-}
-
-// PageNotFound return 404 page
-func PageNotFound(rep http.ResponseWriter, req *http.Request) {
-	output.Log("404 Page not found: %s", req.RequestURI)
-	rep.WriteHeader(404)
-	rep.Write([]byte(fmt.Sprintf("Page not found %s", req.RequestURI)))
-}
-
-// ServerError return 404 page
-func ServerError(rep http.ResponseWriter, req *http.Request) {
-	rep.WriteHeader(404)
-	rep.Write([]byte(fmt.Sprintf("Page not found %s", req.RequestURI)))
 }
 
 func main() {
