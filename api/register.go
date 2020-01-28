@@ -17,4 +17,8 @@ func Register() {
 		"post",
 		getPost,
 	)
+	register.Register(
+		"posts",
+		posts,
+	)
 }
