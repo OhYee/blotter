@@ -7,10 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func friends(context *register.HandleContext) (err error) {
+func Friends(context *register.HandleContext) (err error) {
 	output.Debug("call friends")
 	res := make([]Friend, 0)
-	err = mongo.Find("blotter", "friends", bson.M{}, nil, &res)
+	_,err = mongo.Find("blotter", "friends", bson.M{}, nil, &res)
 	if err != nil {
 		return
 	}

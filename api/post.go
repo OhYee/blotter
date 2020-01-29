@@ -4,26 +4,48 @@ import (
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
+	"github.com/OhYee/goutils/time"
 	"go.mongodb.org/mongo-driver/bson"
 	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type getPostRequest struct {
+type PostRequest struct {
 	URL string `json:"url"`
 }
 
-func getPost(context *register.HandleContext) (err error) {
+func Post(context *register.HandleContext) (err error) {
 	output.Debug("call friends")
-	args := getPostRequest{}
+	args := PostRequest{}
 	context.RequestArgs(&args)
 
-	res := make([]map[string]interface{}, 0)
-	err = mongo.Find("blotter", "posts", bson.M{"url": args.URL}, nil, &res)
+	res := make([]PostUnix, 0)
+	_, err = mongo.Aggregate(
+		"blotter", "posts",
+		[]bson.M{
+			{
+				"$match": bson.M{
+					"url": args.URL,
+				},
+			},
+			{
+				"$limit": 1,
+			},
+			{
+				"$lookup": bson.M{
+					"from":         "tags",
+					"localField":   "tags",
+					"foreignField": "_id",
+					"as":           "tags",
+				},
+			},
+		},
+		nil, &res,
+	)
 	if err != nil {
 		return
 	}
 	if len(res) > 0 {
-		context.ReturnJSON(res[0])
+		context.ReturnJSON(res[0].ToPostTime())
 	} else {
 		context.Response.WriteHeader(404)
 	}
@@ -38,18 +60,18 @@ type PostsRequest struct {
 }
 
 type PostsResponse struct {
-	Total int        `json:"total"`
-	Posts []PostCard `json:"posts"`
+	Total int64            `json:"total"`
+	Posts []PostCardTime `json:"posts"`
 }
 
-func posts(context *register.HandleContext) (err error) {
+func Posts(context *register.HandleContext) (err error) {
 	args := PostsRequest{}
 	context.RequestArgs(&args)
 
 	output.Debug("%+v", args)
 
 	res := PostsResponse{}
-	res.Posts = make([]PostCard, 10)
+	posts := make([]PostCardUnix, 10)
 	switch args.Type {
 	case "index":
 		fallthrough
@@ -66,11 +88,75 @@ func posts(context *register.HandleContext) (err error) {
 			},
 			{"$limit": args.Offset + args.Number},
 			{"$skip": args.Offset},
-		}, nil, &res.Posts)
+		}, nil, &posts)
 	}
 	if err != nil {
 		return
 	}
+
+	res.Posts = make([]PostCardTime, len(posts))
+	for idx, post := range posts {
+		res.Posts[idx] = post.ToPostCardTime()
+	}
+
 	err = context.ReturnJSON(res)
 	return
+}
+
+// ToPostCardTime transfer PostCardUnix to PostCardTime
+func (post PostCardUnix) ToPostCardTime() PostCardTime {
+	return PostCardTime{
+		Title:       post.Title,
+		Abstract:    post.Abstract,
+		View:        post.View,
+		URL:         post.URL,
+		PublishTime: time.ToString(post.PublishTime),
+		EditTime:    time.ToString(post.EditTime),
+		Tags:        post.Tags,
+		HeadImage:   post.HeadImage,
+	}
+}
+
+// ToPostCardUnix transfer PostCardTime to ToPostCardUnix
+func (post PostCardTime) ToPostCardUnix() PostCardUnix {
+	return PostCardUnix{
+		Title:       post.Title,
+		Abstract:    post.Abstract,
+		View:        post.View,
+		URL:         post.URL,
+		PublishTime: time.FromString(post.PublishTime),
+		EditTime:    time.FromString(post.EditTime),
+		Tags:        post.Tags,
+		HeadImage:   post.HeadImage,
+	}
+}
+
+// ToPostTime transfer PostUnix to PostTime
+func (post PostUnix) ToPostTime() PostTime {
+	return PostTime{
+		Title:       post.Title,
+		Abstract:    post.Abstract,
+		View:        post.View,
+		URL:         post.URL,
+		PublishTime: time.ToString(post.PublishTime),
+		EditTime:    time.ToString(post.EditTime),
+		Tags:        post.Tags,
+		HeadImage:   post.HeadImage,
+		Content:     post.Content,
+	}
+}
+
+// ToPostUnix transfer PostTime to ToPostUnix
+func (post PostTime) ToPostUnix() PostUnix {
+	return PostUnix{
+		Title:       post.Title,
+		Abstract:    post.Abstract,
+		View:        post.View,
+		URL:         post.URL,
+		PublishTime: time.FromString(post.PublishTime),
+		EditTime:    time.FromString(post.EditTime),
+		Tags:        post.Tags,
+		HeadImage:   post.HeadImage,
+		Content:     post.Content,
+	}
 }

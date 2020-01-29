@@ -7,18 +7,26 @@ import (
 func Register() {
 	register.Register(
 		"friends",
-		friends,
+		Friends,
 	)
 	register.Register(
 		"menu",
-		getMenu,
+		Menu,
 	)
 	register.Register(
 		"post",
-		getPost,
+		Post,
 	)
 	register.Register(
 		"posts",
-		posts,
+		Posts,
+	)
+	register.Register(
+		"markdown",
+		Markdown,
+	)
+	register.Register(
+		"comments",
+		Comments,
 	)
 }
