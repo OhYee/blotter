@@ -22,6 +22,12 @@ func (handle Handle) ServeHTTP(rep http.ResponseWriter, req *http.Request) {
 
 	// CORS
 	context.AddHeader("Access-Control-Allow-Origin", "*")
+	context.AddHeader("Access-Control-Allow-Headers", "*")
+	context.AddHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
+	if context.Request.Method == "OPTIONS" {
+		context.Success()
+		return
+	}
 
 	path := req.URL.Path
 	if hasPrefix(path, "/api/") {
