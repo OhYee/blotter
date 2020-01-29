@@ -12,11 +12,11 @@ import (
 var clientOptions = options.Client().ApplyURI("mongodb://127.0.0.1:27017")
 
 type countResult struct {
-	Count int `bson:"count"`
+	Count int64 `bson:"count"`
 }
 
 func Find(databaseName string, collectionName string, filter interface{},
-	opt *options.FindOptions, res interface{}) (err error) {
+	opt *options.FindOptions, res interface{}) (total int64, err error) {
 	defer func() {
 		if err != nil {
 			err = errors.NewErr(err)
@@ -41,12 +41,16 @@ func Find(databaseName string, collectionName string, filter interface{},
 	}
 	defer cur.Close(context.TODO())
 
+	if total, err = collection.CountDocuments(context.TODO(), filter, nil); err != nil {
+		return
+	}
+
 	err = cur.All(context.TODO(), res)
 	return
 }
 
 func Aggregate(databaseName string, collectionName string, pipeline interface{},
-	opt *options.AggregateOptions, res interface{}) (total int, err error) {
+	opt *options.AggregateOptions, res interface{}) (total int64, err error) {
 	defer func() {
 		if err != nil {
 			err = errors.NewErr(err)
