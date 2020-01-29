@@ -5,7 +5,7 @@ old_data = utils.query("select * from tags;")
 new_data = list(map(lambda x: {
     "short": x["english"].lower(),
     "name": x["chinese"],
-    "color": x["class"],
+    "color": "",
     "icon": x["img"],
 }, old_data))
 
