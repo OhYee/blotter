@@ -5,10 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/OhYee/blotter/output"
+	"github.com/gorilla/schema"
 	"net/http"
 	"reflect"
 	"strconv"
+	// "strings"
 )
+
+var decoder = schema.NewDecoder()
 
 type httpHeader struct {
 	key   string
@@ -38,40 +42,20 @@ func (context *HandleContext) RequestArgs(args interface{}) {
 	context.Request.ParseForm()
 	query := context.Request.Form
 
-	t := reflect.TypeOf(args).Elem()
-	v := reflect.ValueOf(args).Elem()
-	num := v.NumField()
-	output.Debug("%d", num)
-	for i := 0; i < num; i++ {
-		fieldType := t.Field(i)
-		fieldValue := v.Field(i)
-		value := query.Get(fieldType.Tag.Get("json"))
-		// output.Debug("%+v %+v %+v %+v", fieldType,)
-		switch fieldType.Type.Kind() {
-		case reflect.String:
-			fieldValue.Set(reflect.ValueOf(value))
-		case reflect.Int:
-			fieldValue.Set(reflect.ValueOf(int(strToInt64(value))))
-		case reflect.Int8:
-			fieldValue.Set(reflect.ValueOf(int8(strToInt64(value))))
-		case reflect.Int16:
-			fieldValue.Set(reflect.ValueOf(int16(strToInt64(value))))
-		case reflect.Int32:
-			fieldValue.Set(reflect.ValueOf(int32(strToInt64(value))))
-		case reflect.Int64:
-			fieldValue.Set(reflect.ValueOf(int64(strToInt64(value))))
-		case reflect.Uint8:
-			fieldValue.Set(reflect.ValueOf(uint8(strToUint64(value))))
-		case reflect.Uint16:
-			fieldValue.Set(reflect.ValueOf(uint16(strToUint64(value))))
-		case reflect.Uint32:
-			fieldValue.Set(reflect.ValueOf(uint32(strToUint64(value))))
-		case reflect.Uint64:
-			fieldValue.Set(reflect.ValueOf(uint64(strToUint64(value))))
-		default:
-			output.Debug("%+v", fieldType.Type.Kind())
-		}
-	}
+	decoder.Decode(args, query)
+	output.Debug("args: %+v", args)
+
+	// t := reflect.TypeOf(args).Elem()
+	// v := reflect.ValueOf(args).Elem()
+	// num := v.NumField()
+	// output.Debug("%d", num)
+	// for i := 0; i < num; i++ {
+	// 	fieldType := t.Field(i)
+	// 	fieldValue := v.Field(i)
+	// 	value := query.Get(fieldType.Tag.Get("json"))
+	// 	// output.Debug("%+v %+v %+v %+v", fieldType,)
+	// 	setValue(fieldValue.Addr().Interface(), value)
+	// }
 }
 
 func strToInt64(str string) (num int64) {
@@ -143,4 +127,35 @@ func (context *HandleContext) ServerError(err error) {
 	output.Log("500 Server Error: %s", err.Error())
 	context.writeHeaderWithCode(500)
 	context.Response.Write([]byte(fmt.Sprintf("Server error %s", err.Error())))
+}
+
+func setValue(recv interface{}, value string) {
+	v := reflect.ValueOf(recv).Elem()
+	switch v.Kind() {
+	case reflect.String:
+		v.Set(reflect.ValueOf(value))
+	case reflect.Int:
+		v.Set(reflect.ValueOf(int(strToInt64(value))))
+	case reflect.Int8:
+		v.Set(reflect.ValueOf(int8(strToInt64(value))))
+	case reflect.Int16:
+		v.Set(reflect.ValueOf(int16(strToInt64(value))))
+	case reflect.Int32:
+		v.Set(reflect.ValueOf(int32(strToInt64(value))))
+	case reflect.Int64:
+		v.Set(reflect.ValueOf(int64(strToInt64(value))))
+	case reflect.Uint8:
+		v.Set(reflect.ValueOf(uint8(strToUint64(value))))
+	case reflect.Uint16:
+		v.Set(reflect.ValueOf(uint16(strToUint64(value))))
+	case reflect.Uint32:
+		v.Set(reflect.ValueOf(uint32(strToUint64(value))))
+	case reflect.Uint64:
+		v.Set(reflect.ValueOf(uint64(strToUint64(value))))
+	case reflect.Slice:
+		// strings.Split(value., ",")
+		v.Set(reflect.ValueOf(uint64(strToUint64(value))))
+	default:
+		output.Debug("%+v %+v", v.Kind(), value)
+	}
 }
