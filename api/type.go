@@ -95,10 +95,15 @@ type CommentUnix struct {
 }
 
 type CommentTime struct {
-	ID       int           `json:"id" bson:"id"`
-	Mail     string        `json:"email" bson:"email"`
-	Avatar   string        `json:"avatar" bson:"avatar"`
-	Time     string        `json:"time" bson:"time"`
-	Content  string        `json:"content" bson:"content"`
+	ID       int            `json:"id" bson:"id"`
+	Mail     string         `json:"email" bson:"email"`
+	Avatar   string         `json:"avatar" bson:"avatar"`
+	Time     string         `json:"time" bson:"time"`
+	Content  string         `json:"content" bson:"content"`
 	Children []*CommentTime `json:"children" bson:"children"`
+}
+
+type Variable struct {
+	Key   string      `json:"key" bson:"key"`
+	Value interface{} `json:"value" bson:"value"`
 }

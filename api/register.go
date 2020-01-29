@@ -29,4 +29,8 @@ func Register() {
 		"comments",
 		Comments,
 	)
+	register.Register(
+		"variables",
+		Variables,
+	)
 }
