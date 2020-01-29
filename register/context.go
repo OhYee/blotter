@@ -35,7 +35,8 @@ func NewHandleContext(req *http.Request, rep http.ResponseWriter) *HandleContext
 
 // RequestArgs get request args
 func (context *HandleContext) RequestArgs(args interface{}) {
-	query := context.Request.URL.Query()
+	context.Request.ParseForm()
+	query := context.Request.Form
 
 	t := reflect.TypeOf(args).Elem()
 	v := reflect.ValueOf(args).Elem()
