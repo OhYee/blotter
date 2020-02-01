@@ -1,7 +1,16 @@
 package api
 
-// MenuItem of the blotter
-type MenuItem struct {
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type APIResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+// Menu of the blotter
+type Menu struct {
 	Icon string `json:"icon" bson:"icon"`
 	Name string `json:"name" bson:"name"`
 	Link string `json:"link" bson:"link"`
@@ -85,22 +94,50 @@ type Tag struct {
 	Color string `json:"color" bson:"color"`
 }
 
+type TagWithCount struct {
+	Name  string `json:"name" bson:"name"`
+	Short string `json:"short" bson:"short"`
+	Icon  string `json:"icon" bson:"icon"`
+	Color string `json:"color" bson:"color"`
+	Count int    `json:"count" bson:"count"`
+}
+
+type Comment struct {
+	ID      primitive.ObjectID `json:"id" bson:"_id"`
+	Email   string             `json:"email" bson:"email"`
+	Avatar  string             `json:"avatar" bson:"avatar"`
+	Time    int64              `json:"time" bson:"time"`
+	Raw     string             `json:"raw" bson:"raw"`
+	Content string             `json:"content" bson:"content"`
+	Reply   primitive.ObjectID `json:"reply" bson:"reply"`
+	URL     string             `json:"url" bson:"url"`
+	Ad      bool               `json:"ad" bson:"ad"`
+	Show    bool               `json:"show" bson:"show"`
+	Recv    bool               `json:"recv" bson:"recv"`
+}
+
 type CommentUnix struct {
-	ID      int    `json:"id" bson:"id"`
-	Mail    string `json:"email" bson:"email"`
+	ID      string `json:"id" bson:"_id"`
+	Email   string `json:"email" bson:"email"`
 	Avatar  string `json:"avatar" bson:"avatar"`
 	Time    int64  `json:"time" bson:"time"`
 	Content string `json:"content" bson:"content"`
-	Reply   int    `json:"reply" bson:"reply"`
+	Reply   string `json:"reply" bson:"reply"`
+	Ad      bool   `json:"ad" bson:"ad"`
+	Show    bool   `json:"show" bson:"show"`
+	Recv    bool   `json:"recv" bson:"recv"`
 }
 
 type CommentTime struct {
-	ID       int            `json:"id" bson:"id"`
-	Mail     string         `json:"email" bson:"email"`
+	ID       string         `json:"id" bson:"_id"`
+	Email    string         `json:"email" bson:"email"`
 	Avatar   string         `json:"avatar" bson:"avatar"`
 	Time     string         `json:"time" bson:"time"`
 	Content  string         `json:"content" bson:"content"`
 	Children []*CommentTime `json:"children" bson:"children"`
+	Ad       bool           `json:"ad" bson:"ad"`
+	Show     bool           `json:"show" bson:"show"`
+	Recv     bool           `json:"recv" bson:"recv"`
 }
 
 type Variable struct {

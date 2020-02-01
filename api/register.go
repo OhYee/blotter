@@ -10,8 +10,8 @@ func Register() {
 		Friends,
 	)
 	register.Register(
-		"menu",
-		Menu,
+		"menus",
+		Menus,
 	)
 	register.Register(
 		"post",
@@ -32,5 +32,25 @@ func Register() {
 	register.Register(
 		"variables",
 		Variables,
+	)
+	register.Register(
+		"layout",
+		Layout,
+	)
+	register.Register(
+		"tags",
+		Tags,
+	)
+	register.Register(
+		"avatar",
+		Avatar,
+	)
+	register.Register(
+		"comment/add",
+		CommentAdd,
+	)
+	register.Register(
+		"mail",
+		Mail,
 	)
 }
