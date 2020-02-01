@@ -18,12 +18,7 @@ type MarkdownResponse struct {
 	HTML string `json:"html"`
 }
 
-// RenderMarkdown to HTML from source
-func Markdown(context *register.HandleContext) (err error) {
-	args := new(MarkdownRequest)
-	res := new(MarkdownResponse)
-	context.RequestArgs(args)
-
+func renderMarkdown(source string) (html string, err error) {
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
@@ -36,8 +31,19 @@ func Markdown(context *register.HandleContext) (err error) {
 	)
 
 	buf := bytes.NewBuffer([]byte{})
-	if err = md.Convert([]byte(args.Source), buf); err == nil {
-		res.HTML = buf.String()
+	if err = md.Convert([]byte(source), buf); err == nil {
+		html = buf.String()
+	}
+	return
+}
+
+func Markdown(context *register.HandleContext) (err error) {
+	args := new(MarkdownRequest)
+	res := new(MarkdownResponse)
+	context.RequestArgs(args)
+
+	if res.HTML, err = renderMarkdown(args.Source); err != nil {
+		return
 	}
 
 	context.ReturnJSON(res)
