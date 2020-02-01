@@ -15,6 +15,39 @@ type countResult struct {
 	Count int64 `bson:"count"`
 }
 
+type Conn struct {
+	Client     *mongo.Client
+	Collection *mongo.Collection
+}
+
+func NewConn(databaseName string, collectionName string) (conn *Conn, err error) {
+	defer func() {
+		if err != nil {
+			err = errors.NewErr(err)
+		}
+	}()
+	conn = &Conn{}
+
+	conn.Client, err = mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		return
+	}
+
+	err = conn.Client.Ping(context.TODO(), nil)
+	if err != nil {
+		return
+	}
+
+	conn.Collection = conn.Client.Database(databaseName).Collection(collectionName)
+	return
+}
+
+func (conn *Conn) Close() {
+	if conn.Client != nil {
+		conn.Client.Disconnect(context.TODO())
+	}
+}
+
 func Find(databaseName string, collectionName string, filter interface{},
 	opt *options.FindOptions, res interface{}) (total int64, err error) {
 	defer func() {
@@ -23,29 +56,25 @@ func Find(databaseName string, collectionName string, filter interface{},
 		}
 	}()
 
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		return
-	}
-	defer client.Disconnect(context.TODO())
-
-	err = client.Ping(context.TODO(), nil)
+	conn, err := NewConn(databaseName, collectionName)
+	defer conn.Close()
 	if err != nil {
 		return
 	}
 
-	collection := client.Database(databaseName).Collection(collectionName)
-	cur, err := collection.Find(context.TODO(), filter, opt)
+	cur, err := conn.Collection.Find(context.TODO(), filter, opt)
 	if err != nil {
 		return
 	}
 	defer cur.Close(context.TODO())
 
-	if total, err = collection.CountDocuments(context.TODO(), filter, nil); err != nil {
+	if total, err = conn.Collection.CountDocuments(context.TODO(), filter, nil); err != nil {
 		return
 	}
 
-	err = cur.All(context.TODO(), res)
+	if res != nil {
+		err = cur.All(context.TODO(), res)
+	}
 	return
 }
 
@@ -57,25 +86,22 @@ func Aggregate(databaseName string, collectionName string, pipeline interface{},
 		}
 	}()
 
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		return
-	}
-	defer client.Disconnect(context.TODO())
-
-	err = client.Ping(context.TODO(), nil)
+	conn, err := NewConn(databaseName, collectionName)
+	defer conn.Close()
 	if err != nil {
 		return
 	}
 
-	collection := client.Database(databaseName).Collection(collectionName)
-	cur, err := collection.Aggregate(context.TODO(), pipeline, opt)
+	cur, err := conn.Collection.Aggregate(context.TODO(), pipeline, opt)
 	if err != nil {
 		return
 	}
 	defer cur.Close(context.TODO())
-	if err = cur.All(context.TODO(), res); err != nil {
-		return
+
+	if res != nil {
+		if err = cur.All(context.TODO(), res); err != nil {
+			return
+		}
 	}
 
 	count := countResult{}
@@ -85,7 +111,7 @@ func Aggregate(databaseName string, collectionName string, pipeline interface{},
 		return
 	}
 	output.Debug("%+v", countPipeline)
-	countCur, err := collection.Aggregate(context.TODO(), countPipeline, opt)
+	countCur, err := conn.Collection.Aggregate(context.TODO(), countPipeline, opt)
 	if err != nil {
 		return
 	}
@@ -142,5 +168,21 @@ func pipelineTruncated(pipeline interface{}) (res []bson.M, err error) {
 		break
 	}
 	res = m[0 : end+1]
+	return
+}
+
+func Add(databaseName string, collectionName string,
+	opt *options.InsertManyOptions, documents ...interface{}) (ids []interface{}, err error) {
+	conn, err := NewConn(databaseName, collectionName)
+	defer conn.Close()
+	if err != nil {
+		return
+	}
+
+	result, err := conn.Collection.InsertMany(context.TODO(), documents, opt)
+	if err != nil {
+		return
+	}
+	ids = result.InsertedIDs
 	return
 }
