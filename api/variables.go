@@ -13,16 +13,11 @@ type VariablesRequest struct {
 }
 type VariablesResponse map[string]interface{}
 
-func Variables(context *register.HandleContext) (err error) {
-	args := new(VariablesRequest)
-	res := make(VariablesResponse)
-
-	context.RequestArgs(args)
-	keys := strings.Split(args.Keys, ",")
+func getVariables(keys ...string) (res map[string]interface{}, err error) {
+	res = make(VariablesResponse)
 
 	data := make([]Variable, 0)
-	var a int64
-	a, err = mongo.Find(
+	_, err = mongo.Find(
 		"blotter",
 		"variables",
 		bson.M{
@@ -33,15 +28,20 @@ func Variables(context *register.HandleContext) (err error) {
 		nil,
 		&data,
 	)
-	if err != nil {
-		return
-	}
-
+	output.Debug("%+v", data)
 	for _, d := range data {
 		res[d.Key] = d.Value
 	}
-	output.Debug("%d %+v %t", a, data, args.Keys)
-	err = context.ReturnJSON(res)
+	return
+}
 
+func Variables(context *register.HandleContext) (err error) {
+	args := VariablesRequest{}
+	context.RequestArgs(&args)
+	res, err := getVariables(strings.Split(args.Keys, ",")...)
+	if err != nil {
+		return
+	}
+	err = context.ReturnJSON(res)
 	return
 }
