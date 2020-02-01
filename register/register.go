@@ -25,7 +25,6 @@ func Register(name string, f HandleFunc) {
 func Call(name string, context *HandleContext) (err error) {
 	output.Debug("Call api %s, %s, %s", name, context.Request.URL.Path, context.Request.URL.Query())
 
-	output.Debug("%+v", apiMap)
 	api, exist := apiMap[name]
 	if !exist {
 		err = errors.New("Can not find api %s", name)

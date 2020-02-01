@@ -110,21 +110,21 @@ func (context *HandleContext) Success() {
 
 // PageNotFound return 404 page not found error
 func (context *HandleContext) PageNotFound() {
-	output.Log("404 Page not Found: %s", context.Request.RequestURI)
+	output.ErrOutput.Printf("404 Page not Found: %s\n", context.Request.RequestURI)
 	context.writeHeaderWithCode(404)
 	context.Response.Write([]byte(fmt.Sprintf("Page not found %s", context.Request.RequestURI)))
 }
 
 // NotImplemented return 501 Not Implemented
 func (context *HandleContext) NotImplemented() {
-	output.Log("501 Page not Found: %s", context.Request.RequestURI)
+	output.ErrOutput.Printf("501 Page not Found: %s\n", context.Request.RequestURI)
 	context.writeHeaderWithCode(501)
 	context.Response.Write([]byte(fmt.Sprintf("Can not solve request %s", context.Request.RequestURI)))
 }
 
 // ServerError return 500 server error
 func (context *HandleContext) ServerError(err error) {
-	output.Log("500 Server Error: %s", err.Error())
+	output.ErrOutput.Printf("500 Server Error: %s\n", err.Error())
 	context.writeHeaderWithCode(500)
 	context.Response.Write([]byte(fmt.Sprintf("Server error %s", err.Error())))
 }
