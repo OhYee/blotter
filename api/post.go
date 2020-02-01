@@ -60,7 +60,7 @@ type PostsRequest struct {
 }
 
 type PostsResponse struct {
-	Total int64            `json:"total"`
+	Total int64          `json:"total"`
 	Posts []PostCardTime `json:"posts"`
 }
 
@@ -73,6 +73,22 @@ func Posts(context *register.HandleContext) (err error) {
 	res := PostsResponse{}
 	posts := make([]PostCardUnix, 10)
 	switch args.Type {
+	case "tag":
+		res.Total, err = mongo.Aggregate("blotter", "posts", []bson.M{
+			{"$sort": bson.M{"publish_time": -1}},
+			{
+				"$lookup": bson.M{
+					"from":         "tags",
+					"localField":   "tags",
+					"foreignField": "_id",
+					"as":           "tags",
+				},
+			},
+			{"$set": bson.M{"temp": "$tags.short"}},
+			{"$match": bson.M{"temp": args.Arg}},
+			{"$limit": args.Offset + args.Number},
+			{"$skip": args.Offset},
+		}, nil, &posts)
 	case "index":
 		fallthrough
 	default:
