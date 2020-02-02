@@ -1,7 +1,9 @@
 package api
 
 import (
+	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/register"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type LayoutResponse struct {
@@ -24,6 +26,13 @@ func Layout(context *register.HandleContext) (err error) {
 	}
 	res.View = int(m["view"].(float64))
 	res.Beian = m["beian"].(string)
+
+	go func() {
+		mongo.Update(
+			"blotter", "variables", bson.M{"key": "view"},
+			bson.M{"$inc": bson.M{"value": 1}}, nil,
+		)
+	}()
 
 	context.ReturnJSON(res)
 	return
