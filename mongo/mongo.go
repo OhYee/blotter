@@ -186,3 +186,18 @@ func Add(databaseName string, collectionName string,
 	ids = result.InsertedIDs
 	return
 }
+
+func Update(databaseName string, collectionName string, filter interface{}, update interface{},
+	opt *options.UpdateOptions) (result *mongo.UpdateResult, err error) {
+	conn, err := NewConn(databaseName, collectionName)
+	defer conn.Close()
+	if err != nil {
+		return
+	}
+
+	result, err = conn.Collection.UpdateMany(context.TODO(), filter, update, opt)
+	if err != nil {
+		return
+	}
+	return
+}
