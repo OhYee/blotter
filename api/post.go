@@ -44,6 +44,13 @@ func Post(context *register.HandleContext) (err error) {
 	if err != nil {
 		return
 	}
+	go func() {
+		mongo.Update(
+			"blotter", "posts", bson.M{"url": args.URL},
+			bson.M{"$inc": bson.M{"view": 1}}, nil,
+		)
+	}()
+
 	if len(res) > 0 {
 		context.ReturnJSON(res[0].ToPostTime())
 	} else {
