@@ -7,9 +7,10 @@ import (
 )
 
 type LayoutResponse struct {
-	Menus []Menu `json:"menus"`
-	View  int    `json:"view"`
-	Beian string `json:"beian"`
+	Menus    []Menu `json:"menus"`
+	View     int    `json:"view"`
+	Beian    string `json:"beian"`
+	BlogName string `json:"blog_name"`
 }
 
 func Layout(context *register.HandleContext) (err error) {
@@ -21,11 +22,12 @@ func Layout(context *register.HandleContext) (err error) {
 	}
 
 	m := make(VariablesResponse)
-	if m, err = getVariables("beian", "view"); err != nil {
+	if m, err = getVariables("beian", "view", "blog_name"); err != nil {
 		return
 	}
 	res.View = int(m["view"].(float64))
 	res.Beian = m["beian"].(string)
+	res.BlogName = m["blog_name"].(string)
 
 	go func() {
 		mongo.Update(
