@@ -111,7 +111,7 @@ func CommentAdd(context *register.HandleContext) (err error) {
 	args := new(CommentAddRequest)
 	context.RequestArgs(args)
 
-	html, err := renderMarkdown(args.Raw)
+	html, err := RenderMarkdown(args.Raw)
 	if err != nil {
 		html = args.Raw
 	}

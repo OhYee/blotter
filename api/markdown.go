@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/goldmark-dot"
+	// "github.com/litao91/goldmark-mathjax"
+	"github.com/graemephi/goldmark-qjs-katex"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark-highlighting"
 	"github.com/yuin/goldmark/extension"
@@ -18,11 +20,13 @@ type MarkdownResponse struct {
 	HTML string `json:"html"`
 }
 
-func renderMarkdown(source string) (html string, err error) {
+func RenderMarkdown(source string) (html string, err error) {
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
 			dot.NewDot("dot-svg", highlighting.NewHTMLRenderer()),
+			// mathjax.MathJax,
+			&qjskatex.Extension{},
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
@@ -42,7 +46,7 @@ func Markdown(context *register.HandleContext) (err error) {
 	res := new(MarkdownResponse)
 	context.RequestArgs(args)
 
-	if res.HTML, err = renderMarkdown(args.Source); err != nil {
+	if res.HTML, err = RenderMarkdown(args.Source); err != nil {
 		return
 	}
 
