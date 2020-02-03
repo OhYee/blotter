@@ -14,7 +14,7 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/gorilla/schema v1.1.0
-	// github.com/graemephi/goldmark-qjs-katex v0.1.2
+	github.com/graemephi/goldmark-qjs-katex v0.1.2
 	github.com/litao91/goldmark-mathjax v0.0.0-20191101121019-011def32b12f
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/tidwall/pretty v1.0.0 // indirect
