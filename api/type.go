@@ -29,6 +29,21 @@ type FriendPost struct {
 	Link  string `json:"link" bson:"link"`
 }
 
+type PostDatabase struct {
+	Title       string               `json:"title" bson:"title"`
+	Abstract    string               `json:"abstract" bson:"abstract"`
+	View        int64                `json:"view" bson:"view"`
+	URL         string               `json:"url" bson:"url"`
+	PublishTime int64                `json:"publish_time" bson:"publish_time"`
+	EditTime    int64                `json:"edit_time" bson:"edit_time"`
+	Content     string               `json:"content" bson:"content"`
+	Raw         string               `json:"raw" bson:"raw"`
+	Tags        []primitive.ObjectID `json:"tags" bson:"tags"`
+	Keywords    []string             `json:"keywords" bson:"keywords"`
+	Published   bool                 `json:"published" bson:"published"`
+	HeadImage   string               `json:"head_image" bson:"head_image"`
+}
+
 type PostUnix struct {
 	Title       string `json:"title" bson:"title"`
 	Abstract    string `json:"abstract" bson:"abstract"`

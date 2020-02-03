@@ -4,8 +4,10 @@ import (
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
-	"github.com/OhYee/goutils/time"
+	gt "github.com/OhYee/goutils/time"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -133,8 +135,8 @@ func (post PostCardUnix) ToPostCardTime() PostCardTime {
 		Abstract:    post.Abstract,
 		View:        post.View,
 		URL:         post.URL,
-		PublishTime: time.ToString(post.PublishTime),
-		EditTime:    time.ToString(post.EditTime),
+		PublishTime: gt.ToString(post.PublishTime),
+		EditTime:    gt.ToString(post.EditTime),
 		Tags:        post.Tags,
 		HeadImage:   post.HeadImage,
 	}
@@ -147,8 +149,8 @@ func (post PostCardTime) ToPostCardUnix() PostCardUnix {
 		Abstract:    post.Abstract,
 		View:        post.View,
 		URL:         post.URL,
-		PublishTime: time.FromString(post.PublishTime),
-		EditTime:    time.FromString(post.EditTime),
+		PublishTime: gt.FromString(post.PublishTime),
+		EditTime:    gt.FromString(post.EditTime),
 		Tags:        post.Tags,
 		HeadImage:   post.HeadImage,
 	}
@@ -161,8 +163,8 @@ func (post PostUnix) ToPostTime() PostTime {
 		Abstract:    post.Abstract,
 		View:        post.View,
 		URL:         post.URL,
-		PublishTime: time.ToString(post.PublishTime),
-		EditTime:    time.ToString(post.EditTime),
+		PublishTime: gt.ToString(post.PublishTime),
+		EditTime:    gt.ToString(post.EditTime),
 		Tags:        post.Tags,
 		HeadImage:   post.HeadImage,
 		Content:     post.Content,
@@ -176,10 +178,51 @@ func (post PostTime) ToPostUnix() PostUnix {
 		Abstract:    post.Abstract,
 		View:        post.View,
 		URL:         post.URL,
-		PublishTime: time.FromString(post.PublishTime),
-		EditTime:    time.FromString(post.EditTime),
+		PublishTime: gt.FromString(post.PublishTime),
+		EditTime:    gt.FromString(post.EditTime),
 		Tags:        post.Tags,
 		HeadImage:   post.HeadImage,
 		Content:     post.Content,
+	}
+}
+
+func NewPostDatabase(title string, abstract string, url string, raw string, tags []string, keywords []string, published bool, headImage string) *PostDatabase {
+	html, err := RenderMarkdown(raw)
+	if err != nil {
+		html = raw
+	}
+	ids := make([]struct {
+		ID primitive.ObjectID `bson:"_id"`
+	}, 0)
+
+	mongo.Aggregate("blotter", "tags", []bson.M{
+		{
+			"$match": bson.M{
+				"short": bson.M{"$in": tags},
+			},
+		},
+		{
+			"$project": bson.M{"_id": 1},
+		},
+	}, nil, &ids)
+
+	tagIDs := make([]primitive.ObjectID, len(ids))
+	for idx, tag := range ids {
+		tagIDs[idx] = tag.ID
+	}
+
+	return &PostDatabase{
+		Title:       title,
+		Abstract:    abstract,
+		View:        0,
+		URL:         url,
+		Raw:         raw,
+		PublishTime: time.Now().Unix(),
+		EditTime:    0,
+		Content:     html,
+		Tags:        tagIDs,
+		Keywords:    keywords,
+		Published:   published,
+		HeadImage:   headImage,
 	}
 }
