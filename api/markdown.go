@@ -4,7 +4,7 @@ import (
 	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/goldmark-dot"
 	// "github.com/litao91/goldmark-mathjax"
-	"github.com/graemephi/goldmark-qjs-katex"
+	// "github.com/graemephi/goldmark-qjs-katex"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark-highlighting"
 	"github.com/yuin/goldmark/extension"
@@ -26,7 +26,7 @@ func RenderMarkdown(source string) (html string, err error) {
 			extension.GFM,
 			dot.NewDot("dot-svg", highlighting.NewHTMLRenderer()),
 			// mathjax.MathJax,
-			&qjskatex.Extension{},
+			// &qjskatex.Extension{},
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
