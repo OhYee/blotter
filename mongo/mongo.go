@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
@@ -199,5 +200,21 @@ func Update(databaseName string, collectionName string, filter interface{}, upda
 	if err != nil {
 		return
 	}
+	return
+}
+
+func Remove(databaseName string, collectionName string, filter interface{},
+	opt *options.DeleteOptions) (count int64, err error) {
+	conn, err := NewConn(databaseName, collectionName)
+	defer conn.Close()
+	if err != nil {
+		return
+	}
+
+	result, err := conn.Collection.DeleteMany(context.TODO(), filter, opt)
+	if err != nil {
+		return
+	}
+	count = result.DeletedCount
 	return
 }
