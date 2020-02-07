@@ -53,4 +53,16 @@ func Register() {
 		"mail",
 		Mail,
 	)
+	register.Register(
+		"login",
+		Login,
+	)
+	register.Register(
+		"logout",
+		Logout,
+	)
+	register.Register(
+		"info",
+		Info,
+	)
 }
