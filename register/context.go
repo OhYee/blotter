@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
+	"time"
+
 	"github.com/OhYee/blotter/output"
 	"github.com/gorilla/schema"
-	"net/http"
-	"reflect"
-	"strconv"
-	// "strings"
 )
 
 var decoder = schema.NewDecoder()
@@ -39,39 +39,34 @@ func NewHandleContext(req *http.Request, rep http.ResponseWriter) *HandleContext
 
 // RequestArgs get request args
 func (context *HandleContext) RequestArgs(args interface{}) {
-	context.Request.ParseForm()
-	query := context.Request.Form
+	query := context.Forms()
 
 	decoder.Decode(args, query)
 	output.Debug("args: %+v", args)
-
-	// t := reflect.TypeOf(args).Elem()
-	// v := reflect.ValueOf(args).Elem()
-	// num := v.NumField()
-	// output.Debug("%d", num)
-	// for i := 0; i < num; i++ {
-	// 	fieldType := t.Field(i)
-	// 	fieldValue := v.Field(i)
-	// 	value := query.Get(fieldType.Tag.Get("json"))
-	// 	// output.Debug("%+v %+v %+v %+v", fieldType,)
-	// 	setValue(fieldValue.Addr().Interface(), value)
-	// }
 }
 
-func strToInt64(str string) (num int64) {
-	num, err := strconv.ParseInt(str, 10, 64)
-	if err != nil {
-		num = 0
+func (context *HandleContext) Forms() url.Values {
+	context.Request.ParseForm()
+	return context.Request.Form
+}
+
+func (context *HandleContext) SetCookie(key string, value string) {
+	cookie := http.Cookie{Name: key, Value: value}
+	cookie.Expires.After(time.Now().Add(time.Hour * 24 * 7))
+	http.SetCookie(context.Response, &cookie)
+}
+
+func (context *HandleContext) GetCookie(key string) (value string) {
+	if cookie, err := context.Request.Cookie(key); err == nil {
+		value = cookie.Value
 	}
 	return
 }
 
-func strToUint64(str string) (num uint64) {
-	num, err := strconv.ParseUint(str, 10, 64)
-	if err != nil {
-		num = 0
-	}
-	return
+func (context *HandleContext) DeleteCookie(key string) {
+	cookie := http.Cookie{Name: key, Value: "", MaxAge: -1}
+	cookie.Expires.After(time.Now().Add(time.Second * 1))
+	http.SetCookie(context.Response, &cookie)
 }
 
 // ReturnJSON return json data
@@ -127,35 +122,4 @@ func (context *HandleContext) ServerError(err error) {
 	output.ErrOutput.Printf("500 Server Error: %s\n", err.Error())
 	context.writeHeaderWithCode(500)
 	context.Response.Write([]byte(fmt.Sprintf("Server error %s", err.Error())))
-}
-
-func setValue(recv interface{}, value string) {
-	v := reflect.ValueOf(recv).Elem()
-	switch v.Kind() {
-	case reflect.String:
-		v.Set(reflect.ValueOf(value))
-	case reflect.Int:
-		v.Set(reflect.ValueOf(int(strToInt64(value))))
-	case reflect.Int8:
-		v.Set(reflect.ValueOf(int8(strToInt64(value))))
-	case reflect.Int16:
-		v.Set(reflect.ValueOf(int16(strToInt64(value))))
-	case reflect.Int32:
-		v.Set(reflect.ValueOf(int32(strToInt64(value))))
-	case reflect.Int64:
-		v.Set(reflect.ValueOf(int64(strToInt64(value))))
-	case reflect.Uint8:
-		v.Set(reflect.ValueOf(uint8(strToUint64(value))))
-	case reflect.Uint16:
-		v.Set(reflect.ValueOf(uint16(strToUint64(value))))
-	case reflect.Uint32:
-		v.Set(reflect.ValueOf(uint32(strToUint64(value))))
-	case reflect.Uint64:
-		v.Set(reflect.ValueOf(uint64(strToUint64(value))))
-	case reflect.Slice:
-		// strings.Split(value., ",")
-		v.Set(reflect.ValueOf(uint64(strToUint64(value))))
-	default:
-		output.Debug("%+v %+v", v.Kind(), value)
-	}
 }
