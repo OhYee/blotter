@@ -6,7 +6,8 @@ import (
 
 type APIResponse struct {
 	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 // Menu of the blotter
@@ -30,6 +31,7 @@ type FriendPost struct {
 }
 
 type PostDatabase struct {
+	ID          string               `json:"id" bson:"_id"`
 	Title       string               `json:"title" bson:"title"`
 	Abstract    string               `json:"abstract" bson:"abstract"`
 	View        int64                `json:"view" bson:"view"`
@@ -103,6 +105,7 @@ type PostCardTime struct {
 }
 
 type Tag struct {
+	ID    string `json:"id" bson:"_id"`
 	Name  string `json:"name" bson:"name"`
 	Short string `json:"short" bson:"short"`
 	Icon  string `json:"icon" bson:"icon"`

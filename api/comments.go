@@ -141,6 +141,6 @@ func CommentAdd(context *register.HandleContext) (err error) {
 
 	go commentEmail(args.URL, html, replyObjectID)
 
-	context.ReturnJSON(APIResponse{Success: true, Message: "评论发布成功"})
+	context.ReturnJSON(APIResponse{Success: true, Title: "评论发布成功"})
 	return
 }

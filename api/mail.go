@@ -2,14 +2,16 @@ package api
 
 import (
 	"fmt"
+	"strings"
+
+	"net/smtp"
+
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/smtp"
-	"strings"
 )
 
 func sendMail(host, username, user, password, subject, body string, to ...string) error {
@@ -45,7 +47,8 @@ func Mail(context *register.HandleContext) (err error) {
 
 	err = sendMail(address, username, user, password, args.Subject, args.Body, strings.Split(args.To, ",")...)
 	res.Success = err != nil
-	res.Message = err.Error()
+	res.Title = "邮件发送失败"
+	res.Content = err.Error()
 	context.ReturnJSON(res)
 	return err
 }
