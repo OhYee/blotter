@@ -115,6 +115,13 @@ func (context *HandleContext) PageNotFound() {
 	context.Response.Write([]byte(fmt.Sprintf("Page not found %s", context.Request.RequestURI)))
 }
 
+// Forbidden return 403 Forbidden
+func (context *HandleContext) Forbidden() {
+	output.ErrOutput.Printf("403 Forbidden: %s\n", context.Request.RequestURI)
+	context.writeHeaderWithCode(403)
+	context.Response.Write([]byte(fmt.Sprintf("Forbidden %s", context.Request.RequestURI)))
+}
+
 // NotImplemented return 501 Not Implemented
 func (context *HandleContext) NotImplemented() {
 	output.ErrOutput.Printf("501 Page not Found: %s\n", context.Request.RequestURI)
