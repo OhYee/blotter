@@ -14,19 +14,19 @@ import (
 
 // CompleteFieldDB post with all field for editing in database
 type CompleteFieldDB struct {
-	ID          primitive.ObjectID   `json:"id" bson:"_id"`
-	Title       string               `json:"title" bson:"title"`
-	Abstract    string               `json:"abstract" bson:"abstract"`
-	View        int64                `json:"view" bson:"view"`
-	URL         string               `json:"url" bson:"url"`
-	PublishTime int64                `json:"publish_time" bson:"publish_time"`
-	EditTime    int64                `json:"edit_time" bson:"edit_time"`
-	Content     string               `json:"content" bson:"content"`
-	Raw         string               `json:"raw" bson:"raw"`
-	Tags        []primitive.ObjectID `json:"tags" bson:"tags"`
-	Keywords    []string             `json:"keywords" bson:"keywords"`
-	Published   bool                 `json:"published" bson:"published"`
-	HeadImage   string               `json:"head_image" bson:"head_image"`
+	ID          primitive.ObjectID `json:"id" bson:"_id"`
+	Title       string             `json:"title" bson:"title"`
+	Abstract    string             `json:"abstract" bson:"abstract"`
+	View        int64              `json:"view" bson:"view"`
+	URL         string             `json:"url" bson:"url"`
+	PublishTime int64              `json:"publish_time" bson:"publish_time"`
+	EditTime    int64              `json:"edit_time" bson:"edit_time"`
+	Content     string             `json:"content" bson:"content"`
+	Raw         string             `json:"raw" bson:"raw"`
+	Tags        []tag.Type         `json:"tags" bson:"tags"`
+	Keywords    []string           `json:"keywords" bson:"keywords"`
+	Published   bool               `json:"published" bson:"published"`
+	HeadImage   string             `json:"head_image" bson:"head_image"`
 }
 
 // ToPost transfer CompleteFieldDB to CompleteField
@@ -41,10 +41,10 @@ func (post CompleteFieldDB) ToPost() CompleteField {
 		EditTime:    post.EditTime,
 		Content:     post.Content,
 		Raw:         post.Raw,
-		// Tags:        post.Tags,
-		Keywords:  post.Keywords,
-		Published: post.Published,
-		HeadImage: post.HeadImage,
+		Tags:        post.Tags,
+		Keywords:    post.Keywords,
+		Published:   post.Published,
+		HeadImage:   post.HeadImage,
 	}
 }
 
