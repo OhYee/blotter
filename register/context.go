@@ -12,7 +12,12 @@ import (
 	"github.com/gorilla/schema"
 )
 
-var decoder = schema.NewDecoder()
+var decoder = func() (decoder *schema.Decoder) {
+	decoder = schema.NewDecoder()
+	decoder.SetAliasTag("json")
+	decoder.IgnoreUnknownKeys(true)
+	return
+}()
 
 type httpHeader struct {
 	key   string
@@ -41,8 +46,8 @@ func NewHandleContext(req *http.Request, rep http.ResponseWriter) *HandleContext
 func (context *HandleContext) RequestArgs(args interface{}) {
 	query := context.Forms()
 
-	decoder.Decode(args, query)
-	output.Debug("args: %+v", args)
+	err := decoder.Decode(args, query)
+	output.Debug("query %+v args: %+v err %+v", query, args, err)
 }
 
 func (context *HandleContext) Forms() url.Values {

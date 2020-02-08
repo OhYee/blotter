@@ -2,51 +2,25 @@ package api
 
 import (
 	"github.com/OhYee/blotter/register"
-	"github.com/OhYee/goldmark-dot"
-	// "github.com/litao91/goldmark-mathjax"
-	"github.com/graemephi/goldmark-qjs-katex"
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark-highlighting"
-	"github.com/yuin/goldmark/extension"
-	"github.com/yuin/goldmark/parser"
-
-	"bytes"
+	"github.com/OhYee/blotter/api/pkg/markdown"
 )
 
+// MarkdownRequest request of markdown api
 type MarkdownRequest struct {
 	Source string `json:"source"`
 }
+// MarkdownResponse response of markdown api
 type MarkdownResponse struct {
 	HTML string `json:"html"`
 }
 
-func RenderMarkdown(source string) (html string, err error) {
-	md := goldmark.New(
-		goldmark.WithExtensions(
-			extension.GFM,
-			dot.NewDot("dot-svg", highlighting.NewHTMLRenderer()),
-			// mathjax.MathJax,
-			&qjskatex.Extension{},
-		),
-		goldmark.WithParserOptions(
-			parser.WithAutoHeadingID(),
-		),
-		goldmark.WithRendererOptions(),
-	)
-
-	buf := bytes.NewBuffer([]byte{})
-	if err = md.Convert([]byte(source), buf); err == nil {
-		html = buf.String()
-	}
-	return
-}
-
+// Markdown render markdown to html
 func Markdown(context *register.HandleContext) (err error) {
 	args := new(MarkdownRequest)
 	res := new(MarkdownResponse)
 	context.RequestArgs(args)
 
-	if res.HTML, err = RenderMarkdown(args.Source); err != nil {
+	if res.HTML, err = markdown.Render(args.Source); err != nil {
 		return
 	}
 

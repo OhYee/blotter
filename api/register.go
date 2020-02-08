@@ -4,6 +4,7 @@ import (
 	"github.com/OhYee/blotter/register"
 )
 
+// Register api
 func Register() {
 	register.Register(
 		"friends",
@@ -30,10 +31,6 @@ func Register() {
 		Comments,
 	)
 	register.Register(
-		"variables",
-		Variables,
-	)
-	register.Register(
 		"layout",
 		Layout,
 	)
@@ -48,10 +45,6 @@ func Register() {
 	register.Register(
 		"comment/add",
 		CommentAdd,
-	)
-	register.Register(
-		"mail",
-		Mail,
 	)
 	register.Register(
 		"login",

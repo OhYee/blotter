@@ -1,20 +1,16 @@
 package api
 
 import (
-	"github.com/OhYee/blotter/mongo"
-	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/blotter/api/pkg/friends"
 	"github.com/OhYee/blotter/register"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
+// Friends API query all friends, return []Friend
 func Friends(context *register.HandleContext) (err error) {
-	output.Debug("call friends")
-	res := make([]Friend, 0)
-	_,err = mongo.Find("blotter", "friends", bson.M{}, nil, &res)
+	res, err := friends.GetFriends()
 	if err != nil {
 		return
 	}
-	output.Debug("%+v", res)
 	context.ReturnJSON(res)
 	return
 }

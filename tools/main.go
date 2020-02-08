@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
-	"github.com/OhYee/blotter/api"
+	"strings"
+
+	"github.com/OhYee/blotter/api/pkg/markdown"
 	"github.com/OhYee/blotter/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"strings"
 )
 
 func rerender(filter bson.M) (err error) {
@@ -19,7 +20,7 @@ func rerender(filter bson.M) (err error) {
 		return err
 	}
 	for _, post := range *posts {
-		html, err := api.RenderMarkdown(post["raw"])
+		html, err := markdown.Render(post["raw"])
 		if err != nil {
 			return err
 		}

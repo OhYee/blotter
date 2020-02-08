@@ -1,91 +1,31 @@
 package api
 
 import (
-	"crypto/sha512"
-	"encoding/hex"
-	"math/rand"
-	"time"
-
-	"github.com/OhYee/goutils/bytes"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/OhYee/blotter/mongo"
-	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
 
-func login(password string) bool {
-	output.Debug("%+v", password)
-
-	hash := sha512.New()
-	hash.Write([]byte(password))
-	password = hex.EncodeToString(hash.Sum(nil))
-
-	m, err := getVariables("password")
-	if err != nil {
-		return false
-	}
-	_password, ok := m["password"]
-
-	output.Debug("%+v %+v", _password, password)
-	if !ok || _password != password {
-		return false
-	}
-	return true
-}
-
-func generateToken() (token string) {
-	buf := bytes.NewBuffer()
-
-	buf.Write(bytes.FromInt64(time.Now().Unix()))
-	buf.Write(bytes.FromInt64(time.Now().UnixNano()))
-	buf.Write(bytes.FromInt64(rand.Int63()))
-
-	hash := sha512.New()
-	hash.Write(buf.Bytes())
-
-	token = hex.EncodeToString(hash.Sum(nil))
-
-	mongo.Update("blotter", "variables", bson.M{"key": "token"},
-		bson.M{"$set": bson.M{"value": token}}, options.Update().SetUpsert(true))
-	return
-}
-
-func checkToken(token string) bool {
-	m, err := getVariables("token")
-	if err != nil {
-		return false
-	}
-	_token, ok := m["token"]
-	if !ok || _token != token {
-		return false
-	}
-	return true
-}
-
-func deleteToken() {
-	mongo.Remove("blotter", "variables", bson.M{"key": "token"}, nil)
-}
-
+// LoginRequest request of login api
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+// LoginResponse response of login api
 type LoginResponse struct {
-	APIResponse
+	SimpleResponse
 	InfoResponse
 }
 
+// Login try to login
 func Login(context *register.HandleContext) (err error) {
 	args := new(LoginRequest)
 	res := new(LoginResponse)
 
 	context.RequestArgs(args)
 
-	if args.Username == "" && login(args.Password) {
-		token := generateToken()
+	if args.Username == "" && user.Login(args.Password) {
+		token := user.GenerateToken()
 		context.SetCookie("token", token)
 		res.Success = true
 		res.Title = "登录成功"
@@ -99,24 +39,27 @@ func Login(context *register.HandleContext) (err error) {
 	return
 }
 
+// InfoResponse response of Info api
 type InfoResponse struct {
 	Token string `json:"token"`
 }
 
+// Info get user token api
 func Info(context *register.HandleContext) (err error) {
 	res := new(InfoResponse)
 	token := context.GetCookie("token")
-	if checkToken(token) {
+	if user.CheckToken(token) {
 		res.Token = token
 	}
 	context.ReturnJSON(res)
 	return
 }
 
+// Logout the user
 func Logout(context *register.HandleContext) (err error) {
-	res := new(APIResponse)
-	if checkToken(context.GetCookie("token")) {
-		deleteToken()
+	res := new(SimpleResponse)
+	if user.CheckToken(context.GetCookie("token")) {
+		user.DeleteToken()
 		res.Success = true
 		res.Title = "登出成功"
 		res.Content = "Token已清除"
