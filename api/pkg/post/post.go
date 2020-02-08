@@ -20,28 +20,29 @@ func Query(pipeline []bson.M, res interface{}) (total int64, err error) {
 
 // QueryByURL query post by url
 func QueryByURL(url string, post interface{}, project bson.M) (total int64, err error) {
-	return Query(
-		[]bson.M{
-			{
-				"$match": bson.M{
-					"url": url,
-				},
-			},
-			{
-				"$limit": 1,
-			},
-			{
-				"$lookup": bson.M{
-					"from":         "tags",
-					"localField":   "tags",
-					"foreignField": "_id",
-					"as":           "tags",
-				},
-			},
-			{
-				"$project": project,
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{
+				"url": url,
 			},
 		},
+		{
+			"$limit": 1,
+		},
+		{
+			"$lookup": bson.M{
+				"from":         "tags",
+				"localField":   "tags",
+				"foreignField": "_id",
+				"as":           "tags",
+			},
+		},
+	}
+	if project != nil {
+		pipeline = append(pipeline, bson.M{"$project": project})
+	}
+	return Query(
+		pipeline,
 		post,
 	)
 }
@@ -49,7 +50,7 @@ func QueryByURL(url string, post interface{}, project bson.M) (total int64, err 
 // GetAllFieldPost get all field post
 func GetAllFieldPost(url string) (post CompleteField, err error) {
 	postsDB := make([]CompleteFieldDB, 0)
-	cnt, err := QueryByURL(url, &postsDB, bson.M{})
+	cnt, err := QueryByURL(url, &postsDB, nil)
 	if cnt > 0 {
 		post = postsDB[0].ToPost()
 	}
@@ -59,7 +60,7 @@ func GetAllFieldPost(url string) (post CompleteField, err error) {
 // GetPublicFieldPost get all field post
 func GetPublicFieldPost(url string) (post PublicField, err error) {
 	postsDB := make([]PublicFieldDB, 0)
-	cnt, err := QueryByURL(url, &postsDB, bson.M{})
+	cnt, err := QueryByURL(url, &postsDB, nil)
 	if cnt > 0 {
 		post = postsDB[0].ToPost()
 	}
@@ -116,45 +117,3 @@ func GetCardPosts(offset int64, number int64, tag string, sortField string, sort
 	}
 	return
 }
-
-// func NewPostDatabase(title string, abstract string, url string, raw string, tags []string, keywords []string, published bool, headImage string) *PostDatabase {
-// 	html, err := RenderMarkdown(raw)
-// 	if err != nil {
-// 		html = raw
-// 	}
-// 	ids := make([]struct {
-// 		ID primitive.ObjectID `bson:"_id"`
-// 	}, 0)
-
-// 	mongo.Aggregate("blotter", "tags", []bson.M{
-// 		{
-// 			"$match": bson.M{
-// 				"short": bson.M{"$in": tags},
-// 			},
-// 		},
-// 		{
-// 			"$project": bson.M{"_id": 1},
-// 		},
-// 	}, nil, &ids)
-
-// 	tagIDs := make([]primitive.ObjectID, len(ids))
-// 	for idx, tag := range ids {
-// 		tagIDs[idx] = tag.ID
-// 	}
-
-// 	return &PostDatabase{
-// 		ID:          primitive.NewObjectID(),
-// 		Title:       title,
-// 		Abstract:    abstract,
-// 		View:        0,
-// 		URL:         url,
-// 		Raw:         raw,
-// 		PublishTime: time.Now().Unix(),
-// 		EditTime:    0,
-// 		Content:     html,
-// 		Tags:        tagIDs,
-// 		Keywords:    keywords,
-// 		Published:   published,
-// 		HeadImage:   headImage,
-// 	}
-// }
