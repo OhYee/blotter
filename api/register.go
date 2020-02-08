@@ -19,6 +19,10 @@ func Register() {
 		Post,
 	)
 	register.Register(
+		"admin/post",
+		PostAdmin,
+	)
+	register.Register(
 		"posts",
 		Posts,
 	)

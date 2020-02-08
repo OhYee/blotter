@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/OhYee/blotter/api/pkg/post"
+	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // PostRequest request for post api
@@ -23,10 +23,35 @@ func Post(context *register.HandleContext) (err error) {
 
 	go post.IncView(args.URL)
 
-	if res.URL != args.URL {
+	if res.URL == args.URL {
 		context.ReturnJSON(res)
 	} else {
-		context.Response.WriteHeader(404)
+		context.PageNotFound(404)
+	}
+	return
+}
+
+// PostAdmin get posts with all fields
+func PostAdmin(context *register.HandleContext) (err error) {
+	if !user.CheckToken(context.GetCookie("token")) {
+		context.Forbidden()
+		return
+	}
+
+	args := PostRequest{}
+	context.RequestArgs(&args)
+
+	res, err := post.GetAllFieldPost(args.URL)
+	if err != nil {
+		return
+	}
+
+	go post.IncView(args.URL)
+
+	if res.URL == args.URL {
+		context.ReturnJSON(res)
+	} else {
+		context.PageNotFound(404)
 	}
 	return
 }
