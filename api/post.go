@@ -26,7 +26,7 @@ func Post(context *register.HandleContext) (err error) {
 	if res.URL == args.URL {
 		context.ReturnJSON(res)
 	} else {
-		context.PageNotFound(404)
+		context.PageNotFound()
 	}
 	return
 }
@@ -51,7 +51,7 @@ func PostAdmin(context *register.HandleContext) (err error) {
 	if res.URL == args.URL {
 		context.ReturnJSON(res)
 	} else {
-		context.PageNotFound(404)
+		context.PageNotFound()
 	}
 	return
 }
