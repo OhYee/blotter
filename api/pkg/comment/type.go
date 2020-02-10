@@ -29,7 +29,7 @@ func (cm *TypeDB) ToComment() *Type {
 		Time:     time.ToString(cm.Time),
 		Content:  cm.Content,
 		Children: []*Type{},
-		Ad:       cm.Show,
+		Ad:       cm.Ad,
 		Show:     cm.Show,
 		Recv:     cm.Recv,
 	}
@@ -37,15 +37,15 @@ func (cm *TypeDB) ToComment() *Type {
 
 // Type type
 type Type struct {
-	ID       string     `json:"id" bson:"_id"`
-	Email    string     `json:"email" bson:"email"`
-	Avatar   string     `json:"avatar" bson:"avatar"`
-	Time     string     `json:"time" bson:"time"`
-	Content  string     `json:"content" bson:"content"`
+	ID       string  `json:"id" bson:"_id"`
+	Email    string  `json:"email" bson:"email"`
+	Avatar   string  `json:"avatar" bson:"avatar"`
+	Time     string  `json:"time" bson:"time"`
+	Content  string  `json:"content" bson:"content"`
 	Children []*Type `json:"children" bson:"children"`
-	Ad       bool       `json:"ad" bson:"ad"`
-	Show     bool       `json:"show" bson:"show"`
-	Recv     bool       `json:"recv" bson:"recv"`
+	Ad       bool    `json:"ad" bson:"ad"`
+	Show     bool    `json:"show" bson:"show"`
+	Recv     bool    `json:"recv" bson:"recv"`
 }
 
 // Info base info of comment
