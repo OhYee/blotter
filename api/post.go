@@ -23,7 +23,7 @@ func Post(context *register.HandleContext) (err error) {
 
 	go post.IncView(args.URL)
 
-	if res.URL == args.URL {
+	if res.URL == args.URL && args.URL != "" {
 		context.ReturnJSON(res)
 	} else {
 		context.PageNotFound()
@@ -48,7 +48,7 @@ func PostAdmin(context *register.HandleContext) (err error) {
 
 	go post.IncView(args.URL)
 
-	if res.URL == args.URL {
+	if res.URL == args.URL && args.URL != "" {
 		context.ReturnJSON(res)
 	} else {
 		context.PageNotFound()
