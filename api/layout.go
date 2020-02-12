@@ -15,7 +15,7 @@ type LayoutResponse struct {
 	View     int         `json:"view"`
 	Beian    string      `json:"beian"`
 	BlogName string      `json:"blog_name"`
-	Token    string      `json:"token"`
+	// Token    string      `json:"token"`
 }
 
 // Layout get site base info
@@ -39,7 +39,7 @@ func Layout(context *register.HandleContext) (err error) {
 	if err = m.SetString("blog_name", &res.BlogName); err != nil {
 		return
 	}
-	res.Token = context.GetCookie("token")
+	// res.Token = context.GetCookie("token")
 
 	go func() {
 		mongo.Update(
