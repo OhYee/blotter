@@ -68,6 +68,7 @@ func Logout(context *register.HandleContext) (err error) {
 		res.Title = "登出失败"
 		res.Content = "Token验证错误"
 	}
+	context.DeleteCookie("token")
 	context.ReturnJSON(res)
 	return
 }
