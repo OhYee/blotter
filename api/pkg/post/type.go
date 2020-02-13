@@ -39,7 +39,7 @@ type CardProps struct {
 	Time      `bson:",inline"`
 	Title     string `json:"title" bson:"title"`
 	Abstract  string `json:"abstract" bson:"abstract"`
-	View      int    `json:"view" bson:"view"`
+	View      int64  `json:"view" bson:"view"`
 	URL       string `json:"url" bson:"url"`
 	HeadImage string `json:"head_image" bson:"head_image"`
 }
@@ -61,7 +61,7 @@ type CardDBProps struct {
 	TimeDB    `bson:",inline"`
 	Title     string `json:"title" bson:"title"`
 	Abstract  string `json:"abstract" bson:"abstract"`
-	View      int    `json:"view" bson:"view"`
+	View      int64  `json:"view" bson:"view"`
 	URL       string `json:"url" bson:"url"`
 	HeadImage string `json:"head_image" bson:"head_image"`
 }
@@ -195,4 +195,13 @@ type CompleteField struct {
 	PublicProps `bson:",inline"`
 	EditProps   `bson:",inline"`
 	Tags        []tag.Type `json:"tags" bson:"tags"`
+}
+
+// DB type in database posts collection
+type DB struct {
+	ID          primitive.ObjectID `json:"id" bson:"_id"`
+	CardDBProps `bson:",inline"`
+	PublicProps `bson:",inline"`
+	EditProps   `bson:",inline"`
+	Tags        []primitive.ObjectID `json:"tags" bson:"tags"`
 }

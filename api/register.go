@@ -23,6 +23,14 @@ func Register() {
 		PostAdmin,
 	)
 	register.Register(
+		"admin/post/edit",
+		PostEdit,
+	)
+	register.Register(
+		"post/existed",
+		PostExisted,
+	)
+	register.Register(
 		"posts",
 		Posts,
 	)

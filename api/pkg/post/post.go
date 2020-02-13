@@ -1,8 +1,11 @@
 package post
 
 import (
+	"github.com/OhYee/blotter/api/pkg/markdown"
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Query posts of url
@@ -115,5 +118,112 @@ func GetCardPosts(offset int64, number int64, tag string, sortField string, sort
 	for idx, post := range postsDB {
 		posts[idx] = post.ToCard()
 	}
+	return
+}
+
+func Existed(url string) bool {
+	cnt, err := mongo.Find("blotter", "posts", bson.M{
+		"url": url,
+	}, nil, nil)
+	return !(err == nil && cnt == 0)
+}
+
+// NewPost insert a new post to database
+func NewPost(
+	title string,
+	abstract string,
+	view int64,
+	url string,
+	publishTime int64,
+	editTime int64,
+	raw string,
+	tags []string,
+	keywords []string,
+	published bool,
+	headImage string,
+) (err error) {
+
+	html, err := markdown.Render(raw)
+	if err != nil {
+		return
+	}
+	tagsID := make([]primitive.ObjectID, 0)
+	for idx, tagName := range tags {
+		if tagsID[idx], err = primitive.ObjectIDFromHex(tagName); err != nil {
+			return
+		}
+	}
+
+	p := DB{}
+	p.ID = primitive.NewObjectID()
+	p.Title = title
+	p.Abstract = abstract
+	p.View = view
+	p.URL = url
+	p.PublishTime = publishTime
+	p.EditTime = editTime
+	p.Content = html
+	p.Raw = raw
+	p.Tags = tagsID
+	p.Keywords = keywords
+	p.Published = published
+	p.HeadImage = headImage
+
+	if Existed(url) {
+		err = errors.New("Post with url existed: %s", url)
+		return
+	}
+
+	_, err = mongo.Add("blotter", "posts", nil, p)
+	return
+}
+
+// UpdatePost update post data of id
+func UpdatePost(
+	id string,
+	title string,
+	abstract string,
+	view int64,
+	url string,
+	publishTime int64,
+	editTime int64,
+	raw string,
+	tags []string,
+	keywords []string,
+	published bool,
+	headImage string,
+) (err error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return
+	}
+	html, err := markdown.Render(raw)
+	if err != nil {
+		return
+	}
+	tagsID := make([]primitive.ObjectID, 0)
+	for idx, tagName := range tags {
+		if tagsID[idx], err = primitive.ObjectIDFromHex(tagName); err != nil {
+			return
+		}
+	}
+
+	p := DB{}
+	p.ID = primitive.NewObjectID()
+	p.Title = title
+	p.Abstract = abstract
+	p.View = view
+	p.URL = url
+	p.PublishTime = publishTime
+	p.EditTime = editTime
+	p.Content = html
+	p.Raw = raw
+	p.Tags = tagsID
+	p.Keywords = keywords
+	p.Published = published
+	p.HeadImage = headImage
+	_, err = mongo.Update("blotter", "posts", bson.M{
+		"_id": objectID,
+	}, p, nil)
 	return
 }
