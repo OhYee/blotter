@@ -110,6 +110,46 @@ func (post CardFieldDB) ToCard() CardField {
 	}
 }
 
+// AdminField PostCard type
+type AdminField struct {
+	CardProps `bson:",inline"`
+	ID        string     `json:"id" bson:"_id"`
+	Published bool       `json:"published" bson:"published"`
+	Tags      []tag.Type `json:"tags" bson:"tags"`
+}
+
+// ToCardDB transfer PostCard to PostCardDB
+func (post AdminField) ToCardDB() AdminFieldDB {
+	id, err := primitive.ObjectIDFromHex(post.ID)
+	if err != nil {
+		id = primitive.ObjectID{}
+	}
+	return AdminFieldDB{
+		ID:          id,
+		CardDBProps: post.CardProps.ToCardDBProps(),
+		Published:   post.Published,
+		Tags:        post.Tags,
+	}
+}
+
+// AdminFieldDB PostCard type in database
+type AdminFieldDB struct {
+	CardDBProps `bson:",inline"`
+	ID          primitive.ObjectID `json:"id" bson:"_id"`
+	Published   bool               `json:"published" bson:"published"`
+	Tags        []tag.Type         `json:"tags" bson:"tags"`
+}
+
+// ToCard transfer PostCardDB to PostCard
+func (post AdminFieldDB) ToCard() AdminField {
+	return AdminField{
+		ID:        post.ID.Hex(),
+		CardProps: post.CardDBProps.ToCardProps(),
+		Published: post.Published,
+		Tags:      post.Tags,
+	}
+}
+
 // CardField PostCard type
 type CardField struct {
 	CardProps `bson:",inline"`

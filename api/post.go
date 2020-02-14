@@ -16,7 +16,7 @@ type PostRequest struct {
 // Post get post by url
 func Post(context *register.HandleContext) (err error) {
 	args := PostRequest{}
-	context.RequestArgs(&args)
+	context.RequestParams(&args)
 
 	res, err := post.GetPublicFieldPost(args.URL)
 	if err != nil {
@@ -41,7 +41,7 @@ func PostAdmin(context *register.HandleContext) (err error) {
 	}
 
 	args := PostRequest{}
-	context.RequestArgs(&args)
+	context.RequestParams(&args)
 
 	res, err := post.GetAllFieldPost(args.URL)
 	if err != nil {
@@ -77,9 +77,34 @@ type PostsResponse struct {
 func Posts(context *register.HandleContext) (err error) {
 	args := new(PostsRequest)
 	res := new(PostsResponse)
-	context.RequestArgs(args)
+	context.RequestParams(args)
 
 	res.Total, res.Posts, err = post.GetCardPosts(args.Offset, args.Number, args.Tag, args.SortField, args.SortType)
+	context.ReturnJSON(res)
+	return
+}
+
+// PostsAdminRequest request of posts api
+type PostsAdminRequest PostsRequest
+
+// PostsAdminResponse response of posts api
+type PostsAdminResponse struct {
+	Total int64             `json:"total"`
+	Posts []post.AdminField `json:"posts"`
+}
+
+// PostsAdmin get posts
+func PostsAdmin(context *register.HandleContext) (err error) {
+	if !user.CheckToken(context.GetCookie("token")) {
+		context.Forbidden()
+		return
+	}
+
+	args := new(PostsAdminRequest)
+	res := new(PostsAdminResponse)
+	context.RequestParams(args)
+
+	res.Total, res.Posts, err = post.GetAdminPosts(args.Offset, args.Number, args.Tag, args.SortField, args.SortType)
 	context.ReturnJSON(res)
 	return
 }
@@ -98,7 +123,7 @@ type PostExistedResponse struct {
 func PostExisted(context *register.HandleContext) (err error) {
 	args := new(PostExistedRequest)
 	res := new(PostExistedResponse)
-	context.RequestArgs(args)
+	context.RequestParams(args)
 
 	res.Existed = post.Existed(args.URL)
 
@@ -129,7 +154,7 @@ func PostEdit(context *register.HandleContext) (err error) {
 	args := new(PostEditRequest)
 	res := SimpleResponse{Success: true, Title: "操作成功"}
 
-	context.RequestArgs(args)
+	context.RequestData(args)
 
 	if args.ID == "" {
 		err = post.NewPost(
@@ -170,6 +195,34 @@ func PostEdit(context *register.HandleContext) (err error) {
 	if err != nil {
 		return
 	}
+
+	context.ReturnJSON(res)
+	return
+}
+
+// PostDeleteRequest request of PostDelete api
+type PostDeleteRequest struct {
+	ID string `json:"id"`
+}
+
+// PostDeleteResponse response of PostDeletee api
+type PostDeleteResponse SimpleResponse
+
+// PostDelete return the post is existed
+func PostDelete(context *register.HandleContext) (err error) {
+	if !user.CheckToken(context.GetCookie("token")) {
+		context.Forbidden()
+		return
+	}
+
+	args := new(PostDeleteRequest)
+	res := PostDeleteResponse{
+		Success: true,
+		Title:   "删除成功",
+	}
+	context.RequestParams(args)
+
+	post.Delete(args.ID)
 
 	context.ReturnJSON(res)
 	return

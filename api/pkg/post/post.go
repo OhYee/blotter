@@ -1,9 +1,10 @@
 package post
 
 import (
+	"fmt"
+
 	"github.com/OhYee/blotter/api/pkg/markdown"
 	"github.com/OhYee/blotter/mongo"
-	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -78,15 +79,24 @@ func IncView(url string) {
 	)
 }
 
-// GetCardPosts get all field post
-func GetCardPosts(offset int64, number int64, tag string, sortField string, sortType int) (total int64, posts []CardField, err error) {
+func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortField string, sortType int, posts interface{}) (total int64, err error) {
 	sort := bson.M{"$sort": bson.M{"publish_time": -1}}
 	if sortField != "" && (sortType == 1 || sortType == -1) {
 		sort = bson.M{"$sort": bson.M{sortField: sortType}}
 	}
-	pipeline := []bson.M{
+	pipeline := []bson.M{}
+
+	if publishedOnly {
+		pipeline = append(
+			pipeline,
+			bson.M{"$match": bson.M{"published": true}},
+		)
+	}
+
+	pipeline = append(
+		pipeline,
 		sort,
-		{
+		bson.M{
 			"$lookup": bson.M{
 				"from":         "tags",
 				"localField":   "tags",
@@ -94,7 +104,7 @@ func GetCardPosts(offset int64, number int64, tag string, sortField string, sort
 				"as":           "tags",
 			},
 		},
-	}
+	)
 
 	if tag != "" {
 		pipeline = append(
@@ -112,9 +122,28 @@ func GetCardPosts(offset int64, number int64, tag string, sortField string, sort
 		)
 	}
 
+	total, err = Query(pipeline, posts)
+	return
+}
+
+// GetCardPosts get all field post
+func GetCardPosts(offset int64, number int64, tag string, sortField string, sortType int) (total int64, posts []CardField, err error) {
 	postsDB := make([]CardFieldDB, 0)
-	total, err = Query(pipeline, &postsDB)
+	total, err = getPosts(true, offset, number, tag, sortField, sortType, &postsDB)
+
 	posts = make([]CardField, len(postsDB))
+	for idx, post := range postsDB {
+		posts[idx] = post.ToCard()
+	}
+	return
+}
+
+// GetAdminPosts get all field post
+func GetAdminPosts(offset int64, number int64, tag string, sortField string, sortType int) (total int64, posts []AdminField, err error) {
+	postsDB := make([]AdminFieldDB, 0)
+	total, err = getPosts(false, offset, number, tag, sortField, sortType, &postsDB)
+
+	posts = make([]AdminField, len(postsDB))
 	for idx, post := range postsDB {
 		posts[idx] = post.ToCard()
 	}
@@ -147,7 +176,7 @@ func NewPost(
 	if err != nil {
 		return
 	}
-	tagsID := make([]primitive.ObjectID, 0)
+	tagsID := make([]primitive.ObjectID, len(tags))
 	for idx, tagName := range tags {
 		if tagsID[idx], err = primitive.ObjectIDFromHex(tagName); err != nil {
 			return
@@ -170,7 +199,7 @@ func NewPost(
 	p.HeadImage = headImage
 
 	if Existed(url) {
-		err = errors.New("Post with url existed: %s", url)
+		err = fmt.Errorf("Post with url existed: %s", url)
 		return
 	}
 
@@ -201,7 +230,7 @@ func UpdatePost(
 	if err != nil {
 		return
 	}
-	tagsID := make([]primitive.ObjectID, 0)
+	tagsID := make([]primitive.ObjectID, len(tags))
 	for idx, tagName := range tags {
 		if tagsID[idx], err = primitive.ObjectIDFromHex(tagName); err != nil {
 			return
@@ -209,7 +238,7 @@ func UpdatePost(
 	}
 
 	p := DB{}
-	p.ID = primitive.NewObjectID()
+	p.ID = objectID
 	p.Title = title
 	p.Abstract = abstract
 	p.View = view
@@ -224,6 +253,17 @@ func UpdatePost(
 	p.HeadImage = headImage
 	_, err = mongo.Update("blotter", "posts", bson.M{
 		"_id": objectID,
-	}, p, nil)
+	}, bson.M{
+		"$set": p,
+	}, nil)
 	return
+}
+
+func Delete(id string) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err == nil {
+		mongo.Remove("blotter", "posts", bson.M{
+			"_id": objectID,
+		}, nil)
+	}
 }
