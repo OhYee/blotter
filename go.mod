@@ -6,11 +6,12 @@ require (
 	github.com/DataDog/zstd v1.4.4 // indirect
 	github.com/OhYee/goldmark-dot v0.0.0-20191005034355-67d0b6c97906
 	github.com/OhYee/goutils v0.0.0-20200129074257-382374f6da4e
-	github.com/OhYee/rainbow v0.0.0-20191216131638-b29c73c1cc83
+	github.com/OhYee/rainbow v0.0.0-20200214092021-574705b089af
 	github.com/alecthomas/chroma v0.7.1
 	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/go-delve/delve v1.3.2 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/goinggo/mapstructure v0.0.0-20140717182941-194205d9b4a9
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/gorilla/schema v1.1.0
