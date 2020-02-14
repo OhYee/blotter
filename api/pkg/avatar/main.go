@@ -23,13 +23,17 @@ func makeHTTPClient() *http.Client {
 			break
 		}
 	}
-	return &http.Client{
-		Transport: &http.Transport{
+
+	client := &http.Client{}
+	if proxy != "" {
+		client.Transport = &http.Transport{
 			Proxy: func(_ *http.Request) (*url.URL, error) {
 				return url.Parse(proxy)
 			},
-		},
+		}
 	}
+
+	return client
 }
 
 type githubSearchAPI struct {
@@ -76,7 +80,6 @@ func GetGithubAvatar(email string) (avatar string) {
 	res := githubSearchAPI{}
 
 	json.Unmarshal(data, &res)
-	fmt.Printf("%+v\n", res)
 	if res.TotalCount > 0 {
 		avatar = res.Items[0].AvatarURL
 	}
