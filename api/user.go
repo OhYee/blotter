@@ -22,7 +22,7 @@ func Login(context *register.HandleContext) (err error) {
 	args := new(LoginRequest)
 	res := new(LoginResponse)
 
-	context.RequestArgs(args)
+	context.RequestParams(args)
 
 	if args.Username == "" && user.Login(args.Password) {
 		token := user.GenerateToken()

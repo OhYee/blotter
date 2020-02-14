@@ -21,7 +21,7 @@ type AvatarResponse struct {
 func Avatar(context *register.HandleContext) (err error) {
 	args := new(AvatarRequest)
 	res := new(AvatarResponse)
-	context.RequestArgs(args)
+	context.RequestParams(args)
 
 	res.Avatar = avatar.Get(args.Email)
 

@@ -27,7 +27,7 @@ func Tags(context *register.HandleContext) (err error) {
 	args := new(TagsRequest)
 	var res interface{}
 
-	context.RequestArgs(args)
+	context.RequestParams(args)
 
 	if len(args.Keyword) == 0 {
 		resWithCount := new(TagsResponseWithCount)

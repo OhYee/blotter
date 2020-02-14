@@ -23,7 +23,7 @@ func Comments(context *register.HandleContext) (err error) {
 	args := new(CommentsRequest)
 	res := new(CommentsResponse)
 
-	context.RequestArgs(args)
+	context.RequestParams(args)
 
 	var comments []comment.TypeDB
 	if res.Total, comments, err = comment.Get(args.URL); err != nil {
@@ -49,7 +49,7 @@ type CommentAddRequest struct {
 // CommentAdd add comment apu
 func CommentAdd(context *register.HandleContext) (err error) {
 	args := new(CommentAddRequest)
-	context.RequestArgs(args)
+	context.RequestParams(args)
 
 	if err = comment.Add(args.URL, args.Reply, args.Email, args.Recv, args.Raw); err != nil {
 		return

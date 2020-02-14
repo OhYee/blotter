@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -30,6 +31,7 @@ type HandleContext struct {
 	Response http.ResponseWriter
 	buf      *bytes.Buffer
 	header   []httpHeader
+	forms    url.Values
 }
 
 // NewHandleContext initial a handle context object
@@ -42,12 +44,26 @@ func NewHandleContext(req *http.Request, rep http.ResponseWriter) *HandleContext
 	}
 }
 
-// RequestArgs get request args
-func (context *HandleContext) RequestArgs(args interface{}) {
+// RequestParams get request args of forms
+func (context *HandleContext) RequestParams(args interface{}) {
 	query := context.Forms()
 
+	// err := mapstructure.Decode(query, args)
 	err := decoder.Decode(args, query)
 	output.Debug("query %+v args: %+v err %+v", query, args, err)
+}
+
+// RequestData get request args of body(json)
+func (context *HandleContext) RequestData(args interface{}) {
+	b, err := ioutil.ReadAll(context.Request.Body)
+	if err != nil {
+		output.Err(err)
+		return
+	}
+	if err = json.Unmarshal(b, args); err != nil {
+		output.Err(err)
+		return
+	}
 }
 
 func (context *HandleContext) Forms() url.Values {

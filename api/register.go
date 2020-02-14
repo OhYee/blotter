@@ -35,6 +35,14 @@ func Register() {
 		Posts,
 	)
 	register.Register(
+		"admin/posts",
+		PostsAdmin,
+	)
+	register.Register(
+		"admin/post/delete",
+		PostDelete,
+	)
+	register.Register(
 		"markdown",
 		Markdown,
 	)
