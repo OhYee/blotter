@@ -2,7 +2,6 @@ package variable
 
 import (
 	"github.com/OhYee/blotter/mongo"
-	"github.com/OhYee/blotter/output"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -25,6 +24,5 @@ func Get(keys ...string) (res Variables, err error) {
 	for _, d := range data {
 		res[d.Key] = d.Value
 	}
-	output.Debug("%+v %+v", data, res)
 	return
 }

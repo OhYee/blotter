@@ -3,7 +3,6 @@ package mongo
 import (
 	"context"
 
-	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -111,7 +110,6 @@ func Aggregate(databaseName string, collectionName string, pipeline interface{},
 	if err != nil {
 		return
 	}
-	output.Debug("%+v", countPipeline)
 	countCur, err := conn.Collection.Aggregate(context.TODO(), countPipeline, opt)
 	if err != nil {
 		return
@@ -158,7 +156,6 @@ func pipelineTruncated(pipeline interface{}) (res []bson.M, err error) {
 	m, err := bsonFormat(pipeline)
 	end := -1
 	for i := len(m) - 1; i >= 0; i-- {
-		output.Debug("%+v", m[i])
 		if _, exist := m[i]["$limit"]; exist {
 			continue
 		}

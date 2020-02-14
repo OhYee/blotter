@@ -48,9 +48,10 @@ func NewHandleContext(req *http.Request, rep http.ResponseWriter) *HandleContext
 func (context *HandleContext) RequestParams(args interface{}) {
 	query := context.Forms()
 
-	// err := mapstructure.Decode(query, args)
 	err := decoder.Decode(args, query)
-	output.Debug("query %+v args: %+v err %+v", query, args, err)
+	if err != nil {
+		output.Err(err)
+	}
 }
 
 // RequestData get request args of body(json)
