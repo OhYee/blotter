@@ -23,7 +23,16 @@ func Register(name string, f HandleFunc) {
 
 // Call function
 func Call(name string, context *HandleContext) (err error) {
-	output.Log("Call api %s, %s, %s [%s]", name, context.Request.URL.Path, context.Forms(), context.GetCookie("token"))
+	output.Log("%s:%s [%s] %s\nCall api %s, %s, %s [%s]",
+		context.Request.Method,
+		context.Request.Host,
+		context.Request.Header.Get("nginx"),
+		context.Request.UserAgent(),
+		name,
+		context.Request.URL.Path,
+		context.Forms(),
+		context.GetCookie("token"),
+	)
 
 	api, exist := apiMap[name]
 	if !exist {
