@@ -181,7 +181,7 @@ func SendEmail(url string, html string, replyObjectID primitive.ObjectID) {
 	}
 
 	output.Debug("Send email to %+v", to)
-	email.Send(
+	err = email.Send(
 		address, username, user, password, "博客评论通知",
 		fmt.Sprintf(
 			"<html><body>您在<a href='%s'>《%s》</a>( %s )的评论收到一条回复<br><br>%s</body></html>",
@@ -189,5 +189,8 @@ func SendEmail(url string, html string, replyObjectID primitive.ObjectID) {
 		),
 		to...,
 	)
+	if err != nil {
+		output.Err(err)
+	}
 	return
 }
