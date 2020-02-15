@@ -215,3 +215,11 @@ func Remove(databaseName string, collectionName string, filter interface{},
 	count = result.DeletedCount
 	return
 }
+
+// AggregateOffset using offset in aggregate
+func AggregateOffset(offset int64, number int64) []bson.M {
+	return []bson.M{
+		bson.M{"$limit": offset + number},
+		bson.M{"$skip": offset},
+	}
+}
