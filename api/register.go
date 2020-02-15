@@ -78,4 +78,16 @@ func Register() {
 		"info",
 		Info,
 	)
+	register.Register(
+		"admin/tags/edit",
+		TagEdit,
+	)
+	register.Register(
+		"admin/tags/delete",
+		TagDelete,
+	)
+	register.Register(
+		"tags/existed",
+		TagExisted,
+	)
 }
