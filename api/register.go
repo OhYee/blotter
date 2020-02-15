@@ -79,15 +79,15 @@ func Register() {
 		Info,
 	)
 	register.Register(
-		"admin/tags/edit",
+		"admin/tag/edit",
 		TagEdit,
 	)
 	register.Register(
-		"admin/tags/delete",
+		"admin/tag/delete",
 		TagDelete,
 	)
 	register.Register(
-		"tags/existed",
+		"tag/existed",
 		TagExisted,
 	)
 }
