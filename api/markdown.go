@@ -19,7 +19,7 @@ type MarkdownResponse struct {
 func Markdown(context *register.HandleContext) (err error) {
 	args := new(MarkdownRequest)
 	res := new(MarkdownResponse)
-	context.RequestParams(args)
+	context.RequestData(args)
 
 	if res.HTML, err = markdown.Render(args.Source); err != nil {
 		return
