@@ -104,10 +104,12 @@ func Update(id string, name string, short string, color string, icon string) (er
 		"blotter", "tags",
 		bson.M{"_id": objectID},
 		bson.M{
-			"name":  name,
-			"short": short,
-			"color": color,
-			"icon":  icon,
+			"$set": bson.M{
+				"name":  name,
+				"short": short,
+				"color": color,
+				"icon":  icon,
+			},
 		},
 		nil,
 	)
