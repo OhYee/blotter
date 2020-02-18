@@ -90,4 +90,8 @@ func Register() {
 		"tag/existed",
 		TagExisted,
 	)
+	register.Register(
+		"tag",
+		Tag,
+	)
 }

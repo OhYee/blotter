@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/tag"
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
@@ -135,6 +136,37 @@ func TagExisted(context *register.HandleContext) (err error) {
 	context.RequestParams(args)
 
 	if res.Existed, err = tag.Existed(args.ID, args.Short); err != nil {
+		return
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}
+
+// TagRequest request of Tag api
+type TagRequest struct {
+	Number int64  `json:"number"`
+	Offset int64  `json:"offset"`
+	Tag    string `json:"tag"`
+}
+
+// TagResponse response of Tag api
+type TagResponse struct {
+	Tag   tag.Type         `json:"tag"`
+	Total int64            `json:"total"`
+	Posts []post.CardField `json:"posts"`
+}
+
+// Tag edit tag info
+func Tag(context *register.HandleContext) (err error) {
+	args := new(TagRequest)
+	res := new(TagResponse)
+	context.RequestParams(args)
+
+	if res.Tag, err = tag.Tag(args.Tag); err != nil {
+		return
+	}
+	if res.Total, res.Posts, err = post.GetCardPosts(args.Offset, args.Number, args.Tag, "", -1); err != nil {
 		return
 	}
 
