@@ -79,7 +79,7 @@ func IncView(url string) {
 	)
 }
 
-func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortField string, sortType int, posts interface{}) (total int64, err error) {
+func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortField string, sortType int, searchWord string, posts interface{}) (total int64, err error) {
 	sort := bson.M{"$sort": bson.M{"publish_time": -1}}
 	if sortField != "" && (sortType == 1 || sortType == -1) {
 		sort = bson.M{"$sort": bson.M{sortField: sortType}}
@@ -90,6 +90,21 @@ func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortFi
 		pipeline = append(
 			pipeline,
 			bson.M{"$match": bson.M{"published": true}},
+		)
+	}
+
+	if searchWord != "" {
+		pipeline = append(
+			pipeline,
+			bson.M{
+				"$match": bson.M{
+					"$or": []bson.M{
+						{"title": bson.M{"$regex": searchWord}},
+						{"abstract": bson.M{"$regex": searchWord}},
+						{"raw": bson.M{"$regex": searchWord}},
+					},
+				},
+			},
 		)
 	}
 
@@ -127,9 +142,9 @@ func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortFi
 }
 
 // GetCardPosts get all field post
-func GetCardPosts(offset int64, number int64, tag string, sortField string, sortType int) (total int64, posts []CardField, err error) {
+func GetCardPosts(offset int64, number int64, tag string, sortField string, sortType int, searchWord string) (total int64, posts []CardField, err error) {
 	postsDB := make([]CardFieldDB, 0)
-	total, err = getPosts(true, offset, number, tag, sortField, sortType, &postsDB)
+	total, err = getPosts(true, offset, number, tag, sortField, sortType, searchWord, &postsDB)
 
 	posts = make([]CardField, len(postsDB))
 	for idx, post := range postsDB {
@@ -139,9 +154,9 @@ func GetCardPosts(offset int64, number int64, tag string, sortField string, sort
 }
 
 // GetAdminPosts get all field post
-func GetAdminPosts(offset int64, number int64, tag string, sortField string, sortType int) (total int64, posts []AdminField, err error) {
+func GetAdminPosts(offset int64, number int64, tag string, sortField string, sortType int, searchWord string) (total int64, posts []AdminField, err error) {
 	postsDB := make([]AdminFieldDB, 0)
-	total, err = getPosts(false, offset, number, tag, sortField, sortType, &postsDB)
+	total, err = getPosts(false, offset, number, tag, sortField, sortType, searchWord, &postsDB)
 
 	posts = make([]AdminField, len(postsDB))
 	for idx, post := range postsDB {

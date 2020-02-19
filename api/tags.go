@@ -166,7 +166,7 @@ func Tag(context *register.HandleContext) (err error) {
 	if res.Tag, err = tag.Tag(args.Tag); err != nil {
 		return
 	}
-	if res.Total, res.Posts, err = post.GetCardPosts(args.Offset, args.Number, args.Tag, "", -1); err != nil {
+	if res.Total, res.Posts, err = post.GetCardPosts(args.Offset, args.Number, args.Tag, "", -1, ""); err != nil {
 		return
 	}
 
