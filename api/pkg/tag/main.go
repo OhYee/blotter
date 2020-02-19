@@ -10,6 +10,8 @@ import (
 
 // GetTags get all tags with count
 func GetTags(keyword string, offset int64, number int64, sortField string, sortInc bool) (total int64, res []WithCount, err error) {
+	res = make([]WithCount, 0)
+
 	pipeline := []bson.M{}
 	if keyword != "" {
 		pipeline = append(
