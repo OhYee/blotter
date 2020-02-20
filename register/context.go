@@ -103,6 +103,19 @@ func (context *HandleContext) ReturnJSON(data interface{}) (err error) {
 	return
 }
 
+// ReturnText return json data
+func (context *HandleContext) ReturnText(data string) (err error) {
+	context.AddHeader("Content-Type", "text/plain")
+	context.Write([]byte(data)...)
+	return
+}
+
+// ReturnXML return json data
+func (context *HandleContext) ReturnXML(data string) (err error) {
+	context.AddHeader("Content-Type", "application/xml")
+	context.Write([]byte(data)...)
+	return
+}
 func (context *HandleContext) Write(b ...byte) {
 	context.buf.Write(b)
 }
