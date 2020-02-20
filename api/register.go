@@ -94,4 +94,20 @@ func Register() {
 		"tag",
 		Tag,
 	)
+	register.Register(
+		"robots.txt",
+		Robots,
+	)
+	register.Register(
+		"sitemap.txt",
+		SitemapTXT,
+	)
+	register.Register(
+		"sitemap.xml",
+		SitemapXML,
+	)
+	register.Register(
+		"rss.xml",
+		RSSXML,
+	)
 }
