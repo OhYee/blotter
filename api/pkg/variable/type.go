@@ -37,6 +37,13 @@ func (v Variables) SetInt64(key string, value *int64) (err error) {
 	return err
 }
 
+// GetString get string value
+func (v Variables) GetString(key string) (s string, exist bool) {
+	value, exist := v[key]
+	s = value.(string)
+	return
+}
+
 // Type variable type
 type Type struct {
 	Key   string      `json:"key" bson:"key"`
