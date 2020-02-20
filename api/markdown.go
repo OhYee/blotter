@@ -21,7 +21,7 @@ func Markdown(context *register.HandleContext) (err error) {
 	res := new(MarkdownResponse)
 	context.RequestData(args)
 
-	if res.HTML, err = markdown.Render(args.Source); err != nil {
+	if res.HTML, err = markdown.Render(args.Source, true); err != nil {
 		return
 	}
 

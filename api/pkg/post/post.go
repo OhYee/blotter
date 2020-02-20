@@ -187,7 +187,7 @@ func NewPost(
 	headImage string,
 ) (err error) {
 
-	html, err := markdown.Render(raw)
+	html, err := markdown.Render(raw, true)
 	if err != nil {
 		return
 	}
@@ -241,7 +241,7 @@ func UpdatePost(
 	if err != nil {
 		return
 	}
-	html, err := markdown.Render(raw)
+	html, err := markdown.Render(raw, true)
 	if err != nil {
 		return
 	}

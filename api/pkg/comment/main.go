@@ -66,7 +66,7 @@ func MakeRelation(_comments []TypeDB) (comments []*Type) {
 
 // Add a new comment
 func Add(url string, reply string, email string, recv bool, raw string) (err error) {
-	html, err := markdown.Render(raw)
+	html, err := markdown.Render(raw, false)
 	if err != nil {
 		html = raw
 	}
