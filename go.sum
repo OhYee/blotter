@@ -22,17 +22,20 @@ github.com/OhYee/rainbow v0.0.0-20191216131638-b29c73c1cc83/go.mod h1:N7lMsUEVv5
 github.com/OhYee/rainbow v0.0.0-20200214092021-574705b089af h1:1wC2NWVJDSC0f92cnlsMqy+PddznNMS+98nV8YYgGok=
 github.com/OhYee/rainbow v0.0.0-20200214092021-574705b089af/go.mod h1:N7lMsUEVv57QF4Epb5Tmj4reIFtPoXzp6tACrUHmlb4=
 github.com/akavel/rsrc v0.8.0/go.mod h1:uLoCtb9J+EyAqh+26kdrTgmzRBFPGOolLWKpdxkKq+c=
+github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38 h1:smF2tmSOzy2Mm+0dGI2AIUHY+w0BUc+4tn40djz7+6U=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
 github.com/alecthomas/chroma v0.6.3/go.mod h1:quT2EpvJNqkuPi6DmBHB+E33FXBgBBPzyH5++Dn1LPc=
 github.com/alecthomas/chroma v0.7.0 h1:z+0HgTUmkpRDRz0SRSdMaqOLfJV4F+N1FPDZUZIDUzw=
 github.com/alecthomas/chroma v0.7.0/go.mod h1:1U/PfCsTALWWYHDnsIQkxEBM0+6LLe0v8+RSVMOwxeY=
 github.com/alecthomas/chroma v0.7.1 h1:G1i02OhUbRi2nJxcNkwJaY/J1gHXj9tt72qN6ZouLFQ=
 github.com/alecthomas/chroma v0.7.1/go.mod h1:gHw09mkX1Qp80JlYbmN9L3+4R5o6DJJ3GRShh+AICNc=
+github.com/alecthomas/colour v0.0.0-20160524082231-60882d9e2721 h1:JHZL0hZKJ1VENNfmXvHbgYlbUOvpzYzvy2aZU5gXVeo=
 github.com/alecthomas/colour v0.0.0-20160524082231-60882d9e2721/go.mod h1:QO9JBoKquHd+jz9nshCh40fOfO+JzsoXy8qTHF68zU0=
 github.com/alecthomas/kong v0.1.15/go.mod h1:0m2VYms8rH0qbCqVB2gvGHk74bqLIq0HXjCs5bNbNQU=
 github.com/alecthomas/kong v0.1.17-0.20190424132513-439c674f7ae0/go.mod h1:+inYUSluD+p4L8KdviBSgzcqEjUQOfC5fQDRFuc36lI=
 github.com/alecthomas/kong v0.2.1-0.20190708041108-0548c6b1afae/go.mod h1:+inYUSluD+p4L8KdviBSgzcqEjUQOfC5fQDRFuc36lI=
 github.com/alecthomas/kong-hcl v0.1.8-0.20190615233001-b21fea9723c8/go.mod h1:MRgZdU3vrFd05IQ89AxUZ0aYdF39BYoNFa324SodPCA=
+github.com/alecthomas/repr v0.0.0-20180818092828-117648cd9897 h1:p9Sln00KOTlrYkxI1zYWl1QLnEqAqEARBEYa8FQnQcY=
 github.com/alecthomas/repr v0.0.0-20180818092828-117648cd9897/go.mod h1:xTS7Pm1pD1mvyM075QCDSRqH6qRLXylzS24ZTpRiSzQ=
 github.com/cosiner/argv v0.0.0-20170225145430-13bacc38a0a5/go.mod h1:p/NrK5tF6ICIly4qwEDsf6VDirFiWWz0FenfYBwJaKQ=
 github.com/cpuguy83/go-md2man v1.0.8/go.mod h1:N6JayAiVKtlHSnuTCeuLSQVs75hb8q+dYQLjr7cDsKY=
@@ -118,6 +121,7 @@ github.com/markbates/safe v1.0.1/go.mod h1:nAqgmRi7cY2nqMc92/bSEeQA+R4OheNU2T1kN
 github.com/mattn/go-colorable v0.0.0-20170327083344-ded68f7a9561/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.3/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
+github.com/mattn/go-isatty v0.0.4 h1:bnP0vzxcAdeI1zdubAl5PjU6zsERjGZb7raWodagDYs=
 github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
@@ -138,6 +142,7 @@ github.com/rogpeppe/go-internal v1.1.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/rogpeppe/go-internal v1.2.2/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/russross/blackfriday v0.0.0-20180428102519-11635eb403ff/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
+github.com/sergi/go-diff v1.0.0 h1:Kpca3qRNrduNnOQeazBd0ysaKrUJiIuISHxogkT9RPQ=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/sirupsen/logrus v0.0.0-20180523074243-ea8897e79973/go.mod h1:pMByvHTf9Beacp5x1UXfOR9xyW/9antXMhjMPG0dEzc=
 github.com/sirupsen/logrus v1.4.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=

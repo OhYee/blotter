@@ -10,3 +10,20 @@ func GetFriends() (friends []Friend, err error) {
 	_, err = mongo.Find("blotter", "friends", bson.M{}, nil, &friends)
 	return
 }
+
+func SetFriends(fs []Friend) (err error) {
+	if _, err = mongo.Remove("blotter", "friends", bson.M{}, nil); err != nil {
+		return
+	}
+
+	slice := make([]interface{}, len(fs))
+	for idx, f := range fs {
+		slice[idx] = WithIndex{Index: idx, Friend: f}
+	}
+
+	_, err = mongo.Add(
+		"blotter", "friends", nil,
+		slice...,
+	)
+	return
+}

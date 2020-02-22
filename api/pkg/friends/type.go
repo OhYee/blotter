@@ -14,3 +14,9 @@ type FriendPost struct {
 	Title string `json:"title" bson:"title"`
 	Link  string `json:"link" bson:"link"`
 }
+
+// WithIndex friend type with index
+type WithIndex struct {
+	Friend `bson:",inline"`
+	Index  int `json:"index" bson:"index"`
+}

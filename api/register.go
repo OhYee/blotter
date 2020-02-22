@@ -110,4 +110,8 @@ func Register() {
 		"rss.xml",
 		RSSXML,
 	)
+	register.Register(
+		"admin/friends/set",
+		SetFriends,
+	)
 }
