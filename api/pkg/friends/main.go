@@ -3,7 +3,19 @@ package friends
 import (
 	"github.com/OhYee/blotter/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// GetSimpleFriends get simple friend type
+func GetSimpleFriends() (friends []Simple, err error) {
+	friends = make([]Simple, 0)
+	opts := options.Find().SetProjection(bson.M{
+		"name": 1,
+		"link": 1,
+	})
+	_, err = mongo.Find("blotter", "friends", bson.M{}, opts, &friends)
+	return
+}
 
 func GetFriends() (friends []Friend, err error) {
 	friends = make([]Friend, 0)

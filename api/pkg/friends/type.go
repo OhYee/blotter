@@ -1,10 +1,15 @@
 package friends
 
+// Simple friend type
+type Simple struct {
+	Link string `json:"link" bson:"link"`
+	Name string `json:"name" bson:"name"`
+}
+
 // Friend friend type
 type Friend struct {
+	Simple      `bson:",inline"`
 	Image       string       `json:"image" bson:"image"`
-	Link        string       `json:"link" bson:"link"`
-	Name        string       `json:"name" bson:"name"`
 	Description string       `json:"description" bson:"description"`
 	Posts       []FriendPost `json:"posts" bson:"posts"`
 }

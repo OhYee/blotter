@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/OhYee/blotter/api/pkg/friends"
 	"github.com/OhYee/blotter/api/pkg/menu"
 	"github.com/OhYee/blotter/api/pkg/variable"
 
@@ -11,11 +12,11 @@ import (
 
 // LayoutResponse response of layout api
 type LayoutResponse struct {
-	Menus    []menu.Type `json:"menus"`
-	View     int         `json:"view"`
-	Beian    string      `json:"beian"`
-	BlogName string      `json:"blog_name"`
-	// Token    string      `json:"token"`
+	Menus    []menu.Type      `json:"menus"`
+	View     int              `json:"view"`
+	Beian    string           `json:"beian"`
+	BlogName string           `json:"blog_name"`
+	Friends  []friends.Simple `json:"friends"`
 }
 
 // Layout get site base info
@@ -39,7 +40,9 @@ func Layout(context *register.HandleContext) (err error) {
 	if err = m.SetString("blog_name", &res.BlogName); err != nil {
 		return
 	}
-	// res.Token = context.GetCookie("token")
+	if res.Friends, err = friends.GetSimpleFriends(); err != nil {
+		return
+	}
 
 	go func() {
 		mongo.Update(
