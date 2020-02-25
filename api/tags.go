@@ -1,6 +1,9 @@
 package api
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/tag"
 	"github.com/OhYee/blotter/api/pkg/user"
@@ -164,6 +167,9 @@ func Tag(context *register.HandleContext) (err error) {
 	context.RequestParams(args)
 
 	if res.Tag, err = tag.Tag(args.Tag); err != nil {
+		if strings.HasPrefix(err.Error(), fmt.Sprintf("No tag %s", args.Tag)) {
+			context.PageNotFound()
+		}
 		return
 	}
 	if res.Total, res.Posts, err = post.GetCardPosts(args.Offset, args.Number, args.Tag, "", -1, ""); err != nil {

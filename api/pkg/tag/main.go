@@ -174,7 +174,7 @@ func Tag(short string) (tag Type, err error) {
 		return
 	}
 	if total < 1 {
-		err = errors.New("No tag %s", tag)
+		err = errors.New("No tag %s", short)
 		return
 	}
 	tag = tags[0]
