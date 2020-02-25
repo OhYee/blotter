@@ -7,6 +7,8 @@ github.com/OhYee/godot v0.0.0-20191004043452-9915dee01024 h1:aAm/rek1Pl+7zeu79BH
 github.com/OhYee/godot v0.0.0-20191004043452-9915dee01024/go.mod h1:cMA774NGmTbhLHdmozw2Ejeyyu+S5mDKC97CPgBhNGM=
 github.com/OhYee/goldmark-dot v0.0.0-20191005034355-67d0b6c97906 h1:NPzGBu7r0RVRB1GyOf3b74S8BUuUSfjE4ChpChijJwI=
 github.com/OhYee/goldmark-dot v0.0.0-20191005034355-67d0b6c97906/go.mod h1:0jDWMJxqHjH9lOg39gbm/esw4GWSbkvEwJw5zFLYTEo=
+github.com/OhYee/goldmark-image v0.0.0-20200225152144-159b4cd666c9 h1:0fp5UKD/QWGzXQNSd3UWTngY0OSmNkIHA9XqGXwPyVU=
+github.com/OhYee/goldmark-image v0.0.0-20200225152144-159b4cd666c9/go.mod h1:Ipr1RaCej3yMWwUFqtWAxKtMerJahPkV1Sh7irE+jTQ=
 github.com/OhYee/goutils v0.0.0-20191204050123-4891fd89d899 h1:52OEpkVeYqZzteOyylzq4i4skQ+3sb587BBMUl9LEsQ=
 github.com/OhYee/goutils v0.0.0-20191204050123-4891fd89d899/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/goutils v0.0.0-20200120145102-1fedfc93c251 h1:eJtPSO81qdsUxIxRcI9NMGqqf+yxYnYB0h+O0meoH9U=
@@ -172,6 +174,7 @@ github.com/yuin/goldmark v1.1.20/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.1.22 h1:0e0f6Zee9SAQ5yOZGNMWaOxqVvcc/9/kUWu/Kl91Jk8=
 github.com/yuin/goldmark v1.1.22/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.23 h1:eTodJ8hwEUvwXhb9qxQNuL/q1d+xMQClrXR4mdvV7gs=
+github.com/yuin/goldmark v1.1.23/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark-highlighting v0.0.0-20190830074347-93c30623ac23/go.mod h1:3FYTzt9w4R8wIZ1KUvvoCyOMYNcYzqLr6amkECg35Hc=
 github.com/yuin/goldmark-highlighting v0.0.0-20191202084645-78f32c8dd6d5 h1:QbH7ca1qtgZHrzvcVAEoiJIwBqrXxMOfHYfwZIniIK0=
 github.com/yuin/goldmark-highlighting v0.0.0-20191202084645-78f32c8dd6d5/go.mod h1:4QGn5rJFOASBa2uK4Q2h3BRTyJqRfsAucPFIipSTcaM=

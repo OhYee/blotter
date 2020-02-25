@@ -2,6 +2,7 @@ package markdown
 
 import (
 	dot "github.com/OhYee/goldmark-dot"
+	img "github.com/OhYee/goldmark-image"
 	qjskatex "github.com/graemephi/goldmark-qjs-katex"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
@@ -25,7 +26,7 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 			extension.DefinitionList,
 			extension.Footnote,
 			dot.NewDot("dot-svg", highlighting.NewHTMLRenderer()),
-			// mathjax.MathJax,
+			img.NewImg("image", nil),
 			&qjskatex.Extension{},
 		),
 		goldmark.WithParserOptions(
