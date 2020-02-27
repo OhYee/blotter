@@ -14,11 +14,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Login using password
-func Login(password string) bool {
+func PasswordHash(password string) string {
 	hash := sha512.New()
 	hash.Write([]byte(password))
-	password = hex.EncodeToString(hash.Sum(nil))
+	return hex.EncodeToString(hash.Sum(nil))
+}
+
+// Login using password
+func Login(password string) bool {
+	password = PasswordHash(password)
 
 	m, err := variable.Get("password")
 	if err != nil {
