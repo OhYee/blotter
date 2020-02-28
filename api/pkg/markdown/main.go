@@ -2,7 +2,9 @@ package markdown
 
 import (
 	dot "github.com/OhYee/goldmark-dot"
+	ext "github.com/OhYee/goldmark-fenced_codeblock_extension"
 	img "github.com/OhYee/goldmark-image"
+	uml "github.com/OhYee/goldmark-plantuml"
 	qjskatex "github.com/graemephi/goldmark-qjs-katex"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
@@ -25,7 +27,20 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 			extension.GFM,
 			extension.DefinitionList,
 			extension.Footnote,
-			dot.NewDot("dot-svg", highlighting.NewHTMLRenderer()),
+			ext.NewExt(
+				ext.RenderMap{
+					Language:       []string{"dot-svg"},
+					RenderFunction: dot.NewDot("dot-svg").Renderer,
+				},
+				ext.RenderMap{
+					Language:       []string{"uml-svg"},
+					RenderFunction: uml.NewUML("uml-svg").Renderer,
+				},
+				ext.RenderMap{
+					Language:       []string{"*"},
+					RenderFunction: ext.GetFencedCodeBlockRendererFunc(highlighting.NewHTMLRenderer()),
+				},
+			),
 			img.NewImg("image", nil),
 			&qjskatex.Extension{},
 		),
