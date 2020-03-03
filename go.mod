@@ -17,14 +17,14 @@ require (
 	github.com/goinggo/mapstructure v0.0.0-20140717182941-194205d9b4a9
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/gorilla/schema v1.1.0
-	github.com/graemephi/goldmark-qjs-katex v0.1.3
+	github.com/graemephi/goldmark-qjs-katex v0.1.4
 	github.com/klauspost/compress v1.10.2 // indirect
 	github.com/litao91/goldmark-mathjax v0.0.0-20191101121019-011def32b12f
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
-	github.com/yuin/goldmark v1.1.23
+	github.com/yuin/goldmark v1.1.24
 	github.com/yuin/goldmark-highlighting v0.0.0-20200218065240-d1af22c1126f
 	go.mongodb.org/mongo-driver v1.3.0
-	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d // indirect
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 )

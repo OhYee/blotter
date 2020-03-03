@@ -6,7 +6,7 @@ import (
 	ext "github.com/OhYee/goldmark-fenced_codeblock_extension"
 	img "github.com/OhYee/goldmark-image"
 	uml "github.com/OhYee/goldmark-plantuml"
-	qjskatex "github.com/OhYee/goldmark-qjs-katex"
+	qjskatex "github.com/graemephi/goldmark-qjs-katex"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
 	"github.com/yuin/goldmark/extension"
