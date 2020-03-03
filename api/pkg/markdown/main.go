@@ -47,6 +47,7 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
+			parser.WithAttribute(),
 		),
 		goldmark.WithRendererOptions(renderOpts...),
 	)
