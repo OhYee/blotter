@@ -1,11 +1,12 @@
 package markdown
 
 import (
+	"github.com/OhYee/blotter/output"
 	dot "github.com/OhYee/goldmark-dot"
 	ext "github.com/OhYee/goldmark-fenced_codeblock_extension"
 	img "github.com/OhYee/goldmark-image"
 	uml "github.com/OhYee/goldmark-plantuml"
-	qjskatex "github.com/graemephi/goldmark-qjs-katex"
+	qjskatex "github.com/OhYee/goldmark-qjs-katex"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
 	"github.com/yuin/goldmark/extension"
@@ -53,6 +54,8 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 	buf := bytes.NewBuffer([]byte{})
 	if err = md.Convert([]byte(source), buf); err == nil {
 		htmlResult = buf.String()
+	} else {
+		output.Err(err)
 	}
 	return
 }
