@@ -5,6 +5,7 @@ import (
 
 	"github.com/OhYee/blotter/api/pkg/markdown"
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/blotter/output"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -73,10 +74,12 @@ func GetPublicFieldPost(url string) (post PublicField, err error) {
 
 // IncView view +1
 func IncView(url string) {
-	mongo.Update(
+	if _, err := mongo.Update(
 		"blotter", "posts", bson.M{"url": url},
 		bson.M{"$inc": bson.M{"view": 1}}, nil,
-	)
+	); err != nil {
+		output.Err(err)
+	}
 }
 
 func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortField string, sortType int, searchWord string, posts interface{}) (total int64, err error) {

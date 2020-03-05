@@ -23,13 +23,25 @@ func Post(context *register.HandleContext) (err error) {
 		return
 	}
 
-	go post.IncView(args.URL)
-
 	if res.URL == args.URL && args.URL != "" {
 		context.ReturnJSON(res)
 	} else {
 		context.PageNotFound()
 	}
+	return
+}
+
+// ViewRequest request for inc api
+type ViewRequest struct {
+	URL string `json:"url"`
+}
+
+// View view number of the url
+func View(context *register.HandleContext) (err error) {
+	args := PostRequest{}
+	context.RequestParams(&args)
+
+	go post.IncView(args.URL)
 	return
 }
 

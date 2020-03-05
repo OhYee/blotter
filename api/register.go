@@ -114,4 +114,8 @@ func Register() {
 		"admin/friends/set",
 		SetFriends,
 	)
+	register.Register(
+		"post/view",
+		View,
+	)
 }
