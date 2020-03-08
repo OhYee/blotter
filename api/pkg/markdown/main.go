@@ -38,8 +38,10 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 					RenderFunction: uml.NewUML("uml-svg").Renderer,
 				},
 				ext.RenderMap{
-					Language:       []string{"*"},
-					RenderFunction: ext.GetFencedCodeBlockRendererFunc(highlighting.NewHTMLRenderer()),
+					Language: []string{"*"},
+					RenderFunction: ext.GetFencedCodeBlockRendererFunc(
+						highlighting.NewHTMLRenderer(highlighting.WithGuessLanguage(true)),
+					),
 				},
 			),
 			img.NewImg("image", nil),
