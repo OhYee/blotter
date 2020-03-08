@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/markdown"
@@ -19,8 +20,10 @@ func rerender(filter bson.M) (err error) {
 	if err != nil {
 		return err
 	}
-	for _, post := range *posts {
-		html, err := markdown.Render(post["raw"])
+	total := len(*posts)
+	for idx, post := range *posts {
+		fmt.Printf("%d/%d render %s\n", idx, total, post["url"])
+		html, err := markdown.Render(post["raw"], true)
 		if err != nil {
 			return err
 		}
@@ -43,15 +46,18 @@ func rerender(filter bson.M) (err error) {
 func main() {
 	var err error
 	var posts string
-	flag.StringVar(&posts, "posts", "*", "posts to rerender")
+	flag.StringVar(&posts, "posts", "", "posts to rerender")
 	flag.Parse()
 
 	if posts == "*" {
 		err = rerender(bson.M{})
 	} else {
-		err = rerender(bson.M{
-			"url": bson.M{"$in": strings.Split(posts, ",")},
-		})
+		urls := strings.Split(posts, ",")
+		if len(urls) > 0 {
+			err = rerender(bson.M{
+				"url": bson.M{"$in": urls},
+			})
+		}
 	}
 	if err != nil {
 		panic(err)
