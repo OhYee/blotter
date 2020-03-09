@@ -50,6 +50,7 @@ func MakeRelation(_comments []TypeDB) (comments []*Type) {
 
 		m[cm.ID] = cm
 		if parent, exist := m[cmdb.Reply.Hex()]; cmdb.Reply.Hex() != defaultObjectID.Hex() && exist {
+			cm.ReplyContent = parent.Content
 			parent.Children = append(parent.Children, cm)
 		}
 	}

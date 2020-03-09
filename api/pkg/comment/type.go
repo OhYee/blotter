@@ -23,29 +23,33 @@ type TypeDB struct {
 // ToComment transfer CommentDB to comment
 func (cm *TypeDB) ToComment() *Type {
 	return &Type{
-		ID:       cm.ID.Hex(),
-		Email:    cm.Email,
-		Avatar:   cm.Avatar,
-		Time:     time.ToString(cm.Time),
-		Content:  cm.Content,
-		Children: []*Type{},
-		Ad:       cm.Ad,
-		Show:     cm.Show,
-		Recv:     cm.Recv,
+		ID:           cm.ID.Hex(),
+		Email:        cm.Email,
+		Avatar:       cm.Avatar,
+		Time:         time.ToString(cm.Time),
+		Content:      cm.Content,
+		Reply:        cm.Reply,
+		ReplyContent: "",
+		Children:     []*Type{},
+		Ad:           cm.Ad,
+		Show:         cm.Show,
+		Recv:         cm.Recv,
 	}
 }
 
 // Type type
 type Type struct {
-	ID       string  `json:"id" bson:"_id"`
-	Email    string  `json:"email" bson:"email"`
-	Avatar   string  `json:"avatar" bson:"avatar"`
-	Time     string  `json:"time" bson:"time"`
-	Content  string  `json:"content" bson:"content"`
-	Children []*Type `json:"children" bson:"children"`
-	Ad       bool    `json:"ad" bson:"ad"`
-	Show     bool    `json:"show" bson:"show"`
-	Recv     bool    `json:"recv" bson:"recv"`
+	ID           string             `json:"id" bson:"_id"`
+	Email        string             `json:"email" bson:"email"`
+	Avatar       string             `json:"avatar" bson:"avatar"`
+	Time         string             `json:"time" bson:"time"`
+	Content      string             `json:"content" bson:"content"`
+	Reply        primitive.ObjectID `json:"reply" bson:"reply"`
+	ReplyContent string             `json:"reply_content" bson:"reply_content"`
+	Children     []*Type            `json:"children" bson:"children"`
+	Ad           bool               `json:"ad" bson:"ad"`
+	Show         bool               `json:"show" bson:"show"`
+	Recv         bool               `json:"recv" bson:"recv"`
 }
 
 // Info base info of comment
