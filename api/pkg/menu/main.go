@@ -21,3 +21,20 @@ func Get() (res []Type, err error) {
 	}
 	return
 }
+
+func Set(menus []Type) (err error) {
+	if _, err = mongo.Remove("blotter", "pages", bson.M{}, nil); err != nil {
+		return
+	}
+
+	slice := make([]interface{}, len(menus))
+	for idx, menu := range menus {
+		slice[idx] = WithIndex{Index: idx, Type: menu}
+	}
+
+	_, err = mongo.Add(
+		"blotter", "pages", nil,
+		slice...,
+	)
+	return
+}

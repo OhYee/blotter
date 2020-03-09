@@ -118,4 +118,8 @@ func Register() {
 		"post/view",
 		View,
 	)
+	register.Register(
+		"admin/menus/set",
+		SetMenus,
+	)
 }
