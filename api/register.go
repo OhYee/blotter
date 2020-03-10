@@ -115,7 +115,7 @@ func Register() {
 		SetFriends,
 	)
 	register.Register(
-		"post/view",
+		"view",
 		View,
 	)
 	register.Register(

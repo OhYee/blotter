@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/OhYee/blotter/api/pkg/friends"
 	"github.com/OhYee/blotter/api/pkg/menu"
+	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/variable"
 
 	"github.com/OhYee/blotter/mongo"
@@ -56,13 +57,30 @@ func Layout(context *register.HandleContext) (err error) {
 		return
 	}
 
-	go func() {
-		mongo.Update(
-			"blotter", "variables", bson.M{"key": "view"},
-			bson.M{"$inc": bson.M{"value": 1}}, nil,
-		)
-	}()
-
 	context.ReturnJSON(res)
+	return
+}
+
+// ViewRequest request for inc api
+type ViewRequest struct {
+	URL string `json:"url"`
+}
+
+// View view number of the url
+func View(context *register.HandleContext) (err error) {
+	args := PostRequest{}
+	context.RequestParams(&args)
+
+	if args.URL == "" {
+		go func() {
+			mongo.Update(
+				"blotter", "variables", bson.M{"key": "view"},
+				bson.M{"$inc": bson.M{"value": 1}}, nil,
+			)
+		}()
+	} else {
+		go post.IncView(args.URL)
+	}
+
 	return
 }

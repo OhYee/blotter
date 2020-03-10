@@ -31,20 +31,6 @@ func Post(context *register.HandleContext) (err error) {
 	return
 }
 
-// ViewRequest request for inc api
-type ViewRequest struct {
-	URL string `json:"url"`
-}
-
-// View view number of the url
-func View(context *register.HandleContext) (err error) {
-	args := PostRequest{}
-	context.RequestParams(&args)
-
-	go post.IncView(args.URL)
-	return
-}
-
 // PostAdmin get posts with all fields
 func PostAdmin(context *register.HandleContext) (err error) {
 	if !user.CheckToken(context.GetCookie("token")) {
