@@ -40,7 +40,10 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 				ext.RenderMap{
 					Language: []string{"*"},
 					RenderFunction: ext.GetFencedCodeBlockRendererFunc(
-						highlighting.NewHTMLRenderer(highlighting.WithGuessLanguage(true)),
+						highlighting.NewHTMLRenderer(
+							highlighting.WithGuessLanguage(true),
+							highlighting.WithStyle("trac"),
+						),
 					),
 				},
 			),

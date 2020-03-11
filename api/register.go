@@ -122,4 +122,8 @@ func Register() {
 		"admin/menus/set",
 		SetMenus,
 	)
+	register.Register(
+		"about",
+		About,
+	)
 }
