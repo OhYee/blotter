@@ -1,6 +1,7 @@
 package variable
 
 import (
+	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/rainbow/errors"
 )
 
@@ -12,7 +13,8 @@ func (v Variables) SetString(key string, value *string) (err error) {
 	var t interface{}
 	var ok bool
 	if t, ok = v[key]; !ok {
-		err = errors.New("Can not get value of %s", key)
+		output.Err(errors.New("Can not get value of %s", key))
+		*value = ""
 		return
 	}
 	if *value, ok = t.(string); !ok {
