@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, post
 
 
 class Taifua(Site):
@@ -11,12 +11,29 @@ class Taifua(Site):
         return url == "https://taifua.com/"
 
     def solver(self, url: str):
+        posts = []
+
         res = get("https://taifua.com/")
         soup = BeautifulSoup(res, features="lxml")
-        posts = []
         for item in soup.select(".list-title"):
             link = item.select_one("a")
             posts.append(Post(link.get_text(), link.get("href")))
+
+        res = post(
+            "https://taifua.com/wp-admin/admin-ajax.php",
+            {
+                "append": "list-home",
+                "paged": 2,
+                "action": "ajax_load_posts",
+                "query": "",
+                "page": "home",
+            },
+        )
+        soup = BeautifulSoup(res, features="lxml")
+        for item in soup.select(".list-title"):
+            link = item.select_one("a")
+            posts.append(Post(link.get_text(), link.get("href")))
+
         return posts
 
 

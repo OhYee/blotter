@@ -12,6 +12,12 @@ def get(url: str):
     return rep.text
 
 
+def post(url: str, data: object):
+    rep = requests.post(url, data, headers=headers)
+    rep.encoding = 'utf-8'
+    return rep.text
+
+
 class Site:
     def __init__(self):
         pass

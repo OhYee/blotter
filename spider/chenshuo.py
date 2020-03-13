@@ -14,5 +14,6 @@ class Chenshuo(Site):
         soup = BeautifulSoup(res, features="lxml")
         posts = []
         for item in soup.select("a.article-title"):
-            posts.append(Post(item.get_text(), item.get("href")))
+            posts.append(Post(item.get_text(), "%s/%s" %
+                              (url.strip("/"), item.get("href").strip("/"))))
         return posts

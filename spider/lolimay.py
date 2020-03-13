@@ -18,6 +18,6 @@ class Lolimay(Site):
             link = item.select_one("a")
             posts.append(Post(
                 link.get_text(),
-                "https://lolimay.cn%s" % link.get("href"),
+                "%s/%s" % (url.strip("/"), link.get("href").strip("/")),
             ))
         return posts

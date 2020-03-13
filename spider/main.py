@@ -49,7 +49,7 @@ if __name__ == '__main__':
                         {"_id": item["_id"]},
                         {
                             "$set": {
-                                "posts": [{"title": post.title, "link": post.link} for post in posts[:3]]
+                                "posts": [{"title": post.title, "link": post.link} for post in posts[:5]]
                             }
                         }
                     )
