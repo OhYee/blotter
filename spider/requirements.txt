@@ -1,3 +1,5 @@
 feedparser
 beautifulsoup4
 pymongo
+requests
+lxml
