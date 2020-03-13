@@ -11,6 +11,7 @@ type Friend struct {
 	Simple      `bson:",inline"`
 	Image       string       `json:"image" bson:"image"`
 	Description string       `json:"description" bson:"description"`
+	RSS         string       `json:"rss" bson:"rss"`
 	Posts       []FriendPost `json:"posts" bson:"posts"`
 }
 
