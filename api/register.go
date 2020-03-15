@@ -126,4 +126,12 @@ func Register() {
 		"about",
 		About,
 	)
+	register.Register(
+		"admin/variables",
+		Variables,
+	)
+	register.Register(
+		"admin/variables/set",
+		VariablesSet,
+	)
 }
