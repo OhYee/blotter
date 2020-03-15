@@ -9,7 +9,7 @@ import (
 func Get(keys ...string) (res Variables, err error) {
 	res = make(Variables)
 
-	data := make([]Type, 0)
+	data := make([]map[string]interface{}, 0)
 	_, err = mongo.Find(
 		"blotter",
 		"variables",
@@ -21,7 +21,8 @@ func Get(keys ...string) (res Variables, err error) {
 		nil,
 		&data,
 	)
-	for _, d := range data {
+
+	for _, d := range FromMapSliceToTypeSlice(data) {
 		res[d.Key] = d.Value
 	}
 	return

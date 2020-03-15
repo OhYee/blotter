@@ -51,3 +51,20 @@ type Type struct {
 	Key   string      `json:"key" bson:"key"`
 	Value interface{} `json:"value" bson:"value"`
 }
+
+// FromMapToType transfer map[string]interface{} to Type
+func FromMapToType(m map[string]interface{}) (t Type) {
+	return Type{
+		Key:   m["key"].(string),
+		Value: m["value"],
+	}
+}
+
+// FromMapSliceToTypeSlice transfer []map[string]interface{} to []Type
+func FromMapSliceToTypeSlice(ms []map[string]interface{}) (ts []Type) {
+	ts = make([]Type, len(ms))
+	for idx, m := range ms {
+		ts[idx] = FromMapToType(m)
+	}
+	return
+}
