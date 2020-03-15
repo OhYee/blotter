@@ -1,8 +1,11 @@
 package variable
 
 import (
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/rainbow/errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Variables type
@@ -37,6 +40,37 @@ func (v Variables) SetInt64(key string, value *int64) (err error) {
 		return
 	}
 	return err
+}
+
+// SetArray set value of key to int64
+func (v Variables) SetArray(key string, value interface{}) (err error) {
+	var t interface{}
+	var ok bool
+	var array primitive.A
+	if t, ok = v[key]; !ok {
+		err = errors.New("Can not get value of %s", key)
+		return
+	}
+	if array, ok = t.(primitive.A); !ok {
+		err = errors.New("Value of %s is %s %T, not %t", key, t, t, array)
+		return
+	}
+	m := make([]map[string]interface{}, len(array))
+	for idx, item := range array {
+		switch item.(type) {
+		case primitive.D:
+			m[idx] = item.(primitive.D).Map()
+		case map[string]interface{}:
+			m[idx] = item.(map[string]interface{})
+		case primitive.M:
+			m[idx] = item.(primitive.M)
+		default:
+			err = errors.New("Can not transfer %s array item  %+v %T to map[string]interface{}", key, item, item)
+			return
+		}
+	}
+	err = mapstructure.Decode(m, value)
+	return
 }
 
 // GetString get string value
