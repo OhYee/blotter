@@ -1,10 +1,7 @@
 package api
 
 import (
-	"encoding/json"
-
 	"github.com/OhYee/blotter/api/pkg/variable"
-	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -35,7 +32,6 @@ type AboutResponse struct {
 // About get avatar of emial
 func About(context *register.HandleContext) (err error) {
 	res := new(AboutResponse)
-	var edu, awards string
 
 	data, err := variable.Get("github", "qq", "email", "zhihu", "author", "quote", "description", "edu", "awards")
 	if err != nil {
@@ -62,18 +58,11 @@ func About(context *register.HandleContext) (err error) {
 	if err = data.SetString("description", &res.Description); err != nil {
 		return
 	}
-	if err = data.SetString("edu", &edu); err != nil {
+	if err = data.SetArray("edu", &res.Edu); err != nil {
 		return
 	}
-	if err = data.SetString("awards", &awards); err != nil {
+	if err = data.SetArray("awards", &res.Awards); err != nil {
 		return
-	}
-
-	if err = json.Unmarshal([]byte(edu), &res.Edu); err != nil {
-		output.Err(err)
-	}
-	if err = json.Unmarshal([]byte(awards), &res.Awards); err != nil {
-		output.Err(err)
 	}
 
 	err = context.ReturnJSON(res)
