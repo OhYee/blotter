@@ -82,7 +82,15 @@ func IncView(url string) {
 	}
 }
 
-func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortField string, sortType int, searchWord string, posts interface{}) (total int64, err error) {
+func getPosts(
+	publishedOnly bool,
+	offset int64, number int64,
+	withTags []string,
+	withoutTags []string,
+	sortField string, sortType int,
+	searchWord string,
+	posts interface{},
+) (total int64, err error) {
 	sort := bson.M{"$sort": bson.M{"publish_time": -1}}
 	if sortField != "" && (sortType == 1 || sortType == -1) {
 		sort = bson.M{"$sort": bson.M{sortField: sortType}}
@@ -114,6 +122,25 @@ func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortFi
 	pipeline = append(
 		pipeline,
 		sort,
+	)
+
+	withTagsID := mongo.StringToObjectIDs(withTags...)
+	withoutTagsID := mongo.StringToObjectIDs(withoutTags...)
+	if len(withTagsID) != 0 {
+		pipeline = append(
+			pipeline,
+			bson.M{"$match": bson.M{"tags": bson.M{"$in": withTagsID}}},
+		)
+	}
+	if len(withoutTagsID) != 0 {
+		pipeline = append(
+			pipeline,
+			bson.M{"$match": bson.M{"tags": bson.M{"$nin": withoutTagsID}}},
+		)
+	}
+
+	pipeline = append(
+		pipeline,
 		bson.M{
 			"$lookup": bson.M{
 				"from":         "tags",
@@ -123,14 +150,6 @@ func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortFi
 			},
 		},
 	)
-
-	if tag != "" {
-		pipeline = append(
-			pipeline,
-			bson.M{"$set": bson.M{"temp": "$tags.short"}},
-			bson.M{"$match": bson.M{"temp": tag}},
-		)
-	}
 
 	if offset != 0 || number != 0 {
 		pipeline = append(
@@ -145,9 +164,14 @@ func getPosts(publishedOnly bool, offset int64, number int64, tag string, sortFi
 }
 
 // GetCardPosts get all field post
-func GetCardPosts(offset int64, number int64, tag string, sortField string, sortType int, searchWord string) (total int64, posts []CardField, err error) {
+func GetCardPosts(
+	offset int64, number int64,
+	withTags []string, withoutTags []string,
+	sortField string, sortType int,
+	searchWord string,
+) (total int64, posts []CardField, err error) {
 	postsDB := make([]CardFieldDB, 0)
-	total, err = getPosts(true, offset, number, tag, sortField, sortType, searchWord, &postsDB)
+	total, err = getPosts(true, offset, number, withTags, withoutTags, sortField, sortType, searchWord, &postsDB)
 
 	posts = make([]CardField, len(postsDB))
 	for idx, post := range postsDB {
@@ -157,9 +181,15 @@ func GetCardPosts(offset int64, number int64, tag string, sortField string, sort
 }
 
 // GetAdminPosts get all field post
-func GetAdminPosts(offset int64, number int64, tag string, sortField string, sortType int, searchWord string) (total int64, posts []AdminField, err error) {
+func GetAdminPosts(
+	offset int64, number int64,
+	withTags []string, withoutTags []string,
+	sortField string,
+	sortType int,
+	searchWord string,
+) (total int64, posts []AdminField, err error) {
 	postsDB := make([]AdminFieldDB, 0)
-	total, err = getPosts(false, offset, number, tag, sortField, sortType, searchWord, &postsDB)
+	total, err = getPosts(false, offset, number, withTags, withoutTags, sortField, sortType, searchWord, &postsDB)
 
 	posts = make([]AdminField, len(postsDB))
 	for idx, post := range postsDB {
