@@ -58,12 +58,13 @@ func PostAdmin(context *register.HandleContext) (err error) {
 
 // PostsRequest request of posts api
 type PostsRequest struct {
-	Number    int64  `json:"number"`
-	Offset    int64  `json:"offset"`
-	Tag       string `json:"tag"`
-	SortField string `json:"sort_field"`
-	SortType  int    `json:"sort_type"`
-	Search    string `json:"search"`
+	Number      int64  `json:"number"`
+	Offset      int64  `json:"offset"`
+	WithTags    string `json:"with_tags"`
+	WithoutTags string `json:"without_tags"`
+	SortField   string `json:"sort_field"`
+	SortType    int    `json:"sort_type"`
+	Search      string `json:"search"`
 }
 
 // PostsResponse response of posts api
@@ -78,7 +79,12 @@ func Posts(context *register.HandleContext) (err error) {
 	res := new(PostsResponse)
 	context.RequestParams(args)
 
-	res.Total, res.Posts, err = post.GetCardPosts(args.Offset, args.Number, args.Tag, args.SortField, args.SortType, args.Search)
+	res.Total, res.Posts, err = post.GetCardPosts(
+		args.Offset, args.Number,
+		strings.Split(args.WithTags, ","), strings.Split(args.WithoutTags, ","),
+		args.SortField, args.SortType,
+		args.Search,
+	)
 	context.ReturnJSON(res)
 	return
 }
@@ -103,7 +109,12 @@ func PostsAdmin(context *register.HandleContext) (err error) {
 	res := new(PostsAdminResponse)
 	context.RequestParams(args)
 
-	res.Total, res.Posts, err = post.GetAdminPosts(args.Offset, args.Number, args.Tag, args.SortField, args.SortType, args.Search)
+	res.Total, res.Posts, err = post.GetAdminPosts(
+		args.Offset, args.Number,
+		strings.Split(args.WithTags, ","), strings.Split(args.WithoutTags, ","),
+		args.SortField, args.SortType,
+		args.Search,
+	)
 	context.ReturnJSON(res)
 	return
 }

@@ -45,7 +45,7 @@ func RSSXML(context *register.HandleContext) (err error) {
 	blogName, _ := variables.GetString("blog_name")
 	author, _ := variables.GetString("author")
 
-	total, posts, err := post.GetCardPosts(0, 0, "", "", 0, "")
+	total, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "")
 	if err != nil {
 		return
 	}
