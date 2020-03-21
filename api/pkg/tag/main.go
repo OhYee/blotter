@@ -162,8 +162,8 @@ func Existed(id string, short string) (existed bool, err error) {
 	return
 }
 
-// Tag get tag with short
-func Tag(short string) (tag Type, err error) {
+// Get tag with short
+func Get(short string) (tag Type, err error) {
 	tags := make([]Type, 0)
 
 	total, err := mongo.Find("blotter", "tags", bson.M{
