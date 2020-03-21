@@ -5,6 +5,7 @@ import (
 
 	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -222,4 +223,15 @@ func AggregateOffset(offset int64, number int64) []bson.M {
 		bson.M{"$limit": offset + number},
 		bson.M{"$skip": offset},
 	}
+}
+
+func StringToObjectIDs(idStrings ...string) (ids []primitive.ObjectID) {
+	ids = make([]primitive.ObjectID, 0)
+	for _, s := range idStrings {
+		id, e := primitive.ObjectIDFromHex(s)
+		if e == nil {
+			ids = append(ids, id)
+		}
+	}
+	return ids
 }
