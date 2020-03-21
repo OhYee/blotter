@@ -166,13 +166,17 @@ func Tag(context *register.HandleContext) (err error) {
 	res := new(TagResponse)
 	context.RequestParams(args)
 
-	if res.Tag, err = tag.Tag(args.Tag); err != nil {
+	if res.Tag, err = tag.Get(args.Tag); err != nil {
 		if strings.HasPrefix(err.Error(), fmt.Sprintf("No tag %s", args.Tag)) {
 			context.PageNotFound()
 		}
 		return
 	}
-	if res.Total, res.Posts, err = post.GetCardPosts(args.Offset, args.Number, args.Tag, "", -1, ""); err != nil {
+	if res.Total, res.Posts, err = post.GetCardPosts(
+		args.Offset, args.Number,
+		[]string{res.Tag.ID}, []string{},
+		"", -1, "",
+	); err != nil {
 		return
 	}
 
