@@ -104,6 +104,21 @@ func getPosts(
 		)
 	}
 
+	withTagsID := mongo.StringToObjectIDs(withTags...)
+	withoutTagsID := mongo.StringToObjectIDs(withoutTags...)
+	if len(withTagsID) != 0 {
+		pipeline = append(
+			pipeline,
+			bson.M{"$match": bson.M{"tags": bson.M{"$in": withTagsID}}},
+		)
+	}
+	if len(withoutTagsID) != 0 {
+		pipeline = append(
+			pipeline,
+			bson.M{"$match": bson.M{"tags": bson.M{"$nin": withoutTagsID}}},
+		)
+	}
+
 	if searchWord != "" {
 		pipeline = append(
 			pipeline,
@@ -123,21 +138,6 @@ func getPosts(
 		pipeline,
 		sort,
 	)
-
-	withTagsID := mongo.StringToObjectIDs(withTags...)
-	withoutTagsID := mongo.StringToObjectIDs(withoutTags...)
-	if len(withTagsID) != 0 {
-		pipeline = append(
-			pipeline,
-			bson.M{"$match": bson.M{"tags": bson.M{"$in": withTagsID}}},
-		)
-	}
-	if len(withoutTagsID) != 0 {
-		pipeline = append(
-			pipeline,
-			bson.M{"$match": bson.M{"tags": bson.M{"$nin": withoutTagsID}}},
-		)
-	}
 
 	pipeline = append(
 		pipeline,
