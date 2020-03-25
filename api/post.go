@@ -58,13 +58,14 @@ func PostAdmin(context *register.HandleContext) (err error) {
 
 // PostsRequest request of posts api
 type PostsRequest struct {
-	Number      int64  `json:"number"`
-	Offset      int64  `json:"offset"`
-	WithTags    string `json:"with_tags"`
-	WithoutTags string `json:"without_tags"`
-	SortField   string `json:"sort_field"`
-	SortType    int    `json:"sort_type"`
-	Search      string `json:"search"`
+	Number       int64  `json:"number"`
+	Offset       int64  `json:"offset"`
+	WithTags     string `json:"with_tags"`
+	WithoutTags  string `json:"without_tags"`
+	SortField    string `json:"sort_field"`
+	SortType     int    `json:"sort_type"`
+	Search       string `json:"search"`
+	SearchFields string `json:"search_fields"`
 }
 
 // PostsResponse response of posts api
@@ -83,7 +84,7 @@ func Posts(context *register.HandleContext) (err error) {
 		args.Offset, args.Number,
 		strings.Split(args.WithTags, ","), strings.Split(args.WithoutTags, ","),
 		args.SortField, args.SortType,
-		args.Search,
+		args.Search, strings.Split(args.SearchFields, ","),
 	)
 	context.ReturnJSON(res)
 	return
@@ -113,7 +114,7 @@ func PostsAdmin(context *register.HandleContext) (err error) {
 		args.Offset, args.Number,
 		strings.Split(args.WithTags, ","), strings.Split(args.WithoutTags, ","),
 		args.SortField, args.SortType,
-		args.Search,
+		args.Search, strings.Split(args.SearchFields, ","),
 	)
 	context.ReturnJSON(res)
 	return

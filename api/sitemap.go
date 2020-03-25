@@ -16,7 +16,7 @@ func SitemapTXT(context *register.HandleContext) (err error) {
 		return
 	}
 	root, _ := variables.GetString("root")
-	total, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "")
+	total, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "", []string{})
 	if err != nil {
 		return
 	}
@@ -37,7 +37,7 @@ func SitemapXML(context *register.HandleContext) (err error) {
 		return
 	}
 	root, _ := variables.GetString("root")
-	total, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "")
+	total, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "", []string{})
 	if err != nil {
 		return
 	}

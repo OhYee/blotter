@@ -88,7 +88,7 @@ func getPosts(
 	withTags []string,
 	withoutTags []string,
 	sortField string, sortType int,
-	searchWord string,
+	searchWord string, searchFields []string,
 	posts interface{},
 ) (total int64, err error) {
 	sort := bson.M{"$sort": bson.M{"publish_time": -1}}
@@ -120,17 +120,13 @@ func getPosts(
 	}
 
 	if searchWord != "" {
+		s := make([]bson.M, len(searchFields))
+		for idx, ss := range searchFields {
+			s[idx] = bson.M{ss: bson.M{"$regex": searchWord, "$options": "i"}}
+		}
 		pipeline = append(
 			pipeline,
-			bson.M{
-				"$match": bson.M{
-					"$or": []bson.M{
-						{"title": bson.M{"$regex": searchWord}},
-						{"abstract": bson.M{"$regex": searchWord}},
-						{"raw": bson.M{"$regex": searchWord}},
-					},
-				},
-			},
+			bson.M{"$match": bson.M{"$or": s}},
 		)
 	}
 
@@ -168,10 +164,10 @@ func GetCardPosts(
 	offset int64, number int64,
 	withTags []string, withoutTags []string,
 	sortField string, sortType int,
-	searchWord string,
+	searchWord string, searchFields []string,
 ) (total int64, posts []CardField, err error) {
 	postsDB := make([]CardFieldDB, 0)
-	total, err = getPosts(true, offset, number, withTags, withoutTags, sortField, sortType, searchWord, &postsDB)
+	total, err = getPosts(true, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
 
 	posts = make([]CardField, len(postsDB))
 	for idx, post := range postsDB {
@@ -186,10 +182,10 @@ func GetAdminPosts(
 	withTags []string, withoutTags []string,
 	sortField string,
 	sortType int,
-	searchWord string,
+	searchWord string, searchFields []string,
 ) (total int64, posts []AdminField, err error) {
 	postsDB := make([]AdminFieldDB, 0)
-	total, err = getPosts(false, offset, number, withTags, withoutTags, sortField, sortType, searchWord, &postsDB)
+	total, err = getPosts(false, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
 
 	posts = make([]AdminField, len(postsDB))
 	for idx, post := range postsDB {
