@@ -18,7 +18,7 @@ class Tinshine(Site):
         posts = []
         for item in soup.select(".card"):
             posts.append(Post(
-                item.select_one(".card-body").get_text(),
+                item.select_one(".card-header").get_text(),
                 "%s/%s" % (url.strip("/"),
                            item.parent.get("href").strip("/"))
             ))
