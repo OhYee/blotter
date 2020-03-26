@@ -9,6 +9,7 @@ from shawnluo import ShawnLuo
 from omegaxyz import OmegaXYZ
 from chenshuo import Chenshuo
 from csdn import CSDN
+from tinshine import Tinshine
 
 sites = [
     RSS(),
@@ -19,6 +20,7 @@ sites = [
     OmegaXYZ(),
     Chenshuo(),
     CSDN(),
+    Tinshine(),
 ]
 
 
