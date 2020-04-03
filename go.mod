@@ -9,7 +9,7 @@ require (
 	github.com/OhYee/goldmark-fenced_codeblock_extension v0.0.0-20200228190752-92c5eff33995
 	github.com/OhYee/goldmark-image v0.0.0-20200225152626-f210e1c79b45
 	github.com/OhYee/goldmark-plantuml v0.0.0-20200228185412-bd2cf0f6fd38
-	github.com/OhYee/goutils v0.0.0-20200129074257-382374f6da4e
+	github.com/OhYee/goutils v0.0.0-20200402075346-bfaa3d7ac10e
 	github.com/OhYee/rainbow v0.0.0-20200214092021-574705b089af
 	github.com/alecthomas/chroma v0.7.1
 	github.com/dlclark/regexp2 v1.2.0 // indirect
