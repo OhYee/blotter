@@ -27,6 +27,22 @@ func (v Variables) SetString(key string, value *string) (err error) {
 	return err
 }
 
+// SetBool set value of key to bool
+func (v Variables) SetBool(key string, value *bool, defaultValue bool) (err error) {
+	var t interface{}
+	var ok bool
+	if t, ok = v[key]; !ok {
+		output.Err(errors.New("Can not get value of %s", key))
+		*value = defaultValue
+		return
+	}
+	if *value, ok = t.(bool); !ok {
+		err = errors.New("Value of %s is %s %T, not %t", key, t, *value)
+		return
+	}
+	return err
+}
+
 // SetInt64 set value of key to int64
 func (v Variables) SetInt64(key string, value *int64) (err error) {
 	var t interface{}
