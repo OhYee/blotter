@@ -134,4 +134,8 @@ func Register() {
 		"admin/variables/set",
 		VariablesSet,
 	)
+	register.Register(
+		"admin/comments",
+		AdminComments,
+	)
 }

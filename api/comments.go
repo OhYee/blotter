@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/OhYee/blotter/api/pkg/comment"
+	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 )
@@ -57,5 +58,35 @@ func CommentAdd(context *register.HandleContext) (err error) {
 
 	context.ReturnJSON(SimpleResponse{Success: true, Title: "评论发布成功"})
 
+	return
+}
+
+// AdminCommentsRequest request for AdminComments api
+type AdminCommentsRequest struct {
+	Number int64 `json:"number"`
+	Offset int64 `json:"Offset"`
+}
+
+// AdminCommentsResponse response for AdminComments api
+type AdminCommentsResponse struct {
+	Total    int64           `json:"total"`
+	Comments []comment.Admin `json:"comments"`
+}
+
+// AdminComments api for admin comments page
+func AdminComments(context *register.HandleContext) (err error) {
+	if !user.CheckToken(context.GetCookie("token")) {
+		context.Forbidden()
+		return
+	}
+
+	args := new(AdminCommentsRequest)
+	res := new(AdminCommentsResponse)
+	context.RequestParams(args)
+
+	if res.Total, res.Comments, err = comment.GetAdmin(args.Offset, args.Number); err != nil {
+		return
+	}
+	err = context.ReturnJSON(res)
 	return
 }
