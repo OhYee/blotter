@@ -52,6 +52,16 @@ type Type struct {
 	Recv         bool               `json:"recv" bson:"recv"`
 }
 
+// Admin comment Type
+type Admin struct {
+	TypeDB       `bson:",inline"`
+	ReplyComment TypeDB `json:"reply_comment" bson:"reply_comment"`
+	Post         struct {
+		Title string `json:"title" bson:"title"`
+		URL   string `json:"url" bson:"url"`
+	} `json:"post" bson:"post"`
+}
+
 // Info base info of comment
 type Info struct {
 	Title string `json:"title" bson:"title"`
