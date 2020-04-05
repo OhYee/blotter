@@ -46,7 +46,7 @@ type CommentAddRequest struct {
 	Raw   string `json:"raw"`
 }
 
-// CommentAdd add comment apu
+// CommentAdd add comment api
 func CommentAdd(context *register.HandleContext) (err error) {
 	args := new(CommentAddRequest)
 	context.RequestParams(args)
