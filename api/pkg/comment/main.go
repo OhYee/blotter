@@ -37,6 +37,80 @@ func Get(url string) (total int64, comments []TypeDB, err error) {
 	return
 }
 
+// GetAdmin get comments for admin page
+func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err error) {
+	comments = make([]Admin, 0)
+
+	pipeline := []bson.M{
+		bson.M{
+			"$set": bson.M{
+				"link": bson.M{
+					"$arrayElemAt": []interface{}{
+						bson.M{"$split": []string{"$url", "/post/"}}, 1,
+					},
+				},
+			},
+		},
+		bson.M{
+			"$lookup": bson.M{
+				"from":         "posts",
+				"localField":   "link",
+				"foreignField": "url",
+				"as":           "post",
+			},
+		},
+		bson.M{
+			"$lookup": bson.M{
+				"from":         "comments",
+				"localField":   "reply",
+				"foreignField": "_id",
+				"as":           "reply_comment",
+			},
+		},
+		bson.M{
+			"$set": bson.M{"reply_comment": bson.M{"$arrayElemAt": []interface{}{"$reply_comment", 0}}},
+		},
+		bson.M{
+			"$set": bson.M{"post": bson.M{"$arrayElemAt": []interface{}{"$post", 0}}},
+		},
+		bson.M{
+			"$set": bson.M{
+				"post.url": bson.M{"$concat": []string{"/post/", "$post.url"}},
+			},
+		},
+		bson.M{
+			"$project": bson.M{
+				"post.content":      0,
+				"post.raw":          0,
+				"post.tags":         0,
+				"post.keywords":     0,
+				"post.published":    0,
+				"post.head_image":   0,
+				"post.edit_time":    0,
+				"post.publish_time": 0,
+				"post.abstract":     0,
+			},
+		},
+		bson.M{
+			"$sort": bson.M{"time": -1},
+		},
+	}
+	if number != 0 {
+		pipeline = append(pipeline, mongo.AggregateOffset(offset, number)...)
+	}
+	total, err = mongo.Aggregate(
+		"blotter",
+		"comments",
+		pipeline,
+		nil,
+		&comments,
+	)
+	if err != nil {
+		return
+	}
+	return
+}
+
 // MakeRelation make comment relation
 func MakeRelation(_comments []TypeDB) (comments []*Type) {
 	m := make(map[string]*Type)
