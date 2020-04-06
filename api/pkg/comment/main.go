@@ -39,7 +39,7 @@ func Get(url string) (total int64, comments []TypeDB, err error) {
 
 // GetAdmin get comments for admin page
 func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err error) {
-	comments = make([]Admin, 0)
+	commentsDB := make([]AdminDB, 0)
 
 	pipeline := []bson.M{
 		bson.M{
@@ -75,20 +75,12 @@ func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err er
 		},
 		bson.M{
 			"$set": bson.M{
-				"post.url": bson.M{"$concat": []string{"/post/", "$post.url"}},
+				"title": "$post.title",
 			},
 		},
 		bson.M{
 			"$project": bson.M{
-				"post.content":      0,
-				"post.raw":          0,
-				"post.tags":         0,
-				"post.keywords":     0,
-				"post.published":    0,
-				"post.head_image":   0,
-				"post.edit_time":    0,
-				"post.publish_time": 0,
-				"post.abstract":     0,
+				"post": 0,
 			},
 		},
 		bson.M{
@@ -103,10 +95,15 @@ func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err er
 		"comments",
 		pipeline,
 		nil,
-		&comments,
+		&commentsDB,
 	)
 	if err != nil {
 		return
+	}
+
+	comments = make([]Admin, len(commentsDB))
+	for idx, commentDB := range commentsDB {
+		comments[idx] = *commentDB.ToAdmin()
 	}
 	return
 }

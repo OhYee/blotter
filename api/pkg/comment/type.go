@@ -52,14 +52,29 @@ type Type struct {
 	Recv         bool               `json:"recv" bson:"recv"`
 }
 
-// Admin comment Type
-type Admin struct {
+// AdminDB comment database Type
+type AdminDB struct {
 	TypeDB       `bson:",inline"`
 	ReplyComment TypeDB `json:"reply_comment" bson:"reply_comment"`
-	Post         struct {
-		Title string `json:"title" bson:"title"`
-		URL   string `json:"url" bson:"url"`
-	} `json:"post" bson:"post"`
+	Title        string `json:"title" bson:"title"`
+}
+
+// ToAdmin transfer AdminDB to Admin
+func (comment AdminDB) ToAdmin() *Admin {
+	return &Admin{
+		Type:         *comment.TypeDB.ToComment(),
+		ReplyComment: *comment.ReplyComment.ToComment(),
+		Title:        comment.Title,
+		URL:          comment.TypeDB.URL,
+	}
+}
+
+// Admin comment Type
+type Admin struct {
+	Type         `bson:",inline"`
+	ReplyComment Type   `json:"reply_comment" bson:"reply_comment"`
+	URL          string `json:"url" bson:"url"`
+	Title        string `json:"title" bson:"title"`
 }
 
 // Info base info of comment
