@@ -138,4 +138,9 @@ func Register() {
 		"admin/comments",
 		AdminComments,
 	)
+	register.Register(
+		"admin/comment/set",
+		AdminCommentSet,
+	)
+
 }

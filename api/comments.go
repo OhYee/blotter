@@ -90,3 +90,36 @@ func AdminComments(context *register.HandleContext) (err error) {
 	err = context.ReturnJSON(res)
 	return
 }
+
+// AdminCommentSetRequest request for AdminCommentSet api
+type AdminCommentSetRequest struct {
+	ID   string `json:"id" bson:"id"`
+	Recv bool   `json:"recv" bson:"recv"`
+	Show bool   `json:"show" bson:"show"`
+	Ad   bool   `json:"ad" bson:"ad"`
+}
+
+// AdminCommentSetResponse response for AdminCommentSet api
+type AdminCommentSetResponse SimpleResponse
+
+// AdminCommentSet api for updating admin comments page
+func AdminCommentSet(context *register.HandleContext) (err error) {
+	if !user.CheckToken(context.GetCookie("token")) {
+		context.Forbidden()
+		return
+	}
+
+	args := new(AdminCommentSetRequest)
+	res := new(AdminCommentSetResponse)
+	context.RequestParams(args)
+
+	if err = comment.Set(args.ID, args.Ad, args.Show, args.Recv); err != nil {
+		return
+	}
+
+	res.Success = true
+	res.Title = "修改成功"
+
+	err = context.ReturnJSON(res)
+	return
+}

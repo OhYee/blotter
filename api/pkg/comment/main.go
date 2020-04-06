@@ -266,3 +266,19 @@ func SendEmail(url string, html string, replyObjectID primitive.ObjectID) {
 	}
 	return
 }
+
+// Set comment state by id
+func Set(id string, ad bool, show bool, recv bool) (err error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return
+	}
+	_, err = mongo.Update("blotter", "comments", bson.M{"_id": objectID}, bson.M{
+		"$set": bson.M{
+			"recv": recv,
+			"ad":   ad,
+			"show": show,
+		},
+	}, nil)
+	return
+}
