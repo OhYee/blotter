@@ -1,6 +1,8 @@
 package register
 
 import (
+	"strings"
+
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/rainbow/errors"
 )
@@ -14,11 +16,18 @@ type HandleFunc func(context *HandleContext) (err error)
 
 // Register api
 func Register(name string, f HandleFunc) {
+	name = strings.Trim(name, "/")
 	_, exist := apiMap[name]
 	if exist {
 		output.Log("API %s has existed, it will be replace by the new one", name)
 	}
 	apiMap[name] = f
+}
+
+func DebugApiMap() {
+	for name, _ := range apiMap {
+		output.Debug("%+v", name)
+	}
 }
 
 // Call function
