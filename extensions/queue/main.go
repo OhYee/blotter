@@ -67,13 +67,12 @@ func Push(context *register.HandleContext) (err error) {
 		return err
 	}
 
-	data := Type{
-		ID:     args.ID,
-		Name:   args.Name,
-		Finish: false,
-		Time:   time.Now().Unix(),
-	}
-	if _, err = mongo.Add("blotter", "queue", nil, data); err != nil {
+	if _, err = mongo.Add("blotter", "queue", nil, bson.M{
+		"id":     args.ID,
+		"name":   args.Name,
+		"finish": false,
+		"time":   time.Now().Unix(),
+	}); err != nil {
 		return
 	}
 
