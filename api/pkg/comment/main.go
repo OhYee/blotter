@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/rainbow/errors"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -20,6 +21,8 @@ var defaultObjectID = primitive.ObjectID{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 // Get comment of url
 func Get(url string) (total int64, comments []TypeDB, err error) {
+	defer errors.Wrapper(&err)
+
 	comments = make([]TypeDB, 0)
 
 	total, err = mongo.Find(
@@ -39,10 +42,12 @@ func Get(url string) (total int64, comments []TypeDB, err error) {
 
 // GetAdmin get comments for admin page
 func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err error) {
+	defer errors.Wrapper(&err)
+
 	commentsDB := make([]AdminDB, 0)
 
 	pipeline := []bson.M{
-		bson.M{
+		{
 			"$set": bson.M{
 				"link": bson.M{
 					"$arrayElemAt": []interface{}{
@@ -51,7 +56,7 @@ func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err er
 				},
 			},
 		},
-		bson.M{
+		{
 			"$lookup": bson.M{
 				"from":         "posts",
 				"localField":   "link",
@@ -59,7 +64,7 @@ func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err er
 				"as":           "post",
 			},
 		},
-		bson.M{
+		{
 			"$lookup": bson.M{
 				"from":         "comments",
 				"localField":   "reply",
@@ -67,23 +72,23 @@ func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err er
 				"as":           "reply_comment",
 			},
 		},
-		bson.M{
+		{
 			"$set": bson.M{"reply_comment": bson.M{"$arrayElemAt": []interface{}{"$reply_comment", 0}}},
 		},
-		bson.M{
+		{
 			"$set": bson.M{"post": bson.M{"$arrayElemAt": []interface{}{"$post", 0}}},
 		},
-		bson.M{
+		{
 			"$set": bson.M{
 				"title": "$post.title",
 			},
 		},
-		bson.M{
+		{
 			"$project": bson.M{
 				"post": 0,
 			},
 		},
-		bson.M{
+		{
 			"$sort": bson.M{"time": -1},
 		},
 	}
@@ -121,7 +126,6 @@ func MakeRelation(_comments []TypeDB) (comments []*Type) {
 
 		m[cm.ID] = cm
 		if parent, exist := m[cmdb.Reply.Hex()]; cmdb.Reply.Hex() != defaultObjectID.Hex() && exist {
-			cm.ReplyContent = parent.Content
 			parent.Children = append(parent.Children, cm)
 		}
 	}

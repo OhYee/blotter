@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/OhYee/blotter/api/pkg/comment"
 	"github.com/OhYee/blotter/api/pkg/user"
-	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -20,7 +19,6 @@ type CommentsResponse struct {
 
 // Comments get comments of url, return comments and total comment number
 func Comments(context *register.HandleContext) (err error) {
-	output.Debug("call friends")
 	args := new(CommentsRequest)
 	res := new(CommentsResponse)
 
