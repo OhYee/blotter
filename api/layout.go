@@ -25,7 +25,7 @@ type LayoutResponse struct {
 }
 
 // Layout get site base info
-func Layout(context *register.HandleContext) (err error) {
+func Layout(context register.HandleContext) (err error) {
 	res := LayoutResponse{}
 
 	res.Menus, err = menu.Get()
@@ -71,9 +71,9 @@ type ViewRequest struct {
 }
 
 // View view number of the url
-func View(context *register.HandleContext) (err error) {
+func View(context register.HandleContext) (err error) {
 	args := PostRequest{}
-	context.RequestParams(&args)
+	context.RequestArgs(&args)
 
 	if args.URL == "" {
 		go func() {

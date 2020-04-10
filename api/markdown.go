@@ -16,10 +16,10 @@ type MarkdownResponse struct {
 }
 
 // Markdown render markdown to html
-func Markdown(context *register.HandleContext) (err error) {
+func Markdown(context register.HandleContext) (err error) {
 	args := new(MarkdownRequest)
 	res := new(MarkdownResponse)
-	context.RequestData(args)
+	context.RequestArgs(args, "post")
 
 	if res.HTML, err = markdown.Render(args.Source, true); err != nil {
 		return

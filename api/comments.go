@@ -18,11 +18,11 @@ type CommentsResponse struct {
 }
 
 // Comments get comments of url, return comments and total comment number
-func Comments(context *register.HandleContext) (err error) {
+func Comments(context register.HandleContext) (err error) {
 	args := new(CommentsRequest)
 	res := new(CommentsResponse)
 
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	var comments []comment.TypeDB
 	if res.Total, comments, err = comment.Get(args.URL); err != nil {
@@ -46,9 +46,9 @@ type CommentAddRequest struct {
 }
 
 // CommentAdd add comment api
-func CommentAdd(context *register.HandleContext) (err error) {
+func CommentAdd(context register.HandleContext) (err error) {
 	args := new(CommentAddRequest)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	if err = comment.Add(args.URL, args.Reply, args.Email, args.Recv, args.Raw); err != nil {
 		return
@@ -72,15 +72,15 @@ type AdminCommentsResponse struct {
 }
 
 // AdminComments api for admin comments page
-func AdminComments(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func AdminComments(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(AdminCommentsRequest)
 	res := new(AdminCommentsResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	if res.Total, res.Comments, err = comment.GetAdmin(args.Offset, args.Number); err != nil {
 		return
@@ -101,15 +101,15 @@ type AdminCommentSetRequest struct {
 type AdminCommentSetResponse SimpleResponse
 
 // AdminCommentSet api for updating admin comments page
-func AdminCommentSet(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func AdminCommentSet(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(AdminCommentSetRequest)
 	res := new(AdminCommentSetResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	if err = comment.Set(args.ID, args.Ad, args.Show, args.Recv); err != nil {
 		return

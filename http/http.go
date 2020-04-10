@@ -16,7 +16,7 @@ type Handle struct {
 func (handle Handle) ServeHTTP(rep http.ResponseWriter, req *http.Request) {
 	output.Debug("connection begin")
 
-	context := register.NewHandleContext(req, rep)
+	context := register.NewHTTPContext(req, rep)
 
 	// CORS
 	context.AddHeader("Access-Control-Allow-Origin", "*")

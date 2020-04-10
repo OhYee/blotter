@@ -18,10 +18,10 @@ type AvatarResponse struct {
 }
 
 // Avatar get avatar of emial
-func Avatar(context *register.HandleContext) (err error) {
+func Avatar(context register.HandleContext) (err error) {
 	args := new(AvatarRequest)
 	res := new(AvatarResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	res.Avatar = avatar.Get(args.Email)
 

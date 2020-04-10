@@ -7,7 +7,7 @@ import (
 )
 
 // Menus api, query all menus return []Menu
-func Menus(context *register.HandleContext) (err error) {
+func Menus(context register.HandleContext) (err error) {
 	res, err := menu.Get()
 	if err != nil {
 		return
@@ -25,15 +25,15 @@ type SetMenusRequest struct {
 type SetMenusResponse SimpleResponse
 
 // SetMenus set menus data (method: POST)
-func SetMenus(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func SetMenus(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(SetMenusRequest)
 	res := new(SetMenusResponse)
-	context.RequestData(args)
+	context.RequestArgs(args, "post")
 
 	if err = menu.Set(args.Menus); err != nil {
 		return

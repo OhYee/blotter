@@ -7,7 +7,7 @@ import (
 )
 
 // Friends API query all friends, return []Friend
-func Friends(context *register.HandleContext) (err error) {
+func Friends(context register.HandleContext) (err error) {
 	res, err := friends.GetFriends()
 	if err != nil {
 		return
@@ -25,15 +25,15 @@ type SetFriendsRequest struct {
 type SetFriendsResponse SimpleResponse
 
 // SetFriends set friends data (method: POST)
-func SetFriends(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func SetFriends(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(SetFriendsRequest)
 	res := new(SetFriendsResponse)
-	context.RequestData(args)
+	context.RequestArgs(args, "post")
 
 	if err = friends.SetFriends(args.Friends); err != nil {
 		return

@@ -35,7 +35,7 @@ const (
 )
 
 // RSSXML sitemap.txt
-func RSSXML(context *register.HandleContext) (err error) {
+func RSSXML(context register.HandleContext) (err error) {
 	variables, err := variable.Get("root", "email", "blog_name", "author")
 	if err != nil {
 		return

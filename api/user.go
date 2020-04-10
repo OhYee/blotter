@@ -1,9 +1,14 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
+
+// ErrNotHTTP the api can only be called by HTTP request
+var ErrNotHTTP = fmt.Errorf("Only can be called by HTTP request")
 
 // LoginRequest request of login api
 type LoginRequest struct {
@@ -18,15 +23,21 @@ type LoginResponse struct {
 }
 
 // Login try to login
-func Login(context *register.HandleContext) (err error) {
+func Login(context register.HandleContext) (err error) {
+	httpContext, ok := context.(*register.HTTPContext)
+	if !ok {
+		err = ErrNotHTTP
+		return
+	}
+
 	args := new(LoginRequest)
 	res := new(LoginResponse)
 
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	if args.Username == "" && user.Login(args.Password) {
 		token := user.GenerateToken()
-		context.SetCookie("token", token)
+		httpContext.SetCookie("token", token)
 		res.Success = true
 		res.Title = "登录成功"
 		res.Token = token
@@ -45,9 +56,15 @@ type InfoResponse struct {
 }
 
 // Info get user token api
-func Info(context *register.HandleContext) (err error) {
+func Info(context register.HandleContext) (err error) {
+	httpContext, ok := context.(*register.HTTPContext)
+	if !ok {
+		err = ErrNotHTTP
+		return
+	}
+
 	res := new(InfoResponse)
-	token := context.GetCookie("token")
+	token := httpContext.GetCookie("token")
 	if user.CheckToken(token) {
 		res.Token = token
 	}
@@ -56,9 +73,15 @@ func Info(context *register.HandleContext) (err error) {
 }
 
 // Logout the user
-func Logout(context *register.HandleContext) (err error) {
+func Logout(context register.HandleContext) (err error) {
+	httpContext, ok := context.(*register.HTTPContext)
+	if !ok {
+		err = ErrNotHTTP
+		return
+	}
+
 	res := new(SimpleResponse)
-	if user.CheckToken(context.GetCookie("token")) {
+	if user.CheckUserPermission(context) {
 		user.DeleteToken()
 		res.Success = true
 		res.Title = "登出成功"
@@ -68,7 +91,7 @@ func Logout(context *register.HandleContext) (err error) {
 		res.Title = "登出失败"
 		res.Content = "Token验证错误"
 	}
-	context.DeleteCookie("token")
+	httpContext.DeleteCookie("token")
 	context.ReturnJSON(res)
 	return
 }

@@ -26,11 +26,11 @@ type TagsResponse struct {
 }
 
 // Tags query tags
-func Tags(context *register.HandleContext) (err error) {
+func Tags(context register.HandleContext) (err error) {
 	args := new(TagsRequest)
 	res := new(TagsResponse)
 
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	res.Total, res.Tags, err = tag.GetTags(args.Keyword, args.Offset, args.Number, args.SortField, args.SortInc)
 	if err != nil {
@@ -54,15 +54,15 @@ type TagEditRequest struct {
 type TagEditResponse SimpleResponse
 
 // TagEdit edit tag info
-func TagEdit(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func TagEdit(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(TagEditRequest)
 	res := new(TagEditResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	res.Success = true
 	if args.ID == "" {
@@ -98,15 +98,15 @@ type TagDeleteRequest struct {
 type TagDeleteResponse SimpleResponse
 
 // TagDelete edit tag info
-func TagDelete(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func TagDelete(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(TagDeleteRequest)
 	res := new(TagDeleteResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	if err = tag.Delete(args.ID); err != nil {
 		res.Success = false
@@ -133,10 +133,10 @@ type TagExistedResponse struct {
 }
 
 // TagExisted edit tag info
-func TagExisted(context *register.HandleContext) (err error) {
+func TagExisted(context register.HandleContext) (err error) {
 	args := new(TagExistedRequest)
 	res := new(TagExistedResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	if res.Existed, err = tag.Existed(args.ID, args.Short); err != nil {
 		return
@@ -161,10 +161,10 @@ type TagResponse struct {
 }
 
 // Tag edit tag info
-func Tag(context *register.HandleContext) (err error) {
+func Tag(context register.HandleContext) (err error) {
 	args := new(TagRequest)
 	res := new(TagResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	if res.Tag, err = tag.Get(args.Tag); err != nil {
 		if strings.HasPrefix(err.Error(), fmt.Sprintf("No tag %s", args.Tag)) {

@@ -10,8 +10,8 @@ import (
 type VariablesResponse []variable.Type
 
 // Variables get avatar of emial
-func Variables(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func Variables(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
@@ -21,7 +21,7 @@ func Variables(context *register.HandleContext) (err error) {
 		return
 	}
 
-	err = context.ReturnJSON(res)
+	err = (context).ReturnJSON(res)
 	return
 }
 
@@ -34,15 +34,15 @@ type VariablesSetRequest struct {
 type VariablesSetResponse SimpleResponse
 
 // VariablesSet get avatar of emial
-func VariablesSet(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func VariablesSet(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(VariablesSetRequest)
 	res := new(VariablesSetResponse)
-	context.RequestData(args)
+	context.RequestArgs(args, "post")
 
 	err = variable.SetMany(args.Data...)
 	if err != nil {

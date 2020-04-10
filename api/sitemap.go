@@ -10,7 +10,7 @@ import (
 )
 
 // SitemapTXT sitemap.txt
-func SitemapTXT(context *register.HandleContext) (err error) {
+func SitemapTXT(context register.HandleContext) (err error) {
 	variables, err := variable.Get("root")
 	if err != nil {
 		return
@@ -31,7 +31,7 @@ func SitemapTXT(context *register.HandleContext) (err error) {
 }
 
 // SitemapXML sitemap.txt
-func SitemapXML(context *register.HandleContext) (err error) {
+func SitemapXML(context register.HandleContext) (err error) {
 	variables, err := variable.Get("root")
 	if err != nil {
 		return

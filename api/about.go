@@ -33,7 +33,7 @@ type AboutResponse struct {
 }
 
 // About get avatar of emial
-func About(context *register.HandleContext) (err error) {
+func About(context register.HandleContext) (err error) {
 	res := new(AboutResponse)
 
 	data, err := variable.Get("github", "qq", "email", "zhihu", "author", "quote", "description", "edu", "awards")

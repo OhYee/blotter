@@ -14,9 +14,9 @@ type PostRequest struct {
 }
 
 // Post get post by url
-func Post(context *register.HandleContext) (err error) {
+func Post(context register.HandleContext) (err error) {
 	args := PostRequest{}
-	context.RequestParams(&args)
+	context.RequestArgs(&args)
 
 	res, err := post.GetPublicFieldPost(args.URL)
 	if err != nil {
@@ -32,14 +32,14 @@ func Post(context *register.HandleContext) (err error) {
 }
 
 // PostAdmin get posts with all fields
-func PostAdmin(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func PostAdmin(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := PostRequest{}
-	context.RequestParams(&args)
+	context.RequestArgs(&args)
 
 	res, err := post.GetAllFieldPost(args.URL)
 	if err != nil {
@@ -75,10 +75,10 @@ type PostsResponse struct {
 }
 
 // Posts get posts
-func Posts(context *register.HandleContext) (err error) {
+func Posts(context register.HandleContext) (err error) {
 	args := new(PostsRequest)
 	res := new(PostsResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	res.Total, res.Posts, err = post.GetCardPosts(
 		args.Offset, args.Number,
@@ -100,15 +100,15 @@ type PostsAdminResponse struct {
 }
 
 // PostsAdmin get posts
-func PostsAdmin(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func PostsAdmin(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
 
 	args := new(PostsAdminRequest)
 	res := new(PostsAdminResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	res.Total, res.Posts, err = post.GetAdminPosts(
 		args.Offset, args.Number,
@@ -131,10 +131,10 @@ type PostExistedResponse struct {
 }
 
 // PostExisted return the post is existed
-func PostExisted(context *register.HandleContext) (err error) {
+func PostExisted(context register.HandleContext) (err error) {
 	args := new(PostExistedRequest)
 	res := new(PostExistedResponse)
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	res.Existed = post.Existed(args.URL)
 
@@ -156,8 +156,8 @@ type PostEditRequest struct {
 	Tags        []string `json:"tags"`
 }
 
-func PostEdit(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func PostEdit(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
@@ -165,7 +165,7 @@ func PostEdit(context *register.HandleContext) (err error) {
 	args := new(PostEditRequest)
 	res := SimpleResponse{Success: true, Title: "操作成功"}
 
-	context.RequestData(args)
+	context.RequestArgs(args, "post")
 
 	if args.ID == "" {
 		err = post.NewPost(
@@ -220,8 +220,8 @@ type PostDeleteRequest struct {
 type PostDeleteResponse SimpleResponse
 
 // PostDelete return the post is existed
-func PostDelete(context *register.HandleContext) (err error) {
-	if !user.CheckToken(context.GetCookie("token")) {
+func PostDelete(context register.HandleContext) (err error) {
+	if !user.CheckUserPermission(context) {
 		context.Forbidden()
 		return
 	}
@@ -231,7 +231,7 @@ func PostDelete(context *register.HandleContext) (err error) {
 		Success: true,
 		Title:   "删除成功",
 	}
-	context.RequestParams(args)
+	context.RequestArgs(args)
 
 	post.Delete(args.ID)
 

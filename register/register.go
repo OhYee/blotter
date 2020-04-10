@@ -12,7 +12,7 @@ var (
 )
 
 // HandleFunc handle function type
-type HandleFunc func(context *HandleContext) (err error)
+type HandleFunc func(context HandleContext) (err error)
 
 // Register api
 func Register(name string, f HandleFunc) {
@@ -31,7 +31,7 @@ func DebugApiMap() {
 }
 
 // Call function
-func Call(name string, context *HandleContext) (err error) {
+func Call(name string, context *HTTPContext) (err error) {
 	output.Log("%s:%s [%s] %s\nCall api %s, %s, %s [%s]",
 		context.Request.Method,
 		context.Request.Host,
