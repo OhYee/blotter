@@ -74,3 +74,8 @@ func CheckToken(token string) bool {
 func DeleteToken() {
 	mongo.Remove("blotter", "variables", bson.M{"key": "token"}, nil)
 }
+
+func CheckUserPermission(context register.HandleContext) bool {
+	httpContext, ok := context.(*register.HTTPContext)
+	return ok && CheckToken(httpContext.GetCookie("token"))
+}
