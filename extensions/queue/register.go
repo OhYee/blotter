@@ -23,5 +23,9 @@ func Register() *register.Extension {
 		"admin",
 		Admin,
 	)
+	ext.PreRegister(
+		"ws",
+		WebSocket,
+	)
 	return ext
 }
