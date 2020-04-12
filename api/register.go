@@ -142,5 +142,12 @@ func Register() {
 		"admin/comment/set",
 		AdminCommentSet,
 	)
-
+	register.Register(
+		"user/qq_connect",
+		QQ,
+	)
+	register.Register(
+		"user/jump_to_qq",
+		JumpToQQ,
+	)
 }

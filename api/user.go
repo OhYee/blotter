@@ -95,3 +95,29 @@ func Logout(context register.HandleContext) (err error) {
 	context.ReturnJSON(res)
 	return
 }
+
+func JumpToQQ(context register.HandleContext) (err error) {
+	context.TemporarilyMoved(user.QQConn.LoginPage(context.GetRequest().Header.Get("referer")))
+	return
+}
+
+type QQRequest struct {
+	Code  string `json:"code"`
+	State string `json:"state"`
+}
+type QQResponse struct {
+	Token string `json:"token"`
+}
+
+func QQ(context register.HandleContext) (err error) {
+	args := new(QQRequest)
+	// res := new(QQResponse)
+	context.RequestArgs(args)
+
+	_ = user.QQConnect(args.Code)
+
+	context.TemporarilyMoved(args.State)
+
+	// err = context.ReturnJSON(res)
+	return
+}
