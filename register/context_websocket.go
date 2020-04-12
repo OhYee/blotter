@@ -105,3 +105,11 @@ func (context *WebSocketContext) ServerError(err error) {
 	context.Successed = false
 	context.Error = fmt.Errorf("Server Error: %s", err.Error())
 }
+
+// PermanentlyMoved to url (301)
+func (context *WebSocketContext) PermanentlyMoved(url string) {
+}
+
+// TemporarilyMoved to url (302)
+func (context *WebSocketContext) TemporarilyMoved(url string) {
+}

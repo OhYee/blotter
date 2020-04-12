@@ -171,3 +171,13 @@ func (context *HTTPContext) ServerError(err error) {
 	context.writeHeaderWithCode(500)
 	context.Response.Write([]byte(fmt.Sprintf("Server error %s", err.Error())))
 }
+
+// PermanentlyMoved to url (301)
+func (context *HTTPContext) PermanentlyMoved(url string) {
+	http.Redirect(context.Response, context.Request, url, 301)
+}
+
+// TemporarilyMoved to url (302)
+func (context *HTTPContext) TemporarilyMoved(url string) {
+	http.Redirect(context.Response, context.Request, url, 302)
+}

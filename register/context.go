@@ -37,4 +37,10 @@ type HandleContext interface {
 	NotImplemented()
 	// ServerError return server error
 	ServerError(err error)
+
+	// PermanentlyMoved to url (301)
+	PermanentlyMoved(url string)
+
+	// TemporarilyMoved to url (302)
+	TemporarilyMoved(url string)
 }
