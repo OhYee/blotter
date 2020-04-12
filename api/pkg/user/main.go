@@ -8,6 +8,7 @@ import (
 
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/goutils/bytes"
 
 	"go.mongodb.org/mongo-driver/bson"
