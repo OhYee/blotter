@@ -35,12 +35,13 @@ func Login(context register.HandleContext) (err error) {
 
 	context.RequestArgs(args)
 
-	if args.Username == "" && user.Login(args.Password) {
-		token := user.GenerateToken()
-		httpContext.SetCookie("token", token)
+	u := user.GetUserByUsername(args.Username)
+	if u != nil && u.CheckPassword(args.Password) {
+		token := u.GenerateToken()
 		res.Success = true
 		res.Title = "登录成功"
 		res.Token = token
+		httpContext.SetCookie("token", token)
 	} else {
 		res.Success = false
 		res.Title = "登录失败"
@@ -110,12 +111,22 @@ type QQResponse struct {
 }
 
 func QQ(context register.HandleContext) (err error) {
+	httpContext, ok := context.(*register.HTTPContext)
+	if !ok {
+		err = ErrNotHTTP
+		return
+	}
+
 	args := new(QQRequest)
 	// res := new(QQResponse)
 	context.RequestArgs(args)
 
-	_ = user.QQConnect(args.Code)
+	u, err := user.QQConnect(args.Code)
+	if err != nil {
+		return
+	}
 
+	httpContext.SetCookie("token", u.Token)
 	context.TemporarilyMoved(args.State)
 
 	// err = context.ReturnJSON(res)
