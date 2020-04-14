@@ -26,10 +26,10 @@ type Type struct {
 
 func GetUserByToken(token string) *Type {
 	users := make([]Type, 0)
-	mongo.Find("blotter", "user", bson.M{
+	cnt, err := mongo.Find("blotter", "users", bson.M{
 		"token": token,
 	}, nil, &users)
-	if len(users) != 0 {
+	if err == nil && cnt != 0 {
 		return &users[0]
 	}
 	return nil
@@ -48,10 +48,10 @@ func GetUserByUsername(username string) *Type {
 
 func GetUserByUnionID(unionID string) *Type {
 	users := make([]Type, 0)
-	mongo.Find("blotter", "user", bson.M{
+	cnt, err := mongo.Find("blotter", "users", bson.M{
 		"qq_union_id": unionID,
 	}, nil, &users)
-	if len(users) != 0 {
+	if err == nil && cnt != 0 {
 		return &users[0]
 	}
 	return nil
