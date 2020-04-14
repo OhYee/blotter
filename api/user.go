@@ -51,23 +51,39 @@ func Login(context register.HandleContext) (err error) {
 	return
 }
 
-// InfoResponse response of Info api
-type InfoResponse struct {
-	Token string `json:"token"`
+type InfoRequest struct {
+	Username string `json:"username"`
 }
+
+// InfoResponse response of Info api
+type InfoResponse user.Type
 
 // Info get user token api
 func Info(context register.HandleContext) (err error) {
-	httpContext, ok := context.(*register.HTTPContext)
-	if !ok {
-		err = ErrNotHTTP
-		return
-	}
-
+	args := new(InfoRequest)
 	res := new(InfoResponse)
-	token := httpContext.GetCookie("token")
-	if user.CheckToken(token) {
-		res.Token = token
+	u := new(user.Type)
+
+	context.RequestArgs(args)
+
+	if args.Username == "" {
+		httpContext, ok := context.(*register.HTTPContext)
+		if !ok {
+			err = ErrNotHTTP
+			return
+		}
+		token := httpContext.GetCookie("token")
+		u = user.GetUserByToken(token)
+	} else {
+		u = user.GetUserByUsername(args.Username)
+	}
+	if u != nil {
+		res = (*InfoResponse)(u)
+		if u.Token != res.Token {
+			if len(u.Email) > 2 {
+				u.Email = fmt.Sprintf("%c******%c", u.Email[0], u.Email[len(u.Email)-1])
+			}
+		}
 	}
 	context.ReturnJSON(res)
 	return
