@@ -1,7 +1,10 @@
 package user
 
 import (
+	"errors"
+
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/goutils/set"
 	qq "github.com/OhYee/qqconnect"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -63,9 +66,14 @@ func GetUserByUnionID(unionID string) *Type {
 
 func NewUserFromQQConnect(token string, openID string, unionID string, userInfo qq.UserInfo) (u *Type, err error) {
 	objID := primitive.NewObjectID()
+	username := objID.Hex()
+	uu := GetUserByUsername(userInfo.Nickname)
+	if uu == nil {
+		username = userInfo.Nickname
+	}
 	u = &Type{
 		ID:             objID,
-		Username:       objID.Hex(),
+		Username:       username,
 		Password:       "",
 		Avatar:         userInfo.FigQQ,
 		Token:          GenerateToken(),
@@ -83,7 +91,7 @@ func NewUserFromQQConnect(token string, openID string, unionID string, userInfo 
 }
 
 func (u *Type) HasPermission() bool {
-	return u.Permission != 0
+	return u != nil && u.Permission != 0
 }
 
 func (u *Type) ConnectQQ(openID string, unionID string, userinfo qq.UserInfo) (err error) {
@@ -107,7 +115,18 @@ func (u *Type) CheckPassword(password string) bool {
 
 // GenerateToken generate token for this user
 func (u *Type) GenerateToken() (token string) {
-	token = GenerateToken()
+	u.Token = GenerateToken()
+	u.updateToken(u.Token)
+	return
+}
+
+// ClearToken delete token field
+func (u *Type) ClearToken() {
+	u.updateToken("")
+	return
+}
+
+func (u *Type) updateToken(token string) {
 	mongo.Update("blotter", "users", bson.M{
 		"_id": u.ID,
 	}, bson.M{
@@ -116,4 +135,41 @@ func (u *Type) GenerateToken() (token string) {
 		},
 	}, nil)
 	return
+}
+
+var validKeys = set.NewSet("username", "email", "avatar", "ns", "qq")
+
+// UpdateFields update user fields
+func (u *Type) UpdateFields(fields map[string]string) (err error) {
+	data := bson.M{}
+	for key, value := range fields {
+		if validKeys.Exist(key) {
+			data[key] = value
+		}
+	}
+
+	_, err = mongo.Update("blotter", "users", bson.M{
+		"_id": u.ID,
+	}, bson.M{
+		"$set": data,
+	}, nil)
+
+	return
+}
+
+// ChangePassword change password with username and password plaintext
+func (u *Type) ChangePassword(username, password string) (err error) {
+	if password == "" {
+		err = errors.New("Password can not be empty")
+		return
+	}
+
+	_, err = mongo.Update("blotter", "users", bson.M{
+		"_id": u.ID,
+	}, bson.M{
+		"$set": bson.M{"password": PasswordHash(u.Username, password)},
+	}, nil)
+
+	return
+
 }

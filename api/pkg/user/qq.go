@@ -28,8 +28,11 @@ func QQConnect(code string) (u *Type, err error) {
 
 	u = GetUserByUnionID(unionID)
 	if u == nil {
-		u, err = NewUserFromQQConnect(token, openID, unionID, res)
+		if u, err = NewUserFromQQConnect(token, openID, unionID, res); err != nil {
+			return
+		}
 	}
+	u.GenerateToken()
 
 	return
 }

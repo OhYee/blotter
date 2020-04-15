@@ -150,4 +150,8 @@ func Register() {
 		"user/jump_to_qq",
 		JumpToQQ,
 	)
+	register.Register(
+		"user/set",
+		SetUser,
+	)
 }

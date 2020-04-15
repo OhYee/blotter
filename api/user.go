@@ -19,7 +19,7 @@ type LoginRequest struct {
 // LoginResponse response of login api
 type LoginResponse struct {
 	SimpleResponse
-	InfoResponse
+	User *user.Type `json:"user"`
 }
 
 // Login try to login
@@ -37,11 +37,11 @@ func Login(context register.HandleContext) (err error) {
 
 	u := user.GetUserByUsername(args.Username)
 	if u != nil && u.CheckPassword(args.Password) {
-		token := u.GenerateToken()
+		u.Token = u.GenerateToken()
 		res.Success = true
 		res.Title = "登录成功"
-		res.Token = token
-		httpContext.SetCookie("token", token)
+		res.User = u
+		httpContext.SetCookie("token", u.Token)
 	} else {
 		res.Success = false
 		res.Title = "登录失败"
@@ -73,15 +73,18 @@ func Info(context register.HandleContext) (err error) {
 		}
 	} else {
 		u = user.GetUserByUsername(args.Username)
-	}
-	if u != nil {
-		res = (*InfoResponse)(u)
-		if u.Token != res.Token {
+		if u == nil {
+			context.PageNotFound()
+			return
+		}
+		if context.GetUser() == nil || u.ID != context.GetUser().ID {
 			if len(u.Email) > 2 {
 				u.Email = fmt.Sprintf("%c******%c", u.Email[0], u.Email[len(u.Email)-1])
 			}
 		}
 	}
+	res = (*InfoResponse)(u)
+
 	context.ReturnJSON(res)
 	return
 }
@@ -142,5 +145,49 @@ func QQ(context register.HandleContext) (err error) {
 	context.TemporarilyMoved(args.State)
 
 	// err = context.ReturnJSON(res)
+	return
+}
+
+type SetUserRequest struct {
+	Avatar   string `json:"avatar"`
+	Username string `json:"username"`
+	NS       string `json:"ns"`
+	Email    string `json:"email"`
+	QQ       string `json:"qq"`
+	Password string `json:"password"`
+}
+type SetUserResponse SimpleResponse
+
+func SetUser(context register.HandleContext) (err error) {
+	args := new(SetUserRequest)
+	res := new(SetUserResponse)
+	context.RequestArgs(args)
+
+	u := context.GetUser()
+	if u == nil {
+		context.Forbidden()
+		return
+	}
+
+	if err = u.UpdateFields(map[string]string{
+		"avatar":   args.Avatar,
+		"username": args.Username,
+		"ns":       args.NS,
+		"email":    args.Email,
+		"qq":       args.QQ,
+	}); err != nil {
+		return
+	}
+
+	if args.Password != "" {
+		if err = u.ChangePassword(args.Username, args.Password); err != nil {
+			return
+		}
+	}
+
+	res.Success = true
+	res.Title = "修改成功"
+
+	err = context.ReturnJSON(res)
 	return
 }
