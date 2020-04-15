@@ -9,7 +9,6 @@ import (
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
-	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/goutils/bytes"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -77,9 +76,4 @@ func CheckToken(token string) bool {
 // DeleteToken delete the token
 func DeleteToken() {
 	mongo.Remove("blotter", "variables", bson.M{"key": "token"}, nil)
-}
-
-func CheckUserPermission(context register.HandleContext) bool {
-	httpContext, ok := context.(*register.HTTPContext)
-	return ok && CheckToken(httpContext.GetCookie("token"))
 }

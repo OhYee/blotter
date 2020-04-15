@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/register"
 )
@@ -11,7 +10,7 @@ type VariablesResponse []variable.Type
 
 // Variables get avatar of emial
 func Variables(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -35,7 +34,7 @@ type VariablesSetResponse SimpleResponse
 
 // VariablesSet get avatar of emial
 func VariablesSet(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}

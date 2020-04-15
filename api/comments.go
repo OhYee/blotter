@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/OhYee/blotter/api/pkg/comment"
-	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -73,7 +72,7 @@ type AdminCommentsResponse struct {
 
 // AdminComments api for admin comments page
 func AdminComments(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -102,7 +101,7 @@ type AdminCommentSetResponse SimpleResponse
 
 // AdminCommentSet api for updating admin comments page
 func AdminCommentSet(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}

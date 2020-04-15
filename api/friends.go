@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/OhYee/blotter/api/pkg/friends"
-	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -26,7 +25,7 @@ type SetFriendsResponse SimpleResponse
 
 // SetFriends set friends data (method: POST)
 func SetFriends(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}

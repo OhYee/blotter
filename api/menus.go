@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/OhYee/blotter/api/pkg/menu"
-	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -26,7 +25,7 @@ type SetMenusResponse SimpleResponse
 
 // SetMenus set menus data (method: POST)
 func SetMenus(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}

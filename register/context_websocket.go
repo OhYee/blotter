@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/gorilla/websocket"
 	"github.com/mitchellh/mapstructure"
 )
@@ -112,4 +113,9 @@ func (context *WebSocketContext) PermanentlyMoved(url string) {
 
 // TemporarilyMoved to url (302)
 func (context *WebSocketContext) TemporarilyMoved(url string) {
+}
+
+// GetUser get current user
+func (context *WebSocketContext) GetUser() *user.Type {
+	return nil
 }

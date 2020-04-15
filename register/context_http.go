@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/output"
 )
 
@@ -24,6 +25,8 @@ type HTTPContext struct {
 	Response http.ResponseWriter
 	buf      *bytes.Buffer
 	header   []httpHeader
+	user     *user.Type
+	userGot  bool
 }
 
 func assertHTTP() HandleContext {
@@ -38,6 +41,8 @@ func NewHTTPContext(req *http.Request, rep http.ResponseWriter) *HTTPContext {
 		Response: rep,
 		buf:      bytes.NewBuffer([]byte{}),
 		header:   make([]httpHeader, 0),
+		user:     nil,
+		userGot:  false,
 	}
 }
 
@@ -180,4 +185,13 @@ func (context *HTTPContext) PermanentlyMoved(url string) {
 // TemporarilyMoved to url (302)
 func (context *HTTPContext) TemporarilyMoved(url string) {
 	http.Redirect(context.Response, context.Request, url, 302)
+}
+
+// GetUser get current user
+func (context *HTTPContext) GetUser() *user.Type {
+	if !context.userGot {
+		context.user = user.GetUserByToken(context.GetCookie("token"))
+		context.userGot = true
+	}
+	return context.user
 }

@@ -25,6 +25,10 @@ type Type struct {
 }
 
 func GetUserByToken(token string) *Type {
+	if token == "" {
+		return nil
+	}
+
 	users := make([]Type, 0)
 	cnt, err := mongo.Find("blotter", "users", bson.M{
 		"token": token,

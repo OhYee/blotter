@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/post"
-	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -33,7 +32,7 @@ func Post(context register.HandleContext) (err error) {
 
 // PostAdmin get posts with all fields
 func PostAdmin(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -101,7 +100,7 @@ type PostsAdminResponse struct {
 
 // PostsAdmin get posts
 func PostsAdmin(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -157,7 +156,7 @@ type PostEditRequest struct {
 }
 
 func PostEdit(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -221,7 +220,7 @@ type PostDeleteResponse SimpleResponse
 
 // PostDelete return the post is existed
 func PostDelete(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}

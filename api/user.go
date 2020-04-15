@@ -67,13 +67,10 @@ func Info(context register.HandleContext) (err error) {
 	context.RequestArgs(args)
 
 	if args.Username == "" {
-		httpContext, ok := context.(*register.HTTPContext)
-		if !ok {
-			err = ErrNotHTTP
-			return
+		u = context.GetUser()
+		if u == nil {
+			u = &user.Type{}
 		}
-		token := httpContext.GetCookie("token")
-		u = user.GetUserByToken(token)
 	} else {
 		u = user.GetUserByUsername(args.Username)
 	}
@@ -98,17 +95,16 @@ func Logout(context register.HandleContext) (err error) {
 	}
 
 	res := new(SimpleResponse)
-	if user.CheckUserPermission(context) {
-		user.DeleteToken()
-		res.Success = true
-		res.Title = "登出成功"
-		res.Content = "Token已清除"
-	} else {
-		res.Success = false
-		res.Title = "登出失败"
-		res.Content = "Token验证错误"
+	u := context.GetUser()
+	if u != nil {
+		u.ClearToken()
 	}
+
+	res.Success = true
+	res.Title = "登出成功"
+	res.Content = "Token已清除"
 	httpContext.DeleteCookie("token")
+
 	context.ReturnJSON(res)
 	return
 }

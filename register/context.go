@@ -3,6 +3,7 @@ package register
 import (
 	"net/http"
 
+	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/gorilla/schema"
 )
 
@@ -43,4 +44,7 @@ type HandleContext interface {
 
 	// TemporarilyMoved to url (302)
 	TemporarilyMoved(url string)
+
+	// GetUser get current user info
+	GetUser() *user.Type
 }

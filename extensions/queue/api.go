@@ -2,7 +2,6 @@ package queue
 
 import (
 	"github.com/OhYee/blotter/api"
-	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -90,7 +89,7 @@ type AdminRequest struct {
 type AdminResponse api.SimpleResponse
 
 func Admin(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}

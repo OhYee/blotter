@@ -6,7 +6,6 @@ import (
 
 	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/tag"
-	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -55,7 +54,7 @@ type TagEditResponse SimpleResponse
 
 // TagEdit edit tag info
 func TagEdit(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -99,7 +98,7 @@ type TagDeleteResponse SimpleResponse
 
 // TagDelete edit tag info
 func TagDelete(context register.HandleContext) (err error) {
-	if !user.CheckUserPermission(context) {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
