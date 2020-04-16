@@ -115,7 +115,7 @@ func (context *HTTPContext) ReturnJSON(data interface{}) (err error) {
 
 // ReturnText return json data
 func (context *HTTPContext) ReturnText(data string) (err error) {
-	context.AddHeader("Content-Type", "text/plain")
+	context.AddHeader("Content-Type", "text/plain;charset=utf-8")
 	context.Write([]byte(data)...)
 	return
 }
