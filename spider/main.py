@@ -10,6 +10,7 @@ from omegaxyz import OmegaXYZ
 from chenshuo import Chenshuo
 from csdn import CSDN
 from tinshine import Tinshine
+from sanghangning import Sanghangning
 
 sites = [
     RSS(),
@@ -21,6 +22,7 @@ sites = [
     Chenshuo(),
     CSDN(),
     Tinshine(),
+    Sanghangning(),
 ]
 
 
