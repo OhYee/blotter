@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/goutils/set"
 	qq "github.com/OhYee/qqconnect"
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,6 +26,31 @@ type Type struct {
 	QQToken   string `json:"qq_token" bson:"qq_token"`
 	QQOpenID  string `json:"qq_open_id" bson:"qq_open_id"`
 	QQUnionID string `json:"qq_union_id" bson:"qq_union_id"`
+}
+
+func NewUser(username, password string) *Type {
+	if u := GetUserByUsername(username); u != nil {
+		return nil
+	}
+	u := &Type{
+		ID:             primitive.NewObjectID(),
+		Username:       username,
+		Password:       PasswordHash(username, password),
+		Avatar:         "/static/img/noimg.png",
+		Token:          "",
+		Email:          "",
+		QQ:             "",
+		NintendoSwitch: "",
+		Permission:     0,
+		QQToken:        "",
+		QQOpenID:       "",
+		QQUnionID:      "",
+	}
+	if _, err := mongo.Add("blotter", "users", nil, u); err != nil {
+		output.Err(err)
+		return nil
+	}
+	return u
 }
 
 func GetUserByToken(token string) *Type {
@@ -76,7 +102,7 @@ func NewUserFromQQConnect(token string, openID string, unionID string, userInfo 
 		Username:       username,
 		Password:       "",
 		Avatar:         userInfo.FigQQ,
-		Token:          GenerateToken(),
+		Token:          "",
 		Email:          "",
 		QQ:             "",
 		NintendoSwitch: "",
@@ -86,6 +112,7 @@ func NewUserFromQQConnect(token string, openID string, unionID string, userInfo 
 		QQOpenID:  openID,
 		QQUnionID: unionID,
 	}
+
 	_, err = mongo.Add("blotter", "users", nil, u)
 	return
 }
@@ -94,13 +121,15 @@ func (u *Type) HasPermission() bool {
 	return u != nil && u.Permission != 0
 }
 
-func (u *Type) ConnectQQ(openID string, unionID string, userinfo qq.UserInfo) (err error) {
+func (u *Type) ConnectQQ(token string, openID string, unionID string, userinfo qq.UserInfo) (err error) {
+	u.QQToken = token
 	u.QQOpenID = openID
 	u.QQUnionID = unionID
 	_, err = mongo.Update("blotter", "users", bson.M{
 		"_id": u.ID,
 	}, bson.M{
 		"$set": bson.M{
+			"qq_token":    token,
 			"qq_open_id":  openID,
 			"qq_union_id": unionID,
 		},
@@ -114,10 +143,10 @@ func (u *Type) CheckPassword(password string) bool {
 }
 
 // GenerateToken generate token for this user
-func (u *Type) GenerateToken() (token string) {
+func (u *Type) GenerateToken() string {
 	u.Token = GenerateToken()
 	u.updateToken(u.Token)
-	return
+	return u.Token
 }
 
 // ClearToken delete token field
@@ -127,17 +156,23 @@ func (u *Type) ClearToken() {
 }
 
 func (u *Type) updateToken(token string) {
-	mongo.Update("blotter", "users", bson.M{
-		"_id": u.ID,
-	}, bson.M{
-		"$set": bson.M{
-			"token": token,
-		},
-	}, nil)
+	u.updateField("token", token)
 	return
 }
 
 var validKeys = set.NewSet("username", "email", "avatar", "ns", "qq")
+
+// updateField update user field
+func (u *Type) updateField(key string, value interface{}) (err error) {
+	_, err = mongo.Update("blotter", "users", bson.M{
+		"_id": u.ID,
+	}, bson.M{
+		"$set": bson.M{
+			key: value,
+		},
+	}, nil)
+	return
+}
 
 // UpdateFields update user fields
 func (u *Type) UpdateFields(fields map[string]string) (err error) {

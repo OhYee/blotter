@@ -154,4 +154,16 @@ func Register() {
 		"user/set",
 		SetUser,
 	)
+	register.Register(
+		"user/username",
+		CheckUsername,
+	)
+	register.Register(
+		"user/register",
+		RegisterUser,
+	)
+	register.Register(
+		"user/qq_avatar",
+		SyncQQAvatar,
+	)
 }

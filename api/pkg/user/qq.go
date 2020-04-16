@@ -11,28 +11,20 @@ var environments, _ = env.GetEnv(env.PWDFile(".env"))
 var QQConn = qq.New(environments["APPID"], environments["APPKey"], environments["RedirectURI"])
 
 // QQConnect connect qq and return user data
-func QQConnect(code string) (u *Type, err error) {
-	token, err := QQConn.Auth(code)
+func QQConnect(code string) (token, openID, unionID string, res qq.UserInfo, err error) {
+	token, err = QQConn.Auth(code)
 	if err != nil {
 		return
 	}
 
-	_, openID, unionID, err := QQConn.OpenID(token)
+	_, openID, unionID, err = QQConn.OpenID(token)
 	if err != nil {
 		return
 	}
-	res, err := QQConn.Info(token, openID)
+	res, err = QQConn.Info(token, openID)
 	if err != nil {
 		return
 	}
-
-	u = GetUserByUnionID(unionID)
-	if u == nil {
-		if u, err = NewUserFromQQConnect(token, openID, unionID, res); err != nil {
-			return
-		}
-	}
-	u.GenerateToken()
 
 	return
 }

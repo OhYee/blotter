@@ -5,6 +5,7 @@ import (
 
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
+	"github.com/OhYee/goutils/condition"
 )
 
 // ErrNotHTTP the api can only be called by HTTP request
@@ -112,8 +113,24 @@ func Logout(context register.HandleContext) (err error) {
 	return
 }
 
+type JumpToQQRequest struct {
+	State string `json:"state"`
+}
+
 func JumpToQQ(context register.HandleContext) (err error) {
-	context.TemporarilyMoved(user.QQConn.LoginPage(context.GetRequest().Header.Get("referer")))
+	args := new(JumpToQQRequest)
+	context.RequestArgs(args)
+
+	context.TemporarilyMoved(
+		user.QQConn.LoginPage(
+			condition.IfString(
+				args.State == "",
+				context.GetRequest().Header.Get("referer"),
+				args.State,
+			),
+		),
+	)
+
 	return
 }
 
@@ -136,15 +153,53 @@ func QQ(context register.HandleContext) (err error) {
 	// res := new(QQResponse)
 	context.RequestArgs(args)
 
-	u, err := user.QQConnect(args.Code)
+	var u *user.Type
+
+	token, openID, unionID, res, err := user.QQConnect(args.Code)
 	if err != nil {
 		return
 	}
 
-	httpContext.SetCookie("token", u.Token)
-	context.TemporarilyMoved(args.State)
+	switch args.State {
+	case "connect":
+		u = context.GetUser()
+		if u == nil {
+			context.ReturnText("You should login first\n你需要先登录")
+			return
+		}
+		if uu := user.GetUserByUnionID(unionID); uu != nil {
+			context.ReturnText(fmt.Sprintf("This QQ has connected to %s\n该 QQ 已绑定到 %s", uu.Username, uu.Username))
+			return
+		}
+		if err = u.ConnectQQ(token, openID, unionID, res); err != nil {
+			context.ReturnText(err.Error())
+			return
+		}
+		context.ReturnText("Connect QQ successfully, refresh origin page\n绑定成功，请刷新原页面")
+	case "avatar":
+		u = user.GetUserByUnionID(unionID)
+		if u == nil {
+			context.ReturnText("This QQ is not connect to this site\n该 QQ 未在该网站绑定账号")
+			return
+		}
+		if err = u.UpdateFields(map[string]string{"avatar": res.FigQQ}); err != nil {
+			context.ReturnText(err.Error())
+			return
+		}
+		context.ReturnText("Sync QQ avatar successfully, refresh origin page\nQQ 头像已更新，请刷新原页面")
+	default:
+		if u = user.GetUserByUnionID(unionID); u == nil {
+			// New account
+			if u, err = user.NewUserFromQQConnect(token, openID, unionID, res); err != nil {
+				return
+			}
+		}
+		u.GenerateToken()
 
-	// err = context.ReturnJSON(res)
+		httpContext.SetCookie("token", u.Token)
+		context.TemporarilyMoved(args.State)
+	}
+
 	return
 }
 
@@ -189,5 +244,74 @@ func SetUser(context register.HandleContext) (err error) {
 	res.Title = "修改成功"
 
 	err = context.ReturnJSON(res)
+	return
+}
+
+// CheckUsernameRequest request for CheckUsername api
+type CheckUsernameRequest struct {
+	Username string `json:"username"`
+}
+
+// CheckUsernameResponse response for CheckUsername api
+type CheckUsernameResponse struct {
+	Existed bool `json:"existed"`
+}
+
+// CheckUsername check if username is used
+func CheckUsername(context register.HandleContext) (err error) {
+	args := new(CheckUsernameRequest)
+	res := new(CheckUsernameResponse)
+	context.RequestArgs(args)
+
+	res.Existed = user.GetUserByUsername(args.Username) != nil
+
+	context.ReturnJSON(res)
+	return
+}
+
+// RegisterUserRequest request for RegisterUser api
+type RegisterUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+// RegisterUserResponse response for RegisterUser api
+type RegisterUserResponse SimpleResponse
+
+// RegisterUser check if username is used
+func RegisterUser(context register.HandleContext) (err error) {
+	args := new(RegisterUserRequest)
+	res := new(RegisterUserResponse)
+	context.RequestArgs(args)
+
+	if user.NewUser(args.Username, args.Password) != nil {
+		res.Success = true
+		res.Title = "注册成功"
+	} else {
+		res.Success = false
+		res.Title = "注册失败"
+		res.Content = "请检查用户名是否重复，以及网站是否崩溃"
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}
+
+func SyncQQAvatar(context register.HandleContext) (err error) {
+	u := context.GetUser()
+	if u == nil {
+		context.TemporarilyMoved(user.QQConn.LoginPage("avatar"))
+		return
+	}
+	res, err := user.QQConn.Info(u.QQToken, u.QQOpenID)
+	if err != nil {
+		context.TemporarilyMoved(user.QQConn.LoginPage("avatar"))
+		return
+	}
+	if err = u.UpdateFields(map[string]string{"avatar": res.FigQQ}); err != nil {
+		context.ReturnText(err.Error())
+		return
+	}
+	context.ReturnText("Sync QQ avatar successfully, refresh origin page\nQQ 头像已更新，请刷新原页面")
 	return
 }
