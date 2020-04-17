@@ -14,15 +14,19 @@ import (
 
 // Type of user information
 type Type struct {
-	ID             primitive.ObjectID `json:"id" bson:"_id"`
-	Username       string             `json:"username" bson:"username"`
-	Password       string             `json:"password" bson:"password"`
-	Avatar         string             `json:"avatar" bson:"avatar"`
-	Token          string             `json:"token" bson:"token"`
-	Email          string             `json:"email" bson:"email"`
-	QQ             string             `json:"qq" bson:"qq"`
-	NintendoSwitch string             `json:"ns" bson:"ns"`
-	Permission     int64              `json:"permission" bson:"permission"`
+	ID                   primitive.ObjectID `json:"id" bson:"_id"`
+	Username             string             `json:"username" bson:"username"`
+	Password             string             `json:"password" bson:"password"`
+	Avatar               string             `json:"avatar" bson:"avatar"`
+	Token                string             `json:"token" bson:"token"`
+	Email                string             `json:"email" bson:"email"`
+	QQ                   string             `json:"qq" bson:"qq"`
+	NintendoSwitch       string             `json:"ns_id" bson:"ns_id"`
+	NintendoSwitchName   string             `json:"ns_name" bson:"ns_name"`
+	AnimalCrossingName   string             `json:"ac_name" bson:"ac_name"`
+	AnimalCrossingIsland string             `json:"ac_island" bson:"ac_island"`
+
+	Permission int64 `json:"permission" bson:"permission"`
 
 	QQToken   string `json:"qq_token" bson:"qq_token"`
 	QQOpenID  string `json:"qq_open_id" bson:"qq_open_id"`
@@ -161,7 +165,10 @@ func (u *Type) updateToken(token string) {
 	return
 }
 
-var validKeys = set.NewSet("username", "email", "avatar", "ns", "qq")
+var validKeys = set.NewSet(
+	"username", "email", "avatar", "ns_id",
+	"ns_name", "ac_name", "ac_island", "qq",
+)
 
 // updateField update user field
 func (u *Type) updateField(key string, value interface{}) (err error) {

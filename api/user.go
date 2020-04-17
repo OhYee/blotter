@@ -204,7 +204,10 @@ func QQ(context register.HandleContext) (err error) {
 type SetUserRequest struct {
 	Avatar   string `json:"avatar"`
 	Username string `json:"username"`
-	NS       string `json:"ns"`
+	NSID     string `json:"ns_id"`
+	NSName   string `json:"ns_name"`
+	ACName   string `json:"ac_name"`
+	ACIsland string `json:"ac_island"`
 	Email    string `json:"email"`
 	QQ       string `json:"qq"`
 	Password string `json:"password"`
@@ -223,11 +226,14 @@ func SetUser(context register.HandleContext) (err error) {
 	}
 
 	if err = u.UpdateFields(map[string]string{
-		"avatar":   args.Avatar,
-		"username": args.Username,
-		"ns":       args.NS,
-		"email":    args.Email,
-		"qq":       args.QQ,
+		"avatar":    args.Avatar,
+		"username":  args.Username,
+		"ns_id":     args.NSID,
+		"ns_name":   args.NSName,
+		"ac_name":   args.ACName,
+		"ac_island": args.ACIsland,
+		"email":     args.Email,
+		"qq":        args.QQ,
 	}); err != nil {
 		return
 	}
