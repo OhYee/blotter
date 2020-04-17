@@ -79,9 +79,7 @@ func Info(context register.HandleContext) (err error) {
 			return
 		}
 		if context.GetUser() == nil || u.ID != context.GetUser().ID {
-			if len(u.Email) > 2 {
-				u.Email = fmt.Sprintf("%c******%c", u.Email[0], u.Email[len(u.Email)-1])
-			}
+			u.Desensitization()
 		}
 	}
 	res = (*InfoResponse)(u)

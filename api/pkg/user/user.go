@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
@@ -207,4 +208,17 @@ func (u *Type) ChangePassword(username, password string) (err error) {
 
 	return
 
+}
+
+// Desensitization data desensitization
+func (u *Type) Desensitization() {
+	if len(u.Email) > 2 {
+		u.Email = fmt.Sprintf("%c******%c", u.Email[0], u.Email[len(u.Email)-1])
+	}
+	u.Password = ""
+	u.Token = ""
+	u.QQ = ""
+	u.QQToken = ""
+	u.QQOpenID = ""
+	u.QQUnionID = ""
 }
