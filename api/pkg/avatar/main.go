@@ -93,7 +93,7 @@ func GetGravatar(email string) (avatar string) {
 	hash.Write([]byte(strings.ToLower(email)))
 
 	avatar = fmt.Sprintf(
-		"https://www.gravatar.com/avatar/%s?size=60&default=%s",
+		"https://www.gravatar.com/avatar/%s?size=640&default=%s",
 		hex.EncodeToString(hash.Sum(nil)),
 		url.QueryEscape(defaultAvatar),
 	)
