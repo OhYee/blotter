@@ -76,7 +76,7 @@ func GetUserByToken(token string) *Type {
 func GetUserByUsername(username string) *Type {
 	users := make([]Type, 0)
 	cnt, err := mongo.Find("blotter", "users", bson.M{
-		"username": bson.M{"$regex": username, "$options": "i"},
+		"username": bson.M{"$regex": fmt.Sprintf("^%s$", username), "$options": "i"},
 	}, nil, &users)
 	if err == nil && cnt != 0 {
 		return &users[0]
