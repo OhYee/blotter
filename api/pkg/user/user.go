@@ -12,8 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Type of user information
-type Type struct {
+// TypeDB of user information
+type TypeDB struct {
 	ID                   primitive.ObjectID `json:"id" bson:"_id"`
 	Username             string             `json:"username" bson:"username"`
 	Password             string             `json:"password" bson:"password"`
@@ -33,11 +33,33 @@ type Type struct {
 	QQUnionID string `json:"qq_union_id" bson:"qq_union_id"`
 }
 
-func NewUser(username, password string) *Type {
+type Type struct {
+	ID       string `json:"id" bson:"_id"`
+	Username string `json:"username" bson:"username"`
+	Avatar   string `json:"avatar" bson:"avatar"`
+	Email    string `json:"email" bson:"email"`
+	QQ       string `json:"qq" bson:"qq"`
+
+	Token string `json:"token" bson:"token"`
+
+	NintendoSwitch       string `json:"ns_id" bson:"ns_id"`
+	NintendoSwitchName   string `json:"ns_name" bson:"ns_name"`
+	AnimalCrossingName   string `json:"ac_name" bson:"ac_name"`
+	AnimalCrossingIsland string `json:"ac_island" bson:"ac_island"`
+
+	Permission int64 `json:"permission" bson:"permission"`
+
+	QQConnected bool `json:"qq_connected" bson:"qq_connected"`
+
+	Existed bool `json:"existed" bson:"existed"`
+	Self    bool `json:"self" bson:"self"`
+}
+
+func NewUser(username, password string) *TypeDB {
 	if u := GetUserByUsername(username); u != nil {
 		return nil
 	}
-	u := &Type{
+	u := &TypeDB{
 		ID:             primitive.NewObjectID(),
 		Username:       username,
 		Password:       PasswordHash(username, password),
@@ -58,12 +80,12 @@ func NewUser(username, password string) *Type {
 	return u
 }
 
-func GetUserByToken(token string) *Type {
+func GetUserByToken(token string) *TypeDB {
 	if token == "" {
 		return nil
 	}
 
-	users := make([]Type, 0)
+	users := make([]TypeDB, 0)
 	cnt, err := mongo.Find("blotter", "users", bson.M{
 		"token": token,
 	}, nil, &users)
@@ -73,8 +95,8 @@ func GetUserByToken(token string) *Type {
 	return nil
 }
 
-func GetUserByUsername(username string) *Type {
-	users := make([]Type, 0)
+func GetUserByUsername(username string) *TypeDB {
+	users := make([]TypeDB, 0)
 	cnt, err := mongo.Find("blotter", "users", bson.M{
 		"username": bson.M{"$regex": fmt.Sprintf("^%s$", username), "$options": "i"},
 	}, nil, &users)
@@ -84,8 +106,8 @@ func GetUserByUsername(username string) *Type {
 	return nil
 }
 
-func GetUserByUnionID(unionID string) *Type {
-	users := make([]Type, 0)
+func GetUserByUnionID(unionID string) *TypeDB {
+	users := make([]TypeDB, 0)
 	cnt, err := mongo.Find("blotter", "users", bson.M{
 		"qq_union_id": unionID,
 	}, nil, &users)
@@ -95,14 +117,14 @@ func GetUserByUnionID(unionID string) *Type {
 	return nil
 }
 
-func NewUserFromQQConnect(token string, openID string, unionID string, userInfo qq.UserInfo) (u *Type, err error) {
+func NewUserFromQQConnect(token string, openID string, unionID string, userInfo qq.UserInfo) (u *TypeDB, err error) {
 	objID := primitive.NewObjectID()
 	username := objID.Hex()
 	uu := GetUserByUsername(userInfo.Nickname)
 	if uu == nil {
 		username = userInfo.Nickname
 	}
-	u = &Type{
+	u = &TypeDB{
 		ID:             objID,
 		Username:       username,
 		Password:       "",
@@ -122,11 +144,11 @@ func NewUserFromQQConnect(token string, openID string, unionID string, userInfo 
 	return
 }
 
-func (u *Type) HasPermission() bool {
+func (u *TypeDB) HasPermission() bool {
 	return u != nil && u.Permission != 0
 }
 
-func (u *Type) ConnectQQ(token string, openID string, unionID string, userinfo qq.UserInfo) (err error) {
+func (u *TypeDB) ConnectQQ(token string, openID string, unionID string, userinfo qq.UserInfo) (err error) {
 	u.QQToken = token
 	u.QQOpenID = openID
 	u.QQUnionID = unionID
@@ -143,24 +165,24 @@ func (u *Type) ConnectQQ(token string, openID string, unionID string, userinfo q
 }
 
 // CheckPassword check password is right
-func (u *Type) CheckPassword(password string) bool {
+func (u *TypeDB) CheckPassword(password string) bool {
 	return PasswordHash(u.Username, password) == u.Password
 }
 
 // GenerateToken generate token for this user
-func (u *Type) GenerateToken() string {
+func (u *TypeDB) GenerateToken() string {
 	u.Token = GenerateToken()
 	u.updateToken(u.Token)
 	return u.Token
 }
 
 // ClearToken delete token field
-func (u *Type) ClearToken() {
+func (u *TypeDB) ClearToken() {
 	u.updateToken("")
 	return
 }
 
-func (u *Type) updateToken(token string) {
+func (u *TypeDB) updateToken(token string) {
 	u.updateField("token", token)
 	return
 }
@@ -171,7 +193,7 @@ var validKeys = set.NewSet(
 )
 
 // updateField update user field
-func (u *Type) updateField(key string, value interface{}) (err error) {
+func (u *TypeDB) updateField(key string, value interface{}) (err error) {
 	_, err = mongo.Update("blotter", "users", bson.M{
 		"_id": u.ID,
 	}, bson.M{
@@ -183,7 +205,7 @@ func (u *Type) updateField(key string, value interface{}) (err error) {
 }
 
 // UpdateFields update user fields
-func (u *Type) UpdateFields(fields map[string]string) (err error) {
+func (u *TypeDB) UpdateFields(fields map[string]string) (err error) {
 	data := bson.M{}
 	for key, value := range fields {
 		if validKeys.Exist(key) {
@@ -201,7 +223,7 @@ func (u *Type) UpdateFields(fields map[string]string) (err error) {
 }
 
 // ChangePassword change password with username and password plaintext
-func (u *Type) ChangePassword(username, password string) (err error) {
+func (u *TypeDB) ChangePassword(username, password string) (err error) {
 	if password == "" {
 		err = errors.New("Password can not be empty")
 		return
@@ -218,14 +240,47 @@ func (u *Type) ChangePassword(username, password string) (err error) {
 }
 
 // Desensitization data desensitization
-func (u *Type) Desensitization() {
-	if len(u.Email) > 2 {
-		u.Email = fmt.Sprintf("%c******%c", u.Email[0], u.Email[len(u.Email)-1])
+func (u *TypeDB) Desensitization(self bool) (uu *Type) {
+	if u == nil {
+		return &Type{
+			ID:                   "000000000000000000000000",
+			Username:             "",
+			Avatar:               "",
+			Email:                "",
+			QQ:                   "",
+			Token:                "",
+			NintendoSwitch:       "",
+			NintendoSwitchName:   "",
+			AnimalCrossingName:   "",
+			AnimalCrossingIsland: "",
+			Permission:           0,
+			QQConnected:          false,
+			Existed:              false,
+			Self:                 false,
+		}
 	}
-	u.Password = ""
-	u.Token = ""
-	u.QQ = ""
-	u.QQToken = ""
-	u.QQOpenID = ""
-	u.QQUnionID = ""
+	uu = &Type{
+		ID:                   u.ID.Hex(),
+		Username:             u.Username,
+		Avatar:               u.Avatar,
+		Email:                u.Email,
+		QQ:                   u.QQ,
+		Token:                u.Token,
+		NintendoSwitch:       u.NintendoSwitch,
+		NintendoSwitchName:   u.NintendoSwitchName,
+		AnimalCrossingName:   u.AnimalCrossingName,
+		AnimalCrossingIsland: u.AnimalCrossingIsland,
+		Permission:           u.Permission,
+		QQConnected:          u.QQUnionID != "",
+		Existed:              true,
+		Self:                 self,
+	}
+	if !self {
+		if len(uu.Email) > 2 {
+			uu.Email = fmt.Sprintf("%c******%c", uu.Email[0], uu.Email[len(uu.Email)-1])
+		}
+		uu.QQ = ""
+		uu.Token = ""
+	}
+	return
 }

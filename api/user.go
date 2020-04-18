@@ -41,7 +41,7 @@ func Login(context register.HandleContext) (err error) {
 		u.Token = u.GenerateToken()
 		res.Success = true
 		res.Title = "登录成功"
-		res.User = u
+		res.User = u.Desensitization(true)
 		httpContext.SetCookie("token", u.Token)
 	} else {
 		res.Success = false
@@ -63,26 +63,19 @@ type InfoResponse user.Type
 func Info(context register.HandleContext) (err error) {
 	args := new(InfoRequest)
 	res := new(InfoResponse)
-	u := new(user.Type)
 
 	context.RequestArgs(args)
 
 	if args.Username == "" {
-		u = context.GetUser()
-		if u == nil {
-			u = &user.Type{}
-		}
+		res = (*InfoResponse)(context.GetUser().Desensitization(true))
 	} else {
-		u = user.GetUserByUsername(args.Username)
+		u := user.GetUserByUsername(args.Username)
 		if u == nil {
 			context.PageNotFound()
 			return
 		}
-		if context.GetUser() == nil || u.ID != context.GetUser().ID {
-			u.Desensitization()
-		}
+		res = (*InfoResponse)(u.Desensitization(!(context.GetUser() == nil || u.ID != context.GetUser().ID)))
 	}
-	res = (*InfoResponse)(u)
 
 	context.ReturnJSON(res)
 	return
@@ -151,7 +144,7 @@ func QQ(context register.HandleContext) (err error) {
 	// res := new(QQResponse)
 	context.RequestArgs(args)
 
-	var u *user.Type
+	var u *user.TypeDB
 
 	token, openID, unionID, res, err := user.QQConnect(args.Code)
 	if err != nil {

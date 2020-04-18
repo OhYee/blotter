@@ -46,5 +46,5 @@ type HandleContext interface {
 	TemporarilyMoved(url string)
 
 	// GetUser get current user info
-	GetUser() *user.Type
+	GetUser() *user.TypeDB
 }

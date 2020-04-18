@@ -25,7 +25,7 @@ type HTTPContext struct {
 	Response http.ResponseWriter
 	buf      *bytes.Buffer
 	header   []httpHeader
-	user     *user.Type
+	user     *user.TypeDB
 	userGot  bool
 }
 
@@ -188,7 +188,7 @@ func (context *HTTPContext) TemporarilyMoved(url string) {
 }
 
 // GetUser get current user
-func (context *HTTPContext) GetUser() *user.Type {
+func (context *HTTPContext) GetUser() *user.TypeDB {
 	if !context.userGot {
 		context.user = user.GetUserByToken(context.GetCookie("token"))
 		context.userGot = true

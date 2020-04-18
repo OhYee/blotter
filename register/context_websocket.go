@@ -116,6 +116,6 @@ func (context *WebSocketContext) TemporarilyMoved(url string) {
 }
 
 // GetUser get current user
-func (context *WebSocketContext) GetUser() *user.Type {
+func (context *WebSocketContext) GetUser() *user.TypeDB {
 	return nil
 }
