@@ -12,6 +12,7 @@ import (
 
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/rainbow/errors"
 )
 
 type httpHeader struct {
@@ -172,7 +173,7 @@ func (context *HTTPContext) NotImplemented() {
 
 // ServerError return 500 server error
 func (context *HTTPContext) ServerError(err error) {
-	output.ErrOutput.Printf("500 Server Error: %s\n", err.Error())
+	output.ErrOutput.Printf("500 Server Error: %s\n", errors.ShowStack(err))
 	context.writeHeaderWithCode(500)
 	context.Response.Write([]byte(fmt.Sprintf("Server error %s", err.Error())))
 }

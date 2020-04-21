@@ -52,6 +52,8 @@ github.com/OhYee/rainbow v0.0.0-20191216131638-b29c73c1cc83 h1:1IQA4cPdXDzVektSs
 github.com/OhYee/rainbow v0.0.0-20191216131638-b29c73c1cc83/go.mod h1:N7lMsUEVv57QF4Epb5Tmj4reIFtPoXzp6tACrUHmlb4=
 github.com/OhYee/rainbow v0.0.0-20200214092021-574705b089af h1:1wC2NWVJDSC0f92cnlsMqy+PddznNMS+98nV8YYgGok=
 github.com/OhYee/rainbow v0.0.0-20200214092021-574705b089af/go.mod h1:N7lMsUEVv57QF4Epb5Tmj4reIFtPoXzp6tACrUHmlb4=
+github.com/OhYee/rainbow v1.0.2 h1:UeC68jCiVQNv0OVyyqUyKJfRVA4P3t2Uw6Q+YqHe4FY=
+github.com/OhYee/rainbow v1.0.2/go.mod h1:W8viYm/WUrybXqXxbuTtUqvNx6p9mxpTmaI9DH/VNLs=
 github.com/akavel/rsrc v0.8.0/go.mod h1:uLoCtb9J+EyAqh+26kdrTgmzRBFPGOolLWKpdxkKq+c=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38 h1:smF2tmSOzy2Mm+0dGI2AIUHY+w0BUc+4tn40djz7+6U=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=

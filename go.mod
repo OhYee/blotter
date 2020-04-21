@@ -11,7 +11,7 @@ require (
 	github.com/OhYee/goldmark-plantuml v0.0.0-20200228185412-bd2cf0f6fd38
 	github.com/OhYee/goutils v0.0.0-20200402075346-bfaa3d7ac10e
 	github.com/OhYee/qqconnect v0.0.0-20200408151250-b73780ec1a81
-	github.com/OhYee/rainbow v0.0.0-20200214092021-574705b089af
+	github.com/OhYee/rainbow v1.0.2
 	github.com/alecthomas/chroma v0.7.2-0.20200305040604-4f3623dce67a
 	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/go-delve/delve v1.3.2 // indirect
@@ -23,7 +23,7 @@ require (
 	github.com/klauspost/compress v1.10.4 // indirect
 	github.com/litao91/goldmark-mathjax v0.0.0-20191101121019-011def32b12f
 	github.com/mitchellh/mapstructure v1.2.2
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/xdg/stringprep v1.0.0 // indirect
 	github.com/yuin/goldmark v1.1.27
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
