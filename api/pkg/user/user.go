@@ -1,13 +1,13 @@
 package user
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/goutils/set"
 	qq "github.com/OhYee/qqconnect"
+	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
