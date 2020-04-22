@@ -60,9 +60,9 @@ type response struct {
 }
 
 var wsFuncs = map[string]register.HandleFunc{
-	"get":  Get,
-	"pop":  Pop,
-	"push": Push,
+	// "get":  Get,
+	// "pop":  Pop,
+	// "push": Push,
 }
 
 func WebSocket(context register.HandleContext) (err error) {

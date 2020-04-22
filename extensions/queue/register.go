@@ -1,31 +1,42 @@
 package queue
 
-import (
-	"github.com/OhYee/blotter/register"
-)
+import "github.com/OhYee/blotter/register"
 
 // Register api
 func Register() *register.Extension {
 	ext := register.NewExtension("queue")
 	ext.PreRegister(
-		"/",
-		Get,
+		"create",
+		Create,
+	)
+	ext.PreRegister(
+		"finish",
+		Finish,
 	)
 	ext.PreRegister(
 		"push",
 		Push,
 	)
 	ext.PreRegister(
-		"pop",
-		Pop,
+		"get",
+		Get,
 	)
 	ext.PreRegister(
-		"admin",
-		Admin,
+		"get_all",
+		GetAll,
 	)
-	ext.PreRegister(
-		"ws",
-		WebSocket,
-	)
+
+	// ext.PreRegister(
+	// 	"pop",
+	// 	Pop,
+	// )
+	// ext.PreRegister(
+	// 	"admin",
+	// 	Admin,
+	// )
+	// ext.PreRegister(
+	// 	"ws",
+	// 	WebSocket,
+	// )
 	return ext
 }
