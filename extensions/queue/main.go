@@ -12,39 +12,47 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func userValid(u *user.TypeDB) bool {
-	return u.NintendoSwitch != "" &&
-		u.NintendoSwitchName != "" &&
-		u.AnimalCrossingName != "" &&
-		u.AnimalCrossingIsland != ""
+func userValid(u *user.TypeDB) error {
+	if u.NintendoSwitch == "" &&
+		u.NintendoSwitchName == "" &&
+		u.AnimalCrossingName == "" &&
+		u.AnimalCrossingIsland == "" {
+		return errors.New("请在个人设置界面填写 Nintendo Switch、动森信息")
+
+	}
+	if u.Black > time.Now().Unix() {
+		return errors.New("您由于多次违规，已被拉黑")
+	}
+	return nil
 }
 
-type CreateRequest struct {
+type CreateAndUpdateRequest struct {
+	ID          string `json:"id"` // Only need when updating
 	Max         int8   `json:"max"`
 	Password    string `json:"password"`
 	Description string `json:"description"`
 }
-type CreateResponse struct {
+type CreateAndUpdateResponse struct {
 	api.SimpleResponse
 	ID string `json:"id"`
 }
 
-// Create a queue
-func Create(context register.HandleContext) (err error) {
+// CreateAndUpdate a queue
+func CreateAndUpdate(context register.HandleContext) (err error) {
 	u := context.GetUser()
 	if u == nil {
 		context.Forbidden()
 		return
 	}
 
-	args := new(CreateRequest)
-	res := new(CreateResponse)
+	args := new(CreateAndUpdateRequest)
+	res := new(CreateAndUpdateResponse)
 	context.RequestArgs(args)
 
-	if !userValid(u) {
+	if err = userValid(u); err != nil {
 		res.Success = false
 		res.Title = "创建失败"
-		res.Content = "请在个人设置界面填写 Nintendo Switch、动森信息"
+		res.Content = err.Error()
 		err = context.ReturnJSON(res)
 		return
 	}
@@ -57,20 +65,33 @@ func Create(context register.HandleContext) (err error) {
 		return
 	}
 
-	if res.ID, err = create(u.ID, args.Password, args.Description); err != nil {
-		res.Success = false
-		res.Title = "队列创建失败"
-		res.Content = err.Error()
+	if args.ID != "" {
+		if err = update(args.ID, u.ID, args.Password, args.Description, args.Max); err != nil {
+			res.Success = false
+			res.Title = "修改信息失败"
+			res.Content = err.Error()
+		} else {
+			res.Success = true
+			res.Title = "修改信息成功"
+		}
+
 	} else {
-		res.Success = true
-		res.Title = "队列创建成功"
+		if res.ID, err = create(u.ID, args.Password, args.Description, args.Max); err != nil {
+			res.Success = false
+			res.Title = "队列创建失败"
+			res.Content = err.Error()
+		} else {
+			res.Success = true
+			res.Title = "队列创建成功"
+		}
+
 	}
 
 	err = context.ReturnJSON(res)
 	return
 }
 
-func create(userID primitive.ObjectID, password string, description string) (id string, err error) {
+func create(userID primitive.ObjectID, password string, description string, max int8) (id string, err error) {
 	cnt, err := mongo.Find("blotter", "queue", bson.M{
 		"leader":      userID,
 		"finish_time": 0,
@@ -89,6 +110,7 @@ func create(userID primitive.ObjectID, password string, description string) (id 
 		"description": description,
 		"create_time": time.Now().Unix(),
 		"finish_time": 0,
+		"max":         max,
 		"queue":       []Member{},
 	})
 	if err != nil {
@@ -96,6 +118,26 @@ func create(userID primitive.ObjectID, password string, description string) (id 
 	}
 
 	id = ids[0].(primitive.ObjectID).Hex()
+	return
+}
+
+func update(queueID string, userID primitive.ObjectID, password string, description string, max int8) (err error) {
+	queueObjID, err := primitive.ObjectIDFromHex(queueID)
+	if err != nil {
+		return
+	}
+
+	_, err = mongo.Update("blotter", "queue", bson.M{
+		"_id":         queueObjID,
+		"leader":      userID,
+		"finish_time": 0,
+	}, bson.M{
+		"$set": bson.M{
+			"password":    password,
+			"description": description,
+			"max":         max,
+		},
+	}, nil)
 	return
 }
 
@@ -144,31 +186,31 @@ func finish(userID primitive.ObjectID, ID string) (err error) {
 	return
 }
 
-type PushRequest struct {
+type InsertRequest struct {
 	ID string `json:"id"`
 }
-type PushResponse api.SimpleResponse
+type InsertResponse api.SimpleResponse
 
-func Push(context register.HandleContext) (err error) {
+func Insert(context register.HandleContext) (err error) {
 	u := context.GetUser()
 	if u == nil {
 		context.Forbidden()
 		return
 	}
 
-	args := new(PushRequest)
-	res := new(PushResponse)
+	args := new(InsertRequest)
+	res := new(InsertResponse)
 	context.RequestArgs(args)
 
-	if !userValid(u) {
+	if err = userValid(u); err != nil {
 		res.Success = false
 		res.Title = "入队失败"
-		res.Content = "请在个人设置界面填写 Nintendo Switch、动森信息"
+		res.Content = err.Error()
 		err = context.ReturnJSON(res)
 		return
 	}
 
-	if err = push(u.ID, args.ID); err != nil {
+	if err = insert(u.ID, args.ID); err != nil {
 		res.Success = false
 		res.Title = "入队失败"
 		res.Content = err.Error()
@@ -181,7 +223,7 @@ func Push(context register.HandleContext) (err error) {
 	return
 }
 
-func push(userID primitive.ObjectID, ID string) (err error) {
+func insert(userID primitive.ObjectID, ID string) (err error) {
 	defer errors.Wrapper(&err)
 
 	queueID, err := primitive.ObjectIDFromHex(ID)
@@ -199,6 +241,7 @@ func push(userID primitive.ObjectID, ID string) (err error) {
 	}
 
 	cnt, err = mongo.Find("blotter", "queue_members", bson.M{
+		"queue":    queueID,
 		"user":     userID,
 		"out_time": 0,
 	}, nil, nil)
@@ -212,6 +255,7 @@ func push(userID primitive.ObjectID, ID string) (err error) {
 		"in_time":  time.Now().Unix(),
 		"out_time": 0,
 		"status":   0,
+		"queue":    queueID,
 	})
 	if err != nil {
 		return
@@ -245,7 +289,7 @@ func Get(context register.HandleContext) (err error) {
 		return
 	}
 
-	if res == nil {
+	if res.Queue == nil {
 		context.PageNotFound()
 		return
 	}

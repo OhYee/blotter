@@ -7,15 +7,19 @@ func Register() *register.Extension {
 	ext := register.NewExtension("queue")
 	ext.PreRegister(
 		"create",
-		Create,
+		CreateAndUpdate,
+	)
+	ext.PreRegister(
+		"update",
+		CreateAndUpdate,
 	)
 	ext.PreRegister(
 		"finish",
 		Finish,
 	)
 	ext.PreRegister(
-		"push",
-		Push,
+		"insert",
+		Insert,
 	)
 	ext.PreRegister(
 		"get",
