@@ -3,13 +3,10 @@ package user
 import (
 	"crypto/sha512"
 	"encoding/hex"
-	"math/rand"
-	"time"
 
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
-	"github.com/OhYee/goutils/bytes"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -40,23 +37,6 @@ func Login(username string, password string) bool {
 		return false
 	}
 	return true
-}
-
-// GenerateToken generate a valid token
-func GenerateToken() (token string) {
-	buf := bytes.NewBuffer()
-
-	buf.Write(bytes.FromInt64(time.Now().Unix()))
-	buf.Write(bytes.FromInt64(time.Now().UnixNano()))
-	buf.Write(bytes.FromInt64(rand.Int63()))
-
-	hash := sha512.New()
-	hash.Write(buf.Bytes())
-
-	token = hex.EncodeToString(hash.Sum(nil))
-
-	// mongo.Update("blotter", "variables", bson.M{"key": "token"}, bson.M{"$set": bson.M{"value": token}}, options.Update().SetUpsert(true))
-	return
 }
 
 // CheckToken check the token is valid

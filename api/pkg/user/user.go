@@ -1,10 +1,15 @@
 package user
 
 import (
+	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/goutils/bytes"
 	"github.com/OhYee/goutils/set"
 	qq "github.com/OhYee/qqconnect"
 	"github.com/OhYee/rainbow/errors"
@@ -174,7 +179,17 @@ func (u *TypeDB) CheckPassword(password string) bool {
 
 // GenerateToken generate token for this user
 func (u *TypeDB) GenerateToken() string {
-	u.Token = GenerateToken()
+	buf := bytes.NewBuffer()
+
+	buf.Write(bytes.FromString(u.ID.Hex()))
+	buf.Write(bytes.FromInt64(time.Now().UnixNano()))
+	buf.Write(bytes.FromInt64(rand.Int63()))
+
+	hash := sha512.New()
+	hash.Write(buf.Bytes())
+
+	u.Token = hex.EncodeToString(hash.Sum(nil))
+
 	u.updateToken(u.Token)
 	return u.Token
 }
