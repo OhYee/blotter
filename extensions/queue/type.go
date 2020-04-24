@@ -92,6 +92,7 @@ type Member struct {
 type MemberDB struct {
 	ID      primitive.ObjectID `json:"id" bson:"_id"`
 	User    primitive.ObjectID `json:"user" bson:"user"`
+	Queue   primitive.ObjectID `json:"queue" bson:"queue"`
 	InTime  int64              `json:"in_time" bson:"in_time"`
 	OutTime int64              `json:"out_time" bson:"out_time"`
 	Status  int8               `json:"status" bson:"status"` // 0 in queue; 1 landed; 2 backed; 3 canceled
