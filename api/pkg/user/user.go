@@ -12,33 +12,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// TypeDB of user information
-type TypeDB struct {
-	ID                   primitive.ObjectID `json:"id" bson:"_id"`
-	Username             string             `json:"username" bson:"username"`
-	Password             string             `json:"password" bson:"password"`
-	Avatar               string             `json:"avatar" bson:"avatar"`
-	Token                string             `json:"token" bson:"token"`
-	Email                string             `json:"email" bson:"email"`
-	QQ                   string             `json:"qq" bson:"qq"`
-	NintendoSwitch       string             `json:"ns_id" bson:"ns_id"`
-	NintendoSwitchName   string             `json:"ns_name" bson:"ns_name"`
-	AnimalCrossingName   string             `json:"ac_name" bson:"ac_name"`
-	AnimalCrossingIsland string             `json:"ac_island" bson:"ac_island"`
-
-	Permission int64 `json:"permission" bson:"permission"`
-
-	QQToken   string `json:"qq_token" bson:"qq_token"`
-	QQOpenID  string `json:"qq_open_id" bson:"qq_open_id"`
-	QQUnionID string `json:"qq_union_id" bson:"qq_union_id"`
-}
-
-type Type struct {
-	ID       string `json:"id" bson:"_id"`
+type TypeBase struct {
 	Username string `json:"username" bson:"username"`
 	Avatar   string `json:"avatar" bson:"avatar"`
 	Email    string `json:"email" bson:"email"`
 	QQ       string `json:"qq" bson:"qq"`
+	Black    int64  `json:"black" bson:"black"`
 
 	Token string `json:"token" bson:"token"`
 
@@ -48,11 +27,28 @@ type Type struct {
 	AnimalCrossingIsland string `json:"ac_island" bson:"ac_island"`
 
 	Permission int64 `json:"permission" bson:"permission"`
+}
+
+// TypeDB of user information
+type TypeDB struct {
+	TypeBase `bson:",inline"`
+
+	ID primitive.ObjectID `json:"id" bson:"_id"`
+
+	Password  string `json:"password" bson:"password"`
+	QQToken   string `json:"qq_token" bson:"qq_token"`
+	QQOpenID  string `json:"qq_open_id" bson:"qq_open_id"`
+	QQUnionID string `json:"qq_union_id" bson:"qq_union_id"`
+}
+
+type Type struct {
+	TypeBase `bson:",inline"`
+
+	ID string `json:"id" bson:"_id"`
 
 	QQConnected bool `json:"qq_connected" bson:"qq_connected"`
-
-	Existed bool `json:"existed" bson:"existed"`
-	Self    bool `json:"self" bson:"self"`
+	Existed     bool `json:"existed" bson:"existed"`
+	Self        bool `json:"self" bson:"self"`
 }
 
 func NewUser(username, password string) *TypeDB {
@@ -60,18 +56,21 @@ func NewUser(username, password string) *TypeDB {
 		return nil
 	}
 	u := &TypeDB{
-		ID:             primitive.NewObjectID(),
-		Username:       username,
-		Password:       PasswordHash(username, password),
-		Avatar:         "/static/img/noimg.png",
-		Token:          "",
-		Email:          "",
-		QQ:             "",
-		NintendoSwitch: "",
-		Permission:     0,
-		QQToken:        "",
-		QQOpenID:       "",
-		QQUnionID:      "",
+		TypeBase: TypeBase{
+			Username:       username,
+			Avatar:         "/static/img/noimg.png",
+			Token:          "",
+			Email:          "",
+			QQ:             "",
+			NintendoSwitch: "",
+			Permission:     0,
+		},
+		ID:       primitive.NewObjectID(),
+		Password: PasswordHash(username, password),
+
+		QQToken:   "",
+		QQOpenID:  "",
+		QQUnionID: "",
 	}
 	if _, err := mongo.Add("blotter", "users", nil, u); err != nil {
 		output.Err(err)
@@ -92,6 +91,7 @@ func GetUserByToken(token string) *TypeDB {
 	if err == nil && cnt != 0 {
 		return &users[0]
 	}
+	output.Err(err)
 	return nil
 }
 
@@ -125,15 +125,18 @@ func NewUserFromQQConnect(token string, openID string, unionID string, userInfo 
 		username = userInfo.Nickname
 	}
 	u = &TypeDB{
-		ID:             objID,
-		Username:       username,
-		Password:       "",
-		Avatar:         userInfo.FigQQ,
-		Token:          "",
-		Email:          "",
-		QQ:             "",
-		NintendoSwitch: "",
-		Permission:     0,
+		TypeBase: TypeBase{
+			Username:       username,
+			Avatar:         userInfo.FigQQ,
+			Token:          "",
+			Email:          "",
+			QQ:             "",
+			NintendoSwitch: "",
+			Permission:     0,
+		},
+		ID: objID,
+
+		Password: "",
 
 		QQToken:   token,
 		QQOpenID:  openID,
@@ -243,38 +246,32 @@ func (u *TypeDB) ChangePassword(username, password string) (err error) {
 func (u *TypeDB) Desensitization(self bool) (uu *Type) {
 	if u == nil {
 		return &Type{
-			ID:                   "000000000000000000000000",
-			Username:             "",
-			Avatar:               "",
-			Email:                "",
-			QQ:                   "",
-			Token:                "",
-			NintendoSwitch:       "",
-			NintendoSwitchName:   "",
-			AnimalCrossingName:   "",
-			AnimalCrossingIsland: "",
-			Permission:           0,
-			QQConnected:          false,
-			Existed:              false,
-			Self:                 false,
+			TypeBase: TypeBase{
+				Username:             "",
+				Avatar:               "",
+				Email:                "",
+				QQ:                   "",
+				Token:                "",
+				NintendoSwitch:       "",
+				NintendoSwitchName:   "",
+				AnimalCrossingName:   "",
+				AnimalCrossingIsland: "",
+				Permission:           0,
+			},
+			ID:          "000000000000000000000000",
+			QQConnected: false,
+			Existed:     false,
+			Self:        false,
 		}
 	}
 	uu = &Type{
-		ID:                   u.ID.Hex(),
-		Username:             u.Username,
-		Avatar:               u.Avatar,
-		Email:                u.Email,
-		QQ:                   u.QQ,
-		Token:                u.Token,
-		NintendoSwitch:       u.NintendoSwitch,
-		NintendoSwitchName:   u.NintendoSwitchName,
-		AnimalCrossingName:   u.AnimalCrossingName,
-		AnimalCrossingIsland: u.AnimalCrossingIsland,
-		Permission:           u.Permission,
-		QQConnected:          u.QQUnionID != "",
-		Existed:              true,
-		Self:                 self,
+		TypeBase:    u.TypeBase,
+		ID:          u.ID.Hex(),
+		QQConnected: u.QQUnionID != "",
+		Existed:     true,
+		Self:        self,
 	}
+
 	if !self {
 		if len(uu.Email) > 2 {
 			uu.Email = fmt.Sprintf("%c******%c", uu.Email[0], uu.Email[len(uu.Email)-1])
