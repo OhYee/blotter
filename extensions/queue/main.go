@@ -1,11 +1,13 @@
 package queue
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/OhYee/blotter/api"
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,12 +15,13 @@ import (
 )
 
 func userValid(u *user.TypeDB) error {
-	if u.NintendoSwitch == "" &&
-		u.NintendoSwitchName == "" &&
-		u.AnimalCrossingName == "" &&
+	if u.QQUnionID == "" ||
+		u.QQ == "" ||
+		u.NintendoSwitch == "" ||
+		u.NintendoSwitchName == "" ||
+		u.AnimalCrossingName == "" ||
 		u.AnimalCrossingIsland == "" {
-		return errors.New("请在个人设置界面填写 Nintendo Switch、动森信息")
-
+		return errors.New("请在个人设置界面填写 QQ 号、Nintendo Switch、动森信息并绑定 QQ 互联")
 	}
 	if u.Black > time.Now().Unix() {
 		return errors.New("您由于多次违规，已被拉黑")
@@ -250,13 +253,13 @@ func insert(userID primitive.ObjectID, ID string) (err error) {
 		return
 	}
 
-	ids, err := mongo.Add("blotter", "queue_members", nil, bson.M{
-		"user":     userID,
-		"in_time":  time.Now().Unix(),
-		"out_time": 0,
-		"status":   0,
-		"queue":    queueID,
-	})
+	ids, err := mongo.Add("blotter", "queue_members", nil, NewMemberDB(
+		userID,
+		queueID,
+		time.Now().Unix(),
+		0,
+		0,
+	))
 	if err != nil {
 		return
 	}
@@ -285,7 +288,7 @@ func Get(context register.HandleContext) (err error) {
 	res := new(GetResponse)
 	context.RequestArgs(args)
 
-	if res.Queue, err = getQueue(args.ID); err != nil {
+	if res.Queue, err = getQueue(context.GetUser(), args.ID); err != nil {
 		return
 	}
 
@@ -298,7 +301,7 @@ func Get(context register.HandleContext) (err error) {
 	return
 }
 
-func getQueue(id string) (res *Queue, err error) {
+func getQueue(u *user.TypeDB, id string) (res *Queue, err error) {
 	queueID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return
@@ -324,6 +327,14 @@ func getQueue(id string) (res *Queue, err error) {
 
 	if cnt > 0 {
 		q := &qs[0]
+
+		waitingMembers := q.GetWaitingMembers()
+		output.Debug("%+v", waitingMembers)
+		if !(u != nil &&
+			(u.ID == q.Leader ||
+				(len(waitingMembers) > 0 && u.ID == waitingMembers[0].User))) {
+			q.Password = ""
+		}
 
 		res = q.ToQueue()
 	}
@@ -386,7 +397,129 @@ func getAllQueue(all bool, offset int64, number int64) (cnt int64, res []*Queue,
 	if cnt, err = mongo.Aggregate("blotter", "queue", pipeline, nil, &qs); err != nil {
 		return
 	}
-	res = QueueDBsToQueues(qs)
+	res = queueDBsToQueues(qs, true)
 
+	return
+}
+
+type LandRequest struct {
+	QueueID  string `json:"queue_id"`
+	MemberID string `json:"member_id"`
+}
+type LandResponse api.SimpleResponse
+
+func Land(context register.HandleContext) (err error) {
+	u := context.GetUser()
+	if u == nil {
+		context.Forbidden()
+		return
+	}
+
+	args := new(LandRequest)
+	res := new(LandResponse)
+	context.RequestArgs(args)
+
+	if err = userValid(u); err != nil {
+		res.Success = false
+		res.Title = "着陆失败"
+		res.Content = err.Error()
+		err = context.ReturnJSON(res)
+		return
+	}
+
+	if err = landAndOut(u.ID, args.QueueID, args.MemberID, "land"); err != nil {
+		res.Success = false
+		res.Title = "着陆失败"
+		res.Content = err.Error()
+	} else {
+		res.Success = true
+		res.Title = "着陆成功"
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}
+
+func landAndOut(userObjID primitive.ObjectID, queueID string, memberID string, op string) (err error) {
+	defer errors.Wrapper(&err)
+
+	if op != "land" && op != "out" {
+		err = errors.New("op must be \"land\" or \"out\"")
+		return
+	}
+	fieldName := fmt.Sprintf("%s_time", op)
+
+	queueObjID, err := primitive.ObjectIDFromHex(queueID)
+	if err != nil {
+		return
+	}
+
+	memberObjID, err := primitive.ObjectIDFromHex(memberID)
+	if err != nil {
+		return
+	}
+
+	cnt, err := mongo.Find("blotter", "queue", bson.M{
+		"_id":         queueObjID,
+		"finish_time": 0,
+	}, nil, nil)
+	if cnt == 0 {
+		err = errors.New("队伍不存在或已结束")
+		return
+	}
+
+	res, err := mongo.Update("blotter", "queue_members", bson.M{
+		"_id":     memberObjID,
+		"queue":   queueObjID,
+		"user":    userObjID,
+		fieldName: 0,
+	}, bson.M{
+		"$set": bson.M{
+			fieldName: time.Now().Unix(),
+		},
+	}, nil)
+
+	if err == nil && res.ModifiedCount == 0 {
+		err = errors.New("未找到符合的记录")
+	}
+
+	return
+}
+
+type OutRequest struct {
+	QueueID  string `json:"queue_id"`
+	MemberID string `json:"member_id"`
+}
+type OutResponse api.SimpleResponse
+
+func Out(context register.HandleContext) (err error) {
+	u := context.GetUser()
+	if u == nil {
+		context.Forbidden()
+		return
+	}
+
+	args := new(OutRequest)
+	res := new(OutResponse)
+	context.RequestArgs(args)
+
+	if err = userValid(u); err != nil {
+		res.Success = false
+		res.Title = "出队失败"
+		res.Content = err.Error()
+		err = context.ReturnJSON(res)
+		return
+	}
+
+	if err = landAndOut(u.ID, args.QueueID, args.MemberID, "out"); err != nil {
+		res.Success = false
+		res.Title = "出队失败"
+		res.Content = err.Error()
+	} else {
+		res.Success = true
+		res.Title = "出队成功"
+	}
+
+	err = context.ReturnJSON(res)
 	return
 }

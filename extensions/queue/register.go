@@ -22,6 +22,14 @@ func Register() *register.Extension {
 		Insert,
 	)
 	ext.PreRegister(
+		"land",
+		Land,
+	)
+	ext.PreRegister(
+		"out",
+		Out,
+	)
+	ext.PreRegister(
 		"get",
 		Get,
 	)
