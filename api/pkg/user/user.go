@@ -96,7 +96,9 @@ func GetUserByToken(token string) *TypeDB {
 	if err == nil && cnt != 0 {
 		return &users[0]
 	}
-	output.Err(err)
+	if err != nil {
+		output.Err(err)
+	}
 	return nil
 }
 
