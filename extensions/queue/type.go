@@ -128,9 +128,10 @@ func (q *QueueDB) GetWaitingMembers() (res []*MemberDB) {
 }
 
 type MemberBase struct {
-	InTime   int64 `json:"in_time" bson:"in_time"`
-	LandTime int64 `json:"land_time" bson:"land_time"`
-	OutTime  int64 `json:"out_time" bson:"out_time"`
+	InTime   int64              `json:"in_time" bson:"in_time"`
+	LandTime int64              `json:"land_time" bson:"land_time"`
+	OutTime  int64              `json:"out_time" bson:"out_time"`
+	Queue    primitive.ObjectID `json:"queue" bson:"queue"`
 	// Status  int8  `json:"status" bson:"status"` // 0 in queue; 1 landed; 2 backed; 3 canceled
 }
 
@@ -144,7 +145,6 @@ type MemberDB struct {
 	MemberBase `bson:",inline"`
 	ID         primitive.ObjectID `json:"id" bson:"_id"`
 	User       primitive.ObjectID `json:"user" bson:"user"`
-	Queue      primitive.ObjectID `json:"queue" bson:"queue"`
 }
 
 // ToMember transfer MemberDB to Member
@@ -162,13 +162,13 @@ func NewMemberDB(
 	inTime, landTime, outTime int64,
 ) *MemberDB {
 	return &MemberDB{
-		ID:    primitive.NewObjectID(),
-		User:  userID,
-		Queue: queueID,
+		ID:   primitive.NewObjectID(),
+		User: userID,
 		MemberBase: MemberBase{
 			InTime:   inTime,
 			LandTime: landTime,
 			OutTime:  outTime,
+			Queue:    queueID,
 		},
 	}
 }
