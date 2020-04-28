@@ -196,11 +196,11 @@ type boardcastType struct {
 
 func (b *boardcastType) notify(msg string) {
 
-	qqbot := ""
-	if v, err := variable.Get("qqbot"); err != nil {
+	qqrobot := ""
+	if v, err := variable.Get("qqrobot"); err != nil {
 		return
 	} else {
-		v.SetString("qqbot", &qqbot)
+		v.SetString("qqrobot", &qqrobot)
 	}
 
 	channel := notification.Hub.Get(b.UserID)
@@ -219,7 +219,7 @@ func (b *boardcastType) notify(msg string) {
 		}
 	}
 
-	channel = notification.Hub.Get(qqbot)
+	channel = notification.Hub.Get(qqrobot)
 	if channel != nil {
 		bb, err := json.Marshal(notification.Type{
 			Name: "notification",
