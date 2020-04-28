@@ -166,4 +166,8 @@ func Register() {
 		"user/qq_avatar",
 		SyncQQAvatar,
 	)
+	register.Register(
+		"notification/ws",
+		WebSocket,
+	)
 }
