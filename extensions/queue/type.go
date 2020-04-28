@@ -1,8 +1,13 @@
 package queue
 
 import (
+	"encoding/json"
+
+	"github.com/OhYee/blotter/api/pkg/notification"
 	"github.com/OhYee/blotter/api/pkg/user"
+	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/mongo"
+	"github.com/gorilla/websocket"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -171,4 +176,64 @@ func NewMemberDB(
 			Queue:    queueID,
 		},
 	}
+}
+
+type boardcastType struct {
+	ID       string `json:"_id" bson:"_id"`
+	Queue    string `json:"queue" bson:"queue"`
+	Password string `json:"password" bson:"password"`
+	Max      int8   `json:"max" bson:"max"`
+	UserID   string `json:"user_id" bson:"user_id"`
+	Username string `json:"username" bson:"username"`
+	Email    string `json:"email" bson:"email"`
+	QQ       string `json:"qq" bson:"qq"`
+	ACName   string `json:"ac_name" bson:"ac_name"`
+	ACIsland string `json:"ac_island" bson:"ac_island"`
+	InTime   int64  `json:"in_time" bson:"in_time"`
+	LandTime int64  `json:"land_time" bson:"land_time"`
+	OutTime  int64  `json:"out_time" bson:"out_time"`
+}
+
+func (b *boardcastType) notify(msg string) {
+
+	qqbot := ""
+	if v, err := variable.Get("qqbot"); err != nil {
+		return
+	} else {
+		v.SetString("qqbot", &qqbot)
+	}
+
+	channel := notification.Hub.Get(b.UserID)
+	if channel != nil {
+		bb, err := json.Marshal(notification.Type{
+			Name: "notification",
+			Data: map[string]interface{}{
+				"message": msg,
+			},
+		})
+		if err == nil {
+			channel <- notification.WritePackage{
+				MessageType: websocket.TextMessage,
+				MessageData: bb,
+			}
+		}
+	}
+
+	channel = notification.Hub.Get(qqbot)
+	if channel != nil {
+		bb, err := json.Marshal(notification.Type{
+			Name: "notification",
+			Data: map[string]interface{}{
+				"message": msg,
+				"qq":      b.QQ,
+			},
+		})
+		if err == nil {
+			channel <- notification.WritePackage{
+				MessageType: websocket.TextMessage,
+				MessageData: bb,
+			}
+		}
+	}
+
 }

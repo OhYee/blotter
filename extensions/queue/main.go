@@ -2,13 +2,16 @@ package queue
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/OhYee/blotter/api"
 	"github.com/OhYee/blotter/api/pkg/user"
+	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
+	"github.com/OhYee/goutils/condition"
 	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -471,7 +474,6 @@ func landAndOut(userObjID primitive.ObjectID, queueID string, memberID string, o
 	res, err := mongo.Update("blotter", "queue_members", bson.M{
 		"_id":     memberObjID,
 		"queue":   queueObjID,
-		"user":    userObjID,
 		fieldName: 0,
 	}, bson.M{
 		"$set": bson.M{
@@ -481,6 +483,10 @@ func landAndOut(userObjID primitive.ObjectID, queueID string, memberID string, o
 
 	if err == nil && res.ModifiedCount == 0 {
 		err = errors.New("未找到符合的记录")
+	}
+
+	if op == "out" {
+		go boardcast(queueObjID)
 	}
 
 	return
@@ -521,5 +527,80 @@ func Out(context register.HandleContext) (err error) {
 	}
 
 	err = context.ReturnJSON(res)
+	return
+}
+
+func boardcast(queueObjID primitive.ObjectID) {
+	notifications := make([]*boardcastType, 0)
+	cnt, err := mongo.Aggregate("blotter", "queue", []bson.M{
+		{"$match": bson.M{"_id": queueObjID}},
+		{"$lookup": bson.M{"localField": "queue", "foreignField": "_id", "from": "queue_members", "as": "queue"}},
+		{"$unwind": "$queue"},
+		{"$set": bson.M{"queue.max": "$max"}},
+		{"$set": bson.M{"queue.password": "$password"}},
+		{"$replaceRoot": bson.M{"newRoot": "$queue"}},
+		{"$match": bson.M{"out_time": 0}},
+		{"$lookup": bson.M{"localField": "user", "foreignField": "_id", "from": "users", "as": "user"}},
+		{"$unwind": "$user"},
+		{"$project": bson.M{
+			"queue":     "$queue",
+			"password":  "$password",
+			"max":       "$max",
+			"user_id":   "$user._id",
+			"username":  "$user.username",
+			"email":     "$user.email",
+			"qq":        "$user.qq",
+			"ac_name":   "$user.ac_name",
+			"ac_island": "$user.ac_island",
+			"in_time":   "$in_time",
+			"land_time": "$land_time",
+			"out_time":  "$out_time",
+		}},
+	}, nil, &notifications)
+	if err != nil {
+		output.ErrOutput.Printf("%s\n", errors.ShowStack(err))
+	}
+	if cnt == 0 {
+		return
+	}
+
+	root := ""
+	v, err := variable.Get("root")
+	if err != nil {
+		output.ErrOutput.Printf("%s\n", errors.ShowStack(err))
+	}
+	v.SetString("root", &root)
+
+	var landCount int8 = 0
+	var status = 0
+	for _, member := range notifications {
+		if member.LandTime != 0 {
+			landCount++
+			if landCount >= member.Max {
+				break
+			}
+		} else {
+			if status == 0 {
+				go member.notify(fmt.Sprintf(
+					"您已被获准起飞！%s 请尽快起飞，并在着陆后点击对应按钮。队伍地址: %s",
+					condition.IfString(
+						member.Password == "",
+						"",
+						fmt.Sprintf("飞行密码是:%s.", strings.ToUpper(member.Password)),
+					),
+					fmt.Sprintf("%s/apps/queue/%s", strings.Trim(root, "/"), member.Queue),
+				))
+			} else if status == 1 {
+				go member.notify(fmt.Sprintf(
+					"您即将起飞！请尽快前往机场做好起飞准备，等候进一步通知。队伍地址: %s",
+					fmt.Sprintf("%s/apps/queue/%s", strings.Trim(root, "/"), member.Queue),
+				))
+			} else {
+				break
+			}
+			status++
+		}
+	}
+
 	return
 }
