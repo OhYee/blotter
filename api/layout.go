@@ -22,6 +22,7 @@ type LayoutResponse struct {
 	QQ       string           `json:"qq"`
 	Github   string           `json:"github"`
 	Grey     bool             `json:"grey"`
+	Root     string           `json:"root"`
 }
 
 // Layout get site base info
@@ -33,7 +34,7 @@ func Layout(context register.HandleContext) (err error) {
 		return
 	}
 
-	m, err := variable.Get("beian", "view", "blog_name", "email", "github", "qq", "grey")
+	m, err := variable.Get("beian", "view", "blog_name", "email", "github", "qq", "grey", "root")
 	if err != nil {
 		return
 	}
@@ -58,6 +59,9 @@ func Layout(context register.HandleContext) (err error) {
 		return
 	}
 	if err = m.SetBool("grey", &res.Grey, false); err != nil {
+		return
+	}
+	if err = m.SetString("root", &res.Root); err != nil {
 		return
 	}
 
