@@ -11,6 +11,7 @@ from chenshuo import Chenshuo
 from csdn import CSDN
 from tinshine import Tinshine
 from sanghangning import Sanghangning
+from jarviswwong import Jarviswwong
 
 sites = [
     RSS(),
@@ -23,6 +24,7 @@ sites = [
     CSDN(),
     Tinshine(),
     Sanghangning(),
+    Jarviswwong()
 ]
 
 
