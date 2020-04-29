@@ -133,7 +133,7 @@ func update(queueID string, userID primitive.ObjectID, password string, descript
 		return
 	}
 
-	_, err = mongo.Update("blotter", "queue", bson.M{
+	if _, err = mongo.Update("blotter", "queue", bson.M{
 		"_id":         queueObjID,
 		"leader":      userID,
 		"finish_time": 0,
@@ -143,7 +143,10 @@ func update(queueID string, userID primitive.ObjectID, password string, descript
 			"description": description,
 			"max":         max,
 		},
-	}, nil)
+	}, nil); err != nil {
+		return
+	}
+	go boardcast(queueObjID, false)
 	return
 }
 
@@ -246,14 +249,19 @@ func insert(userID primitive.ObjectID, ID string) (err error) {
 		return
 	}
 
-	cnt, err = mongo.Find("blotter", "queue_members", bson.M{
-		"queue":    queueID,
-		"user":     userID,
+	members := make([]MemberDB, 0)
+	if cnt, err = mongo.Find("blotter", "queue_members", bson.M{
+		"queue": queueID,
+		// "user":     userID,
 		"out_time": 0,
-	}, nil, nil)
-	if cnt != 0 {
-		err = errors.New("您已经在队列中")
+	}, nil, &members); err != nil {
 		return
+	}
+	for _, m := range members {
+		if m.User == userID {
+			err = errors.New("您已经在队列中")
+			return
+		}
 	}
 
 	ids, err := mongo.Add("blotter", "queue_members", nil, NewMemberDB(
@@ -275,6 +283,10 @@ func insert(userID primitive.ObjectID, ID string) (err error) {
 			"queue": memberID,
 		},
 	}, nil)
+
+	if cnt == 0 {
+		go boardcast(queueID, true)
+	}
 
 	return
 }
@@ -486,7 +498,7 @@ func landAndOut(userObjID primitive.ObjectID, queueID string, memberID string, o
 	}
 
 	if op == "out" {
-		go boardcast(queueObjID)
+		go boardcast(queueObjID, false)
 	}
 
 	return
@@ -530,7 +542,7 @@ func Out(context register.HandleContext) (err error) {
 	return
 }
 
-func boardcast(queueObjID primitive.ObjectID) {
+func boardcast(queueObjID primitive.ObjectID, onlyOne bool) {
 	notifications := make([]*boardcastType, 0)
 	cnt, err := mongo.Aggregate("blotter", "queue", []bson.M{
 		{"$match": bson.M{"_id": queueObjID}},
@@ -590,6 +602,9 @@ func boardcast(queueObjID primitive.ObjectID) {
 					),
 					fmt.Sprintf("%s/apps/queue/%s", strings.Trim(root, "/"), member.Queue),
 				))
+				if onlyOne {
+					return
+				}
 			} else if status == 1 {
 				go member.notify(fmt.Sprintf(
 					"您即将起飞！请尽快前往机场做好起飞准备，等候进一步通知。队伍地址: %s",
