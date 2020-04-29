@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
@@ -305,7 +306,7 @@ func SyncQQAvatar(context register.HandleContext) (err error) {
 		context.TemporarilyMoved(user.QQConn.LoginPage("avatar"))
 		return
 	}
-	if err = u.UpdateFields(map[string]string{"avatar": res.FigQQ}); err != nil {
+	if err = u.UpdateFields(map[string]string{"avatar": strings.Replace(res.FigQQ, "http://", "https://", 1)}); err != nil {
 		context.ReturnText(err.Error())
 		return
 	}

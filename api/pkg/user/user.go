@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/OhYee/blotter/mongo"
@@ -134,7 +135,7 @@ func NewUserFromQQConnect(token string, openID string, unionID string, userInfo 
 	u = &TypeDB{
 		TypeBase: TypeBase{
 			Username:       username,
-			Avatar:         userInfo.FigQQ,
+			Avatar:         strings.Replace(userInfo.FigQQ, "http://", "https://", 1),
 			Token:          "",
 			Email:          "",
 			QQ:             "",
