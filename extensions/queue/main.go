@@ -72,7 +72,7 @@ func CreateAndUpdate(context register.HandleContext) (err error) {
 	}
 
 	if args.ID != "" {
-		if err = update(args.ID, u.ID, args.Password, args.Description, args.Max); err != nil {
+		if err = update(args.ID, u, args.Password, args.Description, args.Max); err != nil {
 			res.Success = false
 			res.Title = "修改信息失败"
 			res.Content = err.Error()
@@ -127,17 +127,26 @@ func create(userID primitive.ObjectID, password string, description string, max 
 	return
 }
 
-func update(queueID string, userID primitive.ObjectID, password string, description string, max int8) (err error) {
+func update(queueID string, u *user.TypeDB, password string, description string, max int8) (err error) {
+	if u == nil {
+		return errors.New("user info is nil")
+	}
+
 	queueObjID, err := primitive.ObjectIDFromHex(queueID)
 	if err != nil {
 		return
 	}
 
-	if _, err = mongo.Update("blotter", "queue", bson.M{
+	condition := bson.M{
 		"_id":         queueObjID,
-		"leader":      userID,
 		"finish_time": 0,
-	}, bson.M{
+	}
+
+	if !(u.Permission&1 == 1) {
+		condition["leader"] = u.ID
+	}
+
+	if _, err = mongo.Update("blotter", "queue", condition, bson.M{
 		"$set": bson.M{
 			"password":    password,
 			"description": description,
@@ -166,7 +175,7 @@ func Finish(context register.HandleContext) (err error) {
 		return
 	}
 
-	if err = finish(u.ID, args.ID); err != nil {
+	if err = finish(u, args.ID); err != nil {
 		res.Success = false
 		res.Title = "排队完成失败"
 		res.Content = err.Error()
@@ -179,15 +188,24 @@ func Finish(context register.HandleContext) (err error) {
 	return
 }
 
-func finish(userID primitive.ObjectID, ID string) (err error) {
+func finish(u *user.TypeDB, ID string) (err error) {
+	if u == nil {
+		return errors.New("user info is nil")
+	}
+
 	objID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
 		return
 	}
-	_, err = mongo.Update("blotter", "queue", bson.M{
-		"_id":    objID,
-		"leader": userID,
-	}, bson.M{
+
+	condition := bson.M{
+		"_id": objID,
+	}
+	if !(u.Permission&1 == 1) {
+		condition["leader"] = u.ID
+	}
+
+	_, err = mongo.Update("blotter", "queue", condition, bson.M{
 		"$set": bson.M{
 			"finish_time": time.Now().Unix(),
 		},
@@ -240,12 +258,17 @@ func insert(userID primitive.ObjectID, ID string) (err error) {
 		return
 	}
 
+	queues := make([]struct {
+		Max int64 `bson:"max"`
+	}, 0)
 	cnt, err := mongo.Find("blotter", "queue", bson.M{
 		"_id":         queueID,
 		"finish_time": 0,
-	}, nil, nil)
-	if cnt == 0 {
-		err = errors.New("队伍不存在或已结束")
+	}, nil, &queues)
+	if err != nil || cnt == 0 {
+		if err == nil {
+			err = errors.New("队伍不存在或已结束")
+		}
 		return
 	}
 
@@ -284,7 +307,7 @@ func insert(userID primitive.ObjectID, ID string) (err error) {
 		},
 	}, nil)
 
-	if cnt == 0 {
+	if cnt <= queues[0].Max {
 		go boardcast(queueID, true)
 	}
 
@@ -442,7 +465,7 @@ func Land(context register.HandleContext) (err error) {
 		return
 	}
 
-	if err = landAndOut(u.ID, args.QueueID, args.MemberID, "land"); err != nil {
+	if err = landAndOut(u, args.QueueID, args.MemberID, "land"); err != nil {
 		res.Success = false
 		res.Title = "着陆失败"
 		res.Content = err.Error()
@@ -455,8 +478,11 @@ func Land(context register.HandleContext) (err error) {
 	return
 }
 
-func landAndOut(userObjID primitive.ObjectID, queueID string, memberID string, op string) (err error) {
+func landAndOut(u *user.TypeDB, queueID string, memberID string, op string) (err error) {
 	defer errors.Wrapper(&err)
+	if u == nil {
+		return errors.New("user info is nil")
+	}
 
 	if op != "land" && op != "out" {
 		err = errors.New("op must be \"land\" or \"out\"")
@@ -474,20 +500,30 @@ func landAndOut(userObjID primitive.ObjectID, queueID string, memberID string, o
 		return
 	}
 
+	queues := make([]struct {
+		Leader primitive.ObjectID `bson:"_id"`
+	}, 0)
 	cnt, err := mongo.Find("blotter", "queue", bson.M{
 		"_id":         queueObjID,
 		"finish_time": 0,
-	}, nil, nil)
-	if cnt == 0 {
-		err = errors.New("队伍不存在或已结束")
+	}, nil, &queues)
+	if err != nil || cnt == 0 {
+		if err == nil {
+			err = errors.New("队伍不存在或已结束")
+		}
 		return
 	}
 
-	res, err := mongo.Update("blotter", "queue_members", bson.M{
+	condition := bson.M{
 		"_id":     memberObjID,
 		"queue":   queueObjID,
 		fieldName: 0,
-	}, bson.M{
+	}
+	if !(u.Permission&1 == 1 || u.ID == queues[0].Leader) {
+		condition["user"] = u.ID
+	}
+
+	res, err := mongo.Update("blotter", "queue_members", condition, bson.M{
 		"$set": bson.M{
 			fieldName: time.Now().Unix(),
 		},
@@ -529,7 +565,7 @@ func Out(context register.HandleContext) (err error) {
 		return
 	}
 
-	if err = landAndOut(u.ID, args.QueueID, args.MemberID, "out"); err != nil {
+	if err = landAndOut(u, args.QueueID, args.MemberID, "out"); err != nil {
 		res.Success = false
 		res.Title = "出队失败"
 		res.Content = err.Error()

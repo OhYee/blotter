@@ -7,6 +7,7 @@ import (
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/blotter/output"
 	"github.com/gorilla/websocket"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -195,6 +196,26 @@ type boardcastType struct {
 }
 
 func (b *boardcastType) notify(msg string) {
+	output.Debug("%+v", msg)
+
+	channels := notification.Hub.Get("queue", b.UserID)
+	if channels != nil {
+		bb, err := json.Marshal(notification.Type{
+			Name: "notification",
+			Data: map[string]interface{}{
+				"message": msg,
+			},
+		})
+		if err == nil {
+			for _, channel := range channels {
+				channel.Channel <- notification.WritePackage{
+					MessageType: websocket.TextMessage,
+					MessageData: bb,
+				}
+			}
+
+		}
+	}
 
 	qqrobot := ""
 	if v, err := variable.Get("qqrobot"); err != nil {
@@ -203,24 +224,8 @@ func (b *boardcastType) notify(msg string) {
 		v.SetString("qqrobot", &qqrobot)
 	}
 
-	channel := notification.Hub.Get(b.UserID)
-	if channel != nil {
-		bb, err := json.Marshal(notification.Type{
-			Name: "notification",
-			Data: map[string]interface{}{
-				"message": msg,
-			},
-		})
-		if err == nil {
-			channel <- notification.WritePackage{
-				MessageType: websocket.TextMessage,
-				MessageData: bb,
-			}
-		}
-	}
-
-	channel = notification.Hub.Get(qqrobot)
-	if channel != nil {
+	channels = notification.Hub.Get("qqrobot_queue", qqrobot)
+	if channels != nil {
 		bb, err := json.Marshal(notification.Type{
 			Name: "notification",
 			Data: map[string]interface{}{
@@ -229,9 +234,11 @@ func (b *boardcastType) notify(msg string) {
 			},
 		})
 		if err == nil {
-			channel <- notification.WritePackage{
-				MessageType: websocket.TextMessage,
-				MessageData: bb,
+			for _, channel := range channels {
+				channel.Channel <- notification.WritePackage{
+					MessageType: websocket.TextMessage,
+					MessageData: bb,
+				}
 			}
 		}
 	}
