@@ -17,6 +17,7 @@ var upgrader = websocket.Upgrader{
 
 type WebSocketRequest struct {
 	Token string `json:"token"`
+	Name  string `json:"name"`
 }
 
 func WebSocket(context register.HandleContext) (err error) {
@@ -39,13 +40,16 @@ func WebSocket(context register.HandleContext) (err error) {
 	defer ws.Close()
 	defer func() { closeChannel <- true }()
 
-	notification.Hub.Set(args.Token, writeChannel)
-	defer notification.Hub.Remove(args.Token)
+	channelID := notification.Hub.Set(args.Name, args.Token, writeChannel)
+	defer notification.Hub.Remove(args.Name, args.Token, channelID)
 
 	go func() {
 		for {
 			select {
 			case message := <-writeChannel:
+				if message.MessageType == websocket.TextMessage {
+					output.Debug("%s", message.MessageData)
+				}
 				ws.WriteMessage(message.MessageType, message.MessageData)
 			case <-closeChannel:
 				return
