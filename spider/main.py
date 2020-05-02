@@ -12,6 +12,7 @@ from csdn import CSDN
 from tinshine import Tinshine
 from sanghangning import Sanghangning
 from jarviswwong import Jarviswwong
+from jspang import JSPang
 
 sites = [
     RSS(),
@@ -24,7 +25,8 @@ sites = [
     CSDN(),
     Tinshine(),
     Sanghangning(),
-    Jarviswwong()
+    Jarviswwong(),
+    JSPang()
 ]
 
 
