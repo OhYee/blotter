@@ -5,14 +5,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/rand"
-	"strings"
 	"time"
 
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/goutils/bytes"
 	"github.com/OhYee/goutils/set"
-	qq "github.com/OhYee/qqconnect"
 	"github.com/OhYee/rainbow/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -45,6 +43,9 @@ type TypeDB struct {
 	QQToken   string `json:"qq_token" bson:"qq_token"`
 	QQOpenID  string `json:"qq_open_id" bson:"qq_open_id"`
 	QQUnionID string `json:"qq_union_id" bson:"qq_union_id"`
+
+	GithubID    int64  `json:"github_id" bson:"github_id"`
+	GithubToken string `json:"github_token" bson:"github_token"`
 }
 
 type Type struct {
@@ -53,14 +54,18 @@ type Type struct {
 	ID string `json:"id" bson:"_id"`
 
 	QQConnected bool `json:"qq_connected" bson:"qq_connected"`
-	Existed     bool `json:"existed" bson:"existed"`
-	Self        bool `json:"self" bson:"self"`
+
+	GithubConnected bool `json:"github_connected" bson:"github_connected"`
+
+	Existed bool `json:"existed" bson:"existed"`
+	Self    bool `json:"self" bson:"self"`
 }
 
 func NewUser(username, password string) *TypeDB {
 	if u := GetUserByUsername(username); u != nil {
 		return nil
 	}
+	uid := primitive.NewObjectID()
 	u := &TypeDB{
 		TypeBase: TypeBase{
 			Username:       username,
@@ -71,18 +76,63 @@ func NewUser(username, password string) *TypeDB {
 			NintendoSwitch: "",
 			Permission:     0,
 		},
-		ID:       primitive.NewObjectID(),
-		Password: PasswordHash(username, password),
+		ID:       uid,
+		Password: PasswordHash(username, password, uid.Hex()),
 
 		QQToken:   "",
 		QQOpenID:  "",
 		QQUnionID: "",
+
+		GithubID:    0,
+		GithubToken: "",
 	}
 	if _, err := mongo.Add("blotter", "users", nil, u); err != nil {
 		output.Err(err)
 		return nil
 	}
 	return u
+}
+
+// Desensitization data desensitization
+func (u *TypeDB) Desensitization(self bool) (uu *Type) {
+	if u == nil {
+		return &Type{
+			TypeBase: TypeBase{
+				Username:             "",
+				Avatar:               "",
+				Email:                "",
+				QQ:                   "",
+				Token:                "",
+				NintendoSwitch:       "",
+				NintendoSwitchName:   "",
+				AnimalCrossingName:   "",
+				AnimalCrossingIsland: "",
+				Permission:           0,
+			},
+			ID:              "000000000000000000000000",
+			QQConnected:     false,
+			GithubConnected: false,
+			Existed:         false,
+			Self:            false,
+		}
+	}
+	uu = &Type{
+		TypeBase:        u.TypeBase,
+		ID:              u.ID.Hex(),
+		QQConnected:     u.QQUnionID != "",
+		GithubConnected: u.GithubID != 0,
+		Existed:         true,
+		Self:            self,
+	}
+
+	if !self {
+		if len(uu.Email) > 2 {
+			uu.Email = fmt.Sprintf("%c******%c", uu.Email[0], uu.Email[len(uu.Email)-1])
+		}
+		uu.QQ = ""
+		uu.Token = ""
+	}
+	return
 }
 
 func GetUserByToken(token string) *TypeDB {
@@ -114,65 +164,8 @@ func GetUserByUsername(username string) *TypeDB {
 	return nil
 }
 
-func GetUserByUnionID(unionID string) *TypeDB {
-	users := make([]TypeDB, 0)
-	cnt, err := mongo.Find("blotter", "users", bson.M{
-		"qq_union_id": unionID,
-	}, nil, &users)
-	if err == nil && cnt != 0 {
-		return &users[0]
-	}
-	return nil
-}
-
-func NewUserFromQQConnect(token string, openID string, unionID string, userInfo qq.UserInfo) (u *TypeDB, err error) {
-	objID := primitive.NewObjectID()
-	username := objID.Hex()
-	uu := GetUserByUsername(userInfo.Nickname)
-	if uu == nil {
-		username = userInfo.Nickname
-	}
-	u = &TypeDB{
-		TypeBase: TypeBase{
-			Username:       username,
-			Avatar:         strings.Replace(userInfo.FigQQ, "http://", "https://", 1),
-			Token:          "",
-			Email:          "",
-			QQ:             "",
-			NintendoSwitch: "",
-			Permission:     0,
-		},
-		ID: objID,
-
-		Password: "",
-
-		QQToken:   token,
-		QQOpenID:  openID,
-		QQUnionID: unionID,
-	}
-
-	_, err = mongo.Add("blotter", "users", nil, u)
-	return
-}
-
 func (u *TypeDB) HasPermission() bool {
 	return u != nil && u.Permission != 0
-}
-
-func (u *TypeDB) ConnectQQ(token string, openID string, unionID string, userinfo qq.UserInfo) (err error) {
-	u.QQToken = token
-	u.QQOpenID = openID
-	u.QQUnionID = unionID
-	_, err = mongo.Update("blotter", "users", bson.M{
-		"_id": u.ID,
-	}, bson.M{
-		"$set": bson.M{
-			"qq_token":    token,
-			"qq_open_id":  openID,
-			"qq_union_id": unionID,
-		},
-	}, nil)
-	return
 }
 
 // CheckPassword check password is right
@@ -211,6 +204,7 @@ func (u *TypeDB) updateToken(token string) {
 var validKeys = set.NewSet(
 	"username", "email", "avatar", "ns_id",
 	"ns_name", "ac_name", "ac_island", "qq",
+	"github_token",
 )
 
 // updateField update user field
@@ -258,44 +252,4 @@ func (u *TypeDB) ChangePassword(username, password string) (err error) {
 
 	return
 
-}
-
-// Desensitization data desensitization
-func (u *TypeDB) Desensitization(self bool) (uu *Type) {
-	if u == nil {
-		return &Type{
-			TypeBase: TypeBase{
-				Username:             "",
-				Avatar:               "",
-				Email:                "",
-				QQ:                   "",
-				Token:                "",
-				NintendoSwitch:       "",
-				NintendoSwitchName:   "",
-				AnimalCrossingName:   "",
-				AnimalCrossingIsland: "",
-				Permission:           0,
-			},
-			ID:          "000000000000000000000000",
-			QQConnected: false,
-			Existed:     false,
-			Self:        false,
-		}
-	}
-	uu = &Type{
-		TypeBase:    u.TypeBase,
-		ID:          u.ID.Hex(),
-		QQConnected: u.QQUnionID != "",
-		Existed:     true,
-		Self:        self,
-	}
-
-	if !self {
-		if len(uu.Email) > 2 {
-			uu.Email = fmt.Sprintf("%c******%c", uu.Email[0], uu.Email[len(uu.Email)-1])
-		}
-		uu.QQ = ""
-		uu.Token = ""
-	}
-	return
 }

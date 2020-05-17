@@ -159,7 +159,7 @@ func QQ(context register.HandleContext) (err error) {
 			context.ReturnText("You should login first\n你需要先登录")
 			return
 		}
-		if uu := user.GetUserByUnionID(unionID); uu != nil {
+		if uu := user.GetUserByQQUnionID(unionID); uu != nil {
 			context.ReturnText(fmt.Sprintf("This QQ has connected to %s\n该 QQ 已绑定到 %s", uu.Username, uu.Username))
 			return
 		}
@@ -169,7 +169,7 @@ func QQ(context register.HandleContext) (err error) {
 		}
 		context.ReturnText("Connect QQ successfully, refresh origin page\n绑定成功，请刷新原页面")
 	case "avatar":
-		u = user.GetUserByUnionID(unionID)
+		u = user.GetUserByQQUnionID(unionID)
 		if u == nil {
 			context.ReturnText("This QQ is not connect to this site\n该 QQ 未在该网站绑定账号")
 			return
@@ -180,7 +180,7 @@ func QQ(context register.HandleContext) (err error) {
 		}
 		context.ReturnText("Sync QQ avatar successfully, refresh origin page\nQQ 头像已更新，请刷新原页面")
 	default:
-		if u = user.GetUserByUnionID(unionID); u == nil {
+		if u = user.GetUserByQQUnionID(unionID); u == nil {
 			// New account
 			if u, err = user.NewUserFromQQConnect(token, openID, unionID, res); err != nil {
 				return
@@ -311,5 +311,94 @@ func SyncQQAvatar(context register.HandleContext) (err error) {
 		return
 	}
 	context.ReturnText("Sync QQ avatar successfully, refresh origin page\nQQ 头像已更新，请刷新原页面")
+	return
+}
+
+type JumpToGithubRequest struct {
+	State string `json:"state"`
+}
+
+func JumpToGithub(context register.HandleContext) (err error) {
+	args := new(JumpToGithubRequest)
+	context.RequestArgs(args)
+
+	context.TemporarilyMoved(
+		user.GithubConn.LoginPage(
+			condition.IfString(
+				args.State == "",
+				context.GetRequest().Header.Get("referer"),
+				args.State,
+			),
+			true,
+		),
+	)
+
+	return
+}
+
+type GithubRequest struct {
+	Code  string `json:"code"`
+	State string `json:"state"`
+}
+type GithubResponse struct {
+	Token string `json:"token"`
+}
+
+func Github(context register.HandleContext) (err error) {
+	httpContext, ok := context.(*register.HTTPContext)
+	if !ok {
+		err = ErrNotHTTP
+		return
+	}
+
+	args := new(GithubRequest)
+	// res := new(GithubResponse)
+	context.RequestArgs(args)
+
+	token, info, err := user.GithubConnect(args.Code, args.State)
+	if err != nil {
+		return
+	}
+
+	var u *user.TypeDB
+	switch args.State {
+	case "connect":
+		u = context.GetUser()
+		if u == nil {
+			context.ReturnText("You should login first\n你需要先登录")
+			return
+		}
+		if uu := user.GetUserByGithubID(info.ID); uu != nil {
+			context.ReturnText(fmt.Sprintf("This Github Account has connected to %s\n该 Github 账户已绑定到 %s", uu.Username, uu.Username))
+			return
+		}
+		if err = u.ConnectGithub(token, info); err != nil {
+			context.ReturnText(err.Error())
+			return
+		}
+		context.ReturnText("Connect Github successfully, refresh origin page\n绑定成功，请刷新原页面")
+	case "avatar":
+		u = user.GetUserByGithubID(info.ID)
+		if u == nil {
+			context.ReturnText("This Github account is not connect to this site\n该 Github 未在该网站绑定账号")
+			return
+		}
+		if err = u.UpdateFields(map[string]string{"avatar": info.Avatar}); err != nil {
+			context.ReturnText(err.Error())
+			return
+		}
+		context.ReturnText("Sync Github avatar successfully, refresh origin page\nGithub 头像已更新，请刷新原页面")
+	default:
+		if u = user.GetUserByGithubID(info.ID); u == nil {
+			// New account
+			if u, err = user.NewUserFromGithubConnect(token, info); err != nil {
+				return
+			}
+		}
+		u.GenerateToken()
+
+		httpContext.SetCookie("token", u.Token)
+		context.TemporarilyMoved(args.State)
+	}
 	return
 }

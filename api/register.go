@@ -170,4 +170,12 @@ func Register() {
 		"notification/ws",
 		WebSocket,
 	)
+	register.Register(
+		"user/github_connect",
+		Github,
+	)
+	register.Register(
+		"user/jump_to_github",
+		JumpToGithub,
+	)
 }
