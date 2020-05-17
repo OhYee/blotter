@@ -30,15 +30,15 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 			extension.Footnote,
 			ext.NewExt(
 				ext.RenderMap{
-					Language:       []string{"dot-svg"},
+					Languages:      []string{"dot-svg"},
 					RenderFunction: dot.NewDot("dot-svg").Renderer,
 				},
 				ext.RenderMap{
-					Language:       []string{"uml-svg"},
+					Languages:      []string{"uml-svg"},
 					RenderFunction: uml.NewUML("uml-svg").Renderer,
 				},
 				ext.RenderMap{
-					Language: []string{"*"},
+					Languages: []string{"*"},
 					RenderFunction: ext.GetFencedCodeBlockRendererFunc(
 						highlighting.NewHTMLRenderer(
 							highlighting.WithGuessLanguage(true),
