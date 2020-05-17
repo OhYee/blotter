@@ -12,31 +12,20 @@ import (
 )
 
 // PasswordHash get the hash of the password
-func PasswordHash(username string, password string) (h string) {
+func PasswordHash(username string, password string, userID string) (h string) {
 	hash := sha512.New()
-	hash.Write([]byte(username + password + username))
+
+	// Can not use username as hash salt
+	runes := []rune(password)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	reversePassword := string(runes)
+
+	hash.Write([]byte(password + userID + reversePassword))
 	h = hex.EncodeToString(hash.Sum(nil))
 	output.Debug("%+v", h)
 	return
-}
-
-// Login using password
-func Login(username string, password string) bool {
-
-	password = PasswordHash(username, password)
-
-	m, err := variable.Get("password")
-	if err != nil {
-		return false
-	}
-
-	_password := ""
-	m.SetString("password", &_password)
-
-	if _password != password {
-		return false
-	}
-	return true
 }
 
 // CheckToken check the token is valid

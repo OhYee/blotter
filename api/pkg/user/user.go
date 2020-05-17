@@ -177,7 +177,7 @@ func (u *TypeDB) ConnectQQ(token string, openID string, unionID string, userinfo
 
 // CheckPassword check password is right
 func (u *TypeDB) CheckPassword(password string) bool {
-	return PasswordHash(u.Username, password) == u.Password
+	return PasswordHash(u.Username, password, u.ID.Hex()) == u.Password
 }
 
 // GenerateToken generate token for this user
@@ -253,7 +253,7 @@ func (u *TypeDB) ChangePassword(username, password string) (err error) {
 	_, err = mongo.Update("blotter", "users", bson.M{
 		"_id": u.ID,
 	}, bson.M{
-		"$set": bson.M{"password": PasswordHash(u.Username, password)},
+		"$set": bson.M{"password": PasswordHash(u.Username, password, u.ID.Hex())},
 	}, nil)
 
 	return
