@@ -1,5 +1,8 @@
 
 import requests
+import urllib3
+
+urllib3.disable_warnings()
 
 headers = {
     'User-Agent': 'OhYee Spider',
@@ -7,13 +10,13 @@ headers = {
 
 
 def get(url: str):
-    rep = requests.get(url, headers=headers)
+    rep = requests.get(url, verify=False, headers=headers)
     rep.encoding = 'utf-8'
     return rep.text
 
 
 def post(url: str, data: object):
-    rep = requests.post(url, data, headers=headers)
+    rep = requests.post(url, data, verify=False, headers=headers)
     rep.encoding = 'utf-8'
     return rep.text
 
