@@ -7,7 +7,7 @@ class YLink(Site):
         super(Site, self)
 
     def matcher(self, url: str):
-        return 'ylink.top' in url
+        return 'ylinknest.top' in url
 
     def solver(self, url: str):
         res = get("http://ylinknest.top")
@@ -23,5 +23,5 @@ class YLink(Site):
 
 if __name__ == '__main__':
     t = YLink()
-    print(t.matcher("http://ylink.top/"))
-    print(t.solver("http://ylink.top/"))
+    print(t.matcher("http://ylinknest.top/"))
+    print(t.solver("http://ylinknest.top/"))
