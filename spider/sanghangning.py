@@ -11,14 +11,14 @@ class Sanghangning(Site):
         return 'sanghangning.cn' in url
 
     def solver(self, url: str):
-        res = get("https://www.sanghangning.cn/say-my-life/json/blog.json")
+        res = get("https://www.sanghangning.cn/json/blog.json")
         data = json.loads(res)
         posts = []
-        for post in data:
+        for post in data["blog"]:
             posts.append(Post(
                 post['title'],
                 "%s/%s" % (
-                    "https://www.sanghangning.cn/say-my-life".strip("/"),
+                    "https://www.sanghangning.cn".strip("/"),
                     post['url'].strip("/")
                 )
             ))
