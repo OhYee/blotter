@@ -10,7 +10,7 @@ require (
 	github.com/OhYee/goldmark-image v1.0.0
 	github.com/OhYee/goldmark-plantuml v1.0.1
 	github.com/OhYee/goutils v1.0.0
-	github.com/OhYee/rainbow v1.0.2
+	github.com/OhYee/rainbow v1.0.3
 	github.com/alecthomas/chroma v0.7.3 // indirect
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/websocket v1.4.2

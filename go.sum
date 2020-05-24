@@ -5,6 +5,8 @@ github.com/OhYee/auth_github v1.0.1 h1:4/yeqryGCOiDLM2PW/233ptMLXAG7YuAYmK9XdKF9
 github.com/OhYee/auth_github v1.0.1/go.mod h1:/E5d0Ye55EpzJjY5dqwBERdzl+aVSGmY8DgbS34pQ6k=
 github.com/OhYee/auth_github v1.0.2 h1:BbV24yC8tpCS0VrAnGsIVwdwA+rpBltoNT7aW9tCJKE=
 github.com/OhYee/auth_github v1.0.2/go.mod h1:/E5d0Ye55EpzJjY5dqwBERdzl+aVSGmY8DgbS34pQ6k=
+github.com/OhYee/auth_github v1.0.3 h1:2GVJegjw3joLKH0THeXcRhNznDngchDyc7Cs7Lida1Y=
+github.com/OhYee/auth_github v1.0.3/go.mod h1:/E5d0Ye55EpzJjY5dqwBERdzl+aVSGmY8DgbS34pQ6k=
 github.com/OhYee/auth_qq v1.0.1 h1:S1nKCczrpRTRR7Z/a/UrcI6gOxLuoVWpBSeVINwLHdY=
 github.com/OhYee/auth_qq v1.0.1/go.mod h1:DEpxqaNYD/12yy48C45svD5foStfS2UIjkPwPfyja4U=
 github.com/OhYee/go-plantuml v1.0.0 h1:tUuEzthNj2Yowj8pTkj9OHTV5S67ldKev4GMLFt/SVw=
@@ -24,6 +26,8 @@ github.com/OhYee/goutils v1.0.0 h1:EBY/x5XkUhyQxJHpQtif0fcoSv4Dxb9CpJhewJlrTpw=
 github.com/OhYee/goutils v1.0.0/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/rainbow v1.0.2 h1:UeC68jCiVQNv0OVyyqUyKJfRVA4P3t2Uw6Q+YqHe4FY=
 github.com/OhYee/rainbow v1.0.2/go.mod h1:W8viYm/WUrybXqXxbuTtUqvNx6p9mxpTmaI9DH/VNLs=
+github.com/OhYee/rainbow v1.0.3 h1:9aG4N57tppT38S5+mHVKFUoMuhCUe9TQGshev/lV+0Y=
+github.com/OhYee/rainbow v1.0.3/go.mod h1:W8viYm/WUrybXqXxbuTtUqvNx6p9mxpTmaI9DH/VNLs=
 github.com/akavel/rsrc v0.8.0/go.mod h1:uLoCtb9J+EyAqh+26kdrTgmzRBFPGOolLWKpdxkKq+c=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
 github.com/alecthomas/chroma v0.7.2-0.20200305040604-4f3623dce67a/go.mod h1:fv5SzZPFJbwp2NXJWpFIX7DZS4HgV1K4ew4Pc2OZD9s=
