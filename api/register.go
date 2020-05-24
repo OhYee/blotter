@@ -178,4 +178,8 @@ func Register() {
 		"user/jump_to_github",
 		JumpToGithub,
 	)
+	register.Register(
+		"users",
+		Users,
+	)
 }

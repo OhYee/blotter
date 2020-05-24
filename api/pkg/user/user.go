@@ -253,3 +253,38 @@ func (u *TypeDB) ChangePassword(username, password string) (err error) {
 	return
 
 }
+
+// GetUsers get user list
+func GetUsers(
+	offset int64, number int64,
+	sortField string, sortType int,
+	searchWord string,
+) (total int64, users []TypeDB, err error) {
+	pipeline := []bson.M{}
+	users = make([]TypeDB, 0)
+
+	if number != 0 {
+		pipeline = append(pipeline, mongo.AggregateOffset(offset, number)...)
+	}
+	if searchWord != "" {
+		pipeline = append(pipeline, bson.M{
+			"$match": bson.M{
+				"username": bson.M{"$regex": searchWord, "$options": "i"},
+			},
+		})
+	}
+	if sortField != "" {
+		pipeline = append(pipeline, bson.M{
+			"$sort": bson.M{
+				sortField: sortType,
+			},
+		})
+	}
+
+	total, err = mongo.Aggregate(
+		"blotter", "users",
+		pipeline, nil,
+		&users,
+	)
+	return
+}

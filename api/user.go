@@ -402,3 +402,44 @@ func Github(context register.HandleContext) (err error) {
 	}
 	return
 }
+
+// UsersRequest request of users api
+type UsersRequest struct {
+	Number       int64  `json:"number"`
+	Offset       int64  `json:"offset"`
+	WithTags     string `json:"with_tags"`
+	WithoutTags  string `json:"without_tags"`
+	SortField    string `json:"sort_field"`
+	SortType     int    `json:"sort_type"`
+	Search       string `json:"search"`
+	SearchFields string `json:"search_fields"`
+}
+
+// UsersResponse response of users api
+type UsersResponse struct {
+	Total int64         `json:"total"`
+	Users []user.TypeDB `json:"users"`
+}
+
+// Users get users
+func Users(context register.HandleContext) (err error) {
+	if !context.GetUser().HasPermission() {
+		context.Forbidden()
+	}
+
+	args := new(UsersRequest)
+	res := new(UsersResponse)
+	context.RequestArgs(args)
+
+	res.Total, res.Users, err = user.GetUsers(
+		args.Offset, args.Number,
+		args.SortField, args.SortType,
+		args.Search,
+	)
+
+	if err != nil {
+		return
+	}
+	err = context.ReturnJSON(res)
+	return
+}
