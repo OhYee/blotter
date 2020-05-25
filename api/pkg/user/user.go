@@ -237,8 +237,8 @@ func (u *TypeDB) UpdateFields(fields map[string]string) (err error) {
 	return
 }
 
-// ChangePassword change password with username and password plaintext
-func (u *TypeDB) ChangePassword(username, password string) (err error) {
+// ChangePassword change password with  password plaintext
+func (u *TypeDB) ChangePassword(password string) (err error) {
 	if password == "" {
 		err = errors.New("Password can not be empty")
 		return

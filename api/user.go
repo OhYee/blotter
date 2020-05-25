@@ -233,7 +233,7 @@ func SetUser(context register.HandleContext) (err error) {
 	}
 
 	if args.Password != "" {
-		if err = u.ChangePassword(args.Username, args.Password); err != nil {
+		if err = u.ChangePassword(args.Password); err != nil {
 			return
 		}
 	}
