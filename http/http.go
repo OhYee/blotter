@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -14,8 +13,6 @@ type Handle struct {
 }
 
 func (handle Handle) ServeHTTP(rep http.ResponseWriter, req *http.Request) {
-	output.Debug("connection begin")
-
 	context := register.NewHTTPContext(req, rep)
 
 	// CORS
@@ -38,7 +35,6 @@ func (handle Handle) ServeHTTP(rep http.ResponseWriter, req *http.Request) {
 	} else {
 		context.NotImplemented()
 	}
-	output.Debug("connection end")
 }
 
 // Server start http server
