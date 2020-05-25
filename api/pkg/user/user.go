@@ -153,6 +153,25 @@ func GetUserByToken(token string) *TypeDB {
 	return nil
 }
 
+func GetUserByID(id string) *TypeDB {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil
+	}
+
+	users := make([]TypeDB, 0)
+	cnt, err := mongo.Find("blotter", "users", bson.M{
+		"_id": objID,
+	}, nil, &users)
+	if err == nil && cnt != 0 {
+		return &users[0]
+	}
+	if err != nil {
+		output.Err(err)
+	}
+	return nil
+}
+
 func GetUserByUsername(username string) *TypeDB {
 	users := make([]TypeDB, 0)
 	cnt, err := mongo.Find("blotter", "users", bson.M{
