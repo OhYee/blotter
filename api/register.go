@@ -182,4 +182,8 @@ func Register() {
 		"users",
 		Users,
 	)
+	register.Register(
+		"admin/user/reset_password",
+		ResetPassword,
+	)
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/OhYee/blotter/api/pkg/user"
 	"github.com/OhYee/blotter/register"
+	"github.com/OhYee/blotter/utils/random"
 	"github.com/OhYee/goutils/condition"
 )
 
@@ -441,5 +442,36 @@ func Users(context register.HandleContext) (err error) {
 		return
 	}
 	err = context.ReturnJSON(res)
+	return
+}
+
+// ResetPasswordRequest request for ResetPassword api
+type ResetPasswordRequest struct {
+	ID string `json:"id"`
+}
+
+// ResetPasswordResponse response for ResetPassword api
+type ResetPasswordResponse struct {
+	Password string `json:"password"`
+}
+
+// ResetPassword check if username is used
+func ResetPassword(context register.HandleContext) (err error) {
+	if !context.GetUser().HasPermission() {
+		context.Forbidden()
+	}
+
+	args := new(ResetPasswordRequest)
+	res := new(ResetPasswordResponse)
+	context.RequestArgs(args)
+
+	res.Password = random.RandStringBytesMaskImprSrcUnsafe(10)
+
+	u := user.GetUserByID(args.ID)
+	if u != nil {
+		u.ChangePassword(res.Password)
+	}
+
+	context.ReturnJSON(res)
 	return
 }
