@@ -84,8 +84,12 @@ func (context *HTTPContext) Forms() url.Values {
 }
 
 func (context *HTTPContext) SetCookie(key string, value string) {
-	cookie := http.Cookie{Name: key, Value: value, Path: "/"}
-	cookie.Expires.After(time.Now().Add(time.Hour * 24 * 7))
+	cookie := http.Cookie{
+		Name:    key,
+		Value:   value,
+		Path:    "/",
+		Expires: time.Now().Add(time.Hour * 24 * 7),
+	}
 	http.SetCookie(context.Response, &cookie)
 }
 
