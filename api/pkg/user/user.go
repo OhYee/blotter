@@ -282,9 +282,6 @@ func GetUsers(
 	pipeline := []bson.M{}
 	users = make([]TypeDB, 0)
 
-	if number != 0 {
-		pipeline = append(pipeline, mongo.AggregateOffset(offset, number)...)
-	}
 	if searchWord != "" {
 		pipeline = append(pipeline, bson.M{
 			"$match": bson.M{
@@ -298,6 +295,9 @@ func GetUsers(
 				sortField: sortType,
 			},
 		})
+	}
+	if number != 0 {
+		pipeline = append(pipeline, mongo.AggregateOffset(offset, number)...)
 	}
 
 	total, err = mongo.Aggregate(
