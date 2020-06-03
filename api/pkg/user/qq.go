@@ -4,16 +4,33 @@ import (
 	"strings"
 
 	qq "github.com/OhYee/auth_qq"
-	"github.com/OhYee/blotter/env"
+	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var environments, _ = env.GetEnv(env.PWDFile(".env"))
+// QQConn QQ connect object
+var QQConn = func() (conn *qq.Connect) {
+	conn = qq.New("", "", "")
 
-// QQConn qq connect object
-var QQConn = qq.New(environments["APPID"], environments["APPKey"], environments["RedirectURI"])
+	var id, key, redirect string
+	v, err := variable.Get("qq_id", "qq_key", "qq_redirect")
+	if err != nil {
+		return
+	}
+	if v.SetString("qq_id", &id) != nil {
+		return
+	}
+	if v.SetString("qq_key", &key) != nil {
+		return
+	}
+	if v.SetString("qq_redirect", &redirect) != nil {
+		return
+	}
+	conn = qq.New(id, key, redirect)
+	return
+}()
 
 // QQConnect connect qq and return user data
 func QQConnect(code string) (token, openID, unionID string, res qq.UserInfo, err error) {
