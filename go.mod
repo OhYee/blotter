@@ -14,12 +14,12 @@ require (
 	github.com/alecthomas/chroma v0.7.3 // indirect
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/websocket v1.4.2
-	github.com/graemephi/goldmark-qjs-katex v0.1.4
-	github.com/klauspost/compress v1.10.5 // indirect
-	github.com/mitchellh/mapstructure v1.3.0
-	github.com/yuin/goldmark v1.1.30
+	github.com/graemephi/goldmark-qjs-katex v0.2.0
+	github.com/klauspost/compress v1.10.8 // indirect
+	github.com/mitchellh/mapstructure v1.3.2
+	github.com/yuin/goldmark v1.1.32
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
-	go.mongodb.org/mongo-driver v1.3.3
-	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
+	go.mongodb.org/mongo-driver v1.3.4
+	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9 // indirect
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
 )
