@@ -31,11 +31,11 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 			ext.NewExt(
 				ext.RenderMap{
 					Languages:      []string{"dot-svg"},
-					RenderFunction: dot.NewDot("dot-svg").Renderer,
+					RenderFunction: dot.NewDot(50, "dot-svg").Renderer,
 				},
 				ext.RenderMap{
 					Languages:      []string{"uml-svg"},
-					RenderFunction: uml.NewUML("uml-svg").Renderer,
+					RenderFunction: uml.NewUML(50, "uml-svg").Renderer,
 				},
 				ext.RenderMap{
 					Languages: []string{"*"},

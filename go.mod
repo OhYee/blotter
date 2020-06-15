@@ -5,10 +5,10 @@ go 1.13
 require (
 	github.com/OhYee/auth_github v1.0.3
 	github.com/OhYee/auth_qq v1.0.1
-	github.com/OhYee/goldmark-dot v1.0.1
+	github.com/OhYee/goldmark-dot v1.0.2
 	github.com/OhYee/goldmark-fenced_codeblock_extension v1.0.0
 	github.com/OhYee/goldmark-image v1.0.0
-	github.com/OhYee/goldmark-plantuml v1.0.1
+	github.com/OhYee/goldmark-plantuml v1.0.2
 	github.com/OhYee/goutils v1.0.0
 	github.com/OhYee/rainbow v1.0.3
 	github.com/alecthomas/chroma v0.7.3 // indirect
