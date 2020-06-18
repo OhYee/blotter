@@ -1,6 +1,8 @@
 package api
 
 import (
+	"regexp"
+
 	"github.com/OhYee/blotter/api/pkg/comment"
 	"github.com/OhYee/blotter/register"
 )
@@ -48,6 +50,14 @@ type CommentAddRequest struct {
 func CommentAdd(context register.HandleContext) (err error) {
 	args := new(CommentAddRequest)
 	context.RequestArgs(args)
+
+	if m, e := regexp.MatchString(
+		"^([A-Za-z0-9_\\-\\.\u4e00-\u9fa5])+\\@([A-Za-z0-9_\\-\\.])+\\.([A-Za-z]{2,8})$",
+		args.Email,
+	); e != nil || args.URL == "" || m == false || args.Raw == "" {
+		context.Forbidden()
+		return
+	}
 
 	if err = comment.Add(args.URL, args.Reply, args.Email, args.Recv, args.Raw); err != nil {
 		return
