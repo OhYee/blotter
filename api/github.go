@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/rainbow/errors"
 )
@@ -50,7 +49,6 @@ func GithubRepos(context register.HandleContext) (err error) {
 
 	page := 1
 	for {
-		output.Debug("Page %d", page)
 		var repos []map[string]interface{}
 		if repos, err = githubRepo(args.Username, page); err != nil {
 			return
