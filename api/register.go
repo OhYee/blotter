@@ -186,4 +186,8 @@ func Register() {
 		"admin/user/reset_password",
 		ResetPassword,
 	)
+	register.Register(
+		"github/repos",
+		GithubRepos,
+	)
 }
