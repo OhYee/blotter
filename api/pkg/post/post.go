@@ -214,6 +214,7 @@ func NewPost(
 	keywords []string,
 	published bool,
 	headImage string,
+	images []string,
 ) (err error) {
 
 	html, err := markdown.Render(raw, true)
@@ -241,6 +242,7 @@ func NewPost(
 	p.Keywords = keywords
 	p.Published = published
 	p.HeadImage = headImage
+	p.Images = images
 
 	if Existed(url) {
 		err = fmt.Errorf("Post with url existed: %s", url)
@@ -265,6 +267,7 @@ func UpdatePost(
 	keywords []string,
 	published bool,
 	headImage string,
+	images []string,
 ) (err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -295,6 +298,7 @@ func UpdatePost(
 	p.Keywords = keywords
 	p.Published = published
 	p.HeadImage = headImage
+	p.Images = images
 	_, err = mongo.Update("blotter", "posts", bson.M{
 		"_id": objectID,
 	}, bson.M{

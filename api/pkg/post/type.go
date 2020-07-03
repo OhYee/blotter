@@ -80,7 +80,8 @@ func (props CardDBProps) ToCardProps() CardProps {
 
 // PublicProps extra props of public post
 type PublicProps struct {
-	Content string `json:"content" bson:"content"`
+	Content string   `json:"content" bson:"content"`
+	Images  []string `json:"images" bson:"images"`
 }
 
 // EditProps extra props for editing

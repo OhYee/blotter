@@ -153,6 +153,7 @@ type PostEditRequest struct {
 	Published   bool     `json:"published"`
 	Raw         string   `json:"raw"`
 	Tags        []string `json:"tags"`
+	Images      []string `json:"images"`
 }
 
 func PostEdit(context register.HandleContext) (err error) {
@@ -179,6 +180,7 @@ func PostEdit(context register.HandleContext) (err error) {
 			[]string{},
 			args.Published,
 			args.HeadImage,
+			args.Images,
 		)
 		if err != nil && strings.HasPrefix(err.Error(), "Post with url existed") {
 			res.Success = false
@@ -200,6 +202,7 @@ func PostEdit(context register.HandleContext) (err error) {
 			[]string{},
 			args.Published,
 			args.HeadImage,
+			args.Images,
 		)
 	}
 	if err != nil {
