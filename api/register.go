@@ -195,6 +195,10 @@ func Register() {
 		TravelsGet,
 	)
 	register.Register(
+		"travels/url",
+		TravelsGetByURL,
+	)
+	register.Register(
 		"travels/set",
 		TravelsSet,
 	)

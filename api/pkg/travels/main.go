@@ -25,3 +25,27 @@ func Set(travels []Type) (err error) {
 	return
 }
 
+func GetByURL(url string) (exist bool, res Travel, err error) {
+	var total int64
+	results := make([]Travel, 0)
+
+	if total, err = mongo.Aggregate("blotter", "travels", []bson.M{
+		{"$unwind": "$travels"},
+		{"$project": bson.M{
+			"name": 1,
+			"lng":  1,
+			"lat":  1,
+			"zoom": 1,
+			"time": "$travels.time",
+			"link": "$travels.link",
+		}},
+		{"$match": bson.M{"link": url}},
+	}, nil, &results); err != nil {
+		return
+	}
+	if total > 0 {
+		exist = true
+		res = results[0]
+	}
+	return
+}

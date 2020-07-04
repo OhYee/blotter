@@ -54,3 +54,24 @@ func TravelsSet(context register.HandleContext) (err error) {
 	return
 }
 
+type TravelsGetByURLRequest struct {
+	URL string `json:"url"`
+}
+
+type TravelsGetByURLResponse struct {
+	Exist  bool           `json:"exist"`
+	Travel travels.Travel `json:"travel"`
+}
+
+func TravelsGetByURL(context register.HandleContext) (err error) {
+	args := new(TravelsGetByURLRequest)
+	res := new(TravelsGetByURLResponse)
+	context.RequestArgs(args)
+
+	if res.Exist, res.Travel, err = travels.GetByURL(args.URL); err != nil {
+		context.ServerError(err)
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}
