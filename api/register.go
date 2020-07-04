@@ -190,4 +190,8 @@ func Register() {
 		"github/repos",
 		GithubRepos,
 	)
+	register.Register(
+		"travels",
+		TravelsGet,
+	)
 }
