@@ -194,4 +194,8 @@ func Register() {
 		"travels",
 		TravelsGet,
 	)
+	register.Register(
+		"travels/set",
+		TravelsSet,
+	)
 }

@@ -15,3 +15,13 @@ func Get() (total int64, res []Type, err error) {
 	return
 }
 
+func Set(travels []Type) (err error) {
+	output.Debug("%+v", travels)
+	defer errors.Wrapper(&err)
+	if _, err = mongo.Remove("blotter", "travels", bson.M{}, nil); err != nil {
+		return
+	}
+	_, err = mongo.Add("blotter", "travels", nil, transfer.ToInterfaceSlice(travels)...)
+	return
+}
+

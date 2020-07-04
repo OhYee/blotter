@@ -22,3 +22,35 @@ func TravelsGet(context register.HandleContext) (err error) {
 	err = context.ReturnJSON(res)
 	return
 }
+
+type TravelsSetRequest struct {
+	Travels []travels.Type `json:"travels"`
+}
+
+type TravelsSetResponse SimpleResponse
+
+func TravelsSet(context register.HandleContext) (err error) {
+	if !context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
+
+	args := new(TravelsSetRequest)
+	res := new(TravelsSetResponse)
+	context.RequestArgs(args, "POST")
+
+	output.Debug("%+v", args)
+
+	if err = travels.Set(args.Travels); err != nil {
+		res.Success = false
+		res.Title = "游记设置失败"
+		res.Content = errors.ShowStack(err)
+	} else {
+		res.Success = true
+		res.Title = "游记设置成功"
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}
+
