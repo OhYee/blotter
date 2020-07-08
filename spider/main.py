@@ -14,6 +14,7 @@ from sanghangning import Sanghangning
 from jarviswwong import Jarviswwong
 from jspang import JSPang
 from ylink import YLink
+from secnews import SecNews
 
 sites = [
     RSS(),
@@ -29,6 +30,7 @@ sites = [
     Jarviswwong(),
     JSPang(),
     YLink(),
+    SecNews(),
 ]
 
 
