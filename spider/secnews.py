@@ -15,7 +15,6 @@ class SecNews(Site):
         soup = BeautifulSoup(res, features="lxml")
         posts = []
         for item in soup.select("tr"):
-            print(item)
             link = item.select_one("a")
             if link == None:
                 continue
