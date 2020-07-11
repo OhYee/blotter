@@ -1,6 +1,8 @@
 package markdown
 
 import (
+	"fmt"
+
 	"github.com/OhYee/blotter/output"
 	dot "github.com/OhYee/goldmark-dot"
 	ext "github.com/OhYee/goldmark-fenced_codeblock_extension"
@@ -47,7 +49,18 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 					),
 				},
 			),
-			img.NewImg("image", nil),
+			img.NewImg("image", func(args img.ImgArgs, class string, renderImg img.RenderImgFunc) string {
+				var title = ""
+				if args.Title != "" {
+					title = fmt.Sprintf("<p>%s</p>", args.Title)
+				} else if args.Alt != "" {
+					title = fmt.Sprintf("<p>%s</p>", args.Alt)
+				}
+				return fmt.Sprintf(
+					"<div class='%s'><a href='%s' target='_blank' rel='noopener noreferrer'>%s</a>%s</div>",
+					class, args.Src, renderImg(args), title,
+				)
+			}),
 			&qjskatex.Extension{},
 		),
 		goldmark.WithParserOptions(
