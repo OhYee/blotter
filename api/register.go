@@ -210,4 +210,8 @@ func Register() {
 		"qiniu/images",
 		GetImages,
 	)
+	register.Register(
+		"qiniu/token",
+		GetQiniuToken,
+	)
 }

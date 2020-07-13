@@ -36,3 +36,30 @@ type GetImagesResponse struct {
 	HasNext bool          `json:"has_next"`
 }
 
+// GetImages get images of bucket
+func GetImages(context register.HandleContext) (err error) {
+	args := new(GetImagesRequest)
+	res := new(GetImagesResponse)
+	context.RequestArgs(args)
+
+	if res.Files, res.Marker, res.HasNext, err = qiniu.GetImages(args.Bucket, args.Prefix, args.Marker, args.Number); err != nil {
+		return
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}
+
+type GetQiniuTokenResponse struct {
+	Token string `json:"token"`
+}
+
+// GetQiniuToken get images of bucket
+func GetQiniuToken(context register.HandleContext) (err error) {
+	res := new(GetQiniuTokenResponse)
+
+	res.Token = qiniu.GenerateToken()
+
+	err = context.ReturnJSON(res)
+	return
+}
