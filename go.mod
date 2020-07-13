@@ -17,9 +17,11 @@ require (
 	github.com/graemephi/goldmark-qjs-katex v0.2.0
 	github.com/klauspost/compress v1.10.8 // indirect
 	github.com/mitchellh/mapstructure v1.3.2
+	github.com/qiniu/api.v7 v7.2.5+incompatible
+	github.com/qiniu/api.v7/v7 v7.5.0
 	github.com/yuin/goldmark v1.1.32
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
 	go.mongodb.org/mongo-driver v1.3.4
-	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9 // indirect
+	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
 )
