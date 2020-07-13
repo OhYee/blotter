@@ -202,4 +202,8 @@ func Register() {
 		"travels/set",
 		TravelsSet,
 	)
+	register.Register(
+		"qiniu/buckets",
+		GetBuckets,
+	)
 }
