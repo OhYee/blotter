@@ -21,3 +21,18 @@ func GetBuckets(context register.HandleContext) (err error) {
 	err = context.ReturnJSON(res)
 	return
 }
+
+type GetImagesRequest struct {
+	Bucket string `json:"bucket"`
+	Prefix string `json:"prefix"`
+	Marker string `json:"marker"`
+	Number int    `json:"number"`
+}
+
+// GithubReposResponse response for GithubRepos api
+type GetImagesResponse struct {
+	Files   []*qiniu.File `json:"files"`
+	Marker  string        `json:"marker"`
+	HasNext bool          `json:"has_next"`
+}
+

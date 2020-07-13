@@ -206,4 +206,8 @@ func Register() {
 		"qiniu/buckets",
 		GetBuckets,
 	)
+	register.Register(
+		"qiniu/images",
+		GetImages,
+	)
 }
