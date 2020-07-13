@@ -1,0 +1,65 @@
+package qiniu
+
+import (
+	"fmt"
+
+	"github.com/OhYee/blotter/api/pkg/variable"
+	"github.com/qiniu/api.v7/v7/auth/qbox"
+	"github.com/qiniu/api.v7/v7/storage"
+)
+
+func getKeys() (accessKey, secretKey string) {
+	var err error
+	v, err := variable.Get("qiniu_access_key", "qiniu_secret_key")
+	if err != nil {
+		return
+	}
+	fmt.Println(v)
+	if v.SetString("qiniu_access_key", &accessKey) != nil {
+		return
+	}
+	if v.SetString("qiniu_secret_key", &secretKey) != nil {
+		return
+	}
+	return
+}
+
+func GenerateToken() (token string) {
+	accessKey, secretKey := getKeys()
+	mac := qbox.NewMac(accessKey, secretKey)
+	putPolicy := storage.PutPolicy{
+		Scope:   "space",
+		Expires: 60,
+	}
+	token = putPolicy.UploadToken(mac)
+	return
+}
+
+func GetBuckets() (buckets []string, err error) {
+	accessKey, secretKey := getKeys()
+	mac := qbox.NewMac(accessKey, secretKey)
+	bucketManager := storage.NewBucketManager(mac, &storage.Config{
+		UseHTTPS: true,
+	})
+	buckets, err = bucketManager.Buckets(true)
+	return
+}
+
+func GetImages(bucket string, prefix string, marker string, count int) (files []*File, next string, hasNext bool, err error) {
+	accessKey, secretKey := getKeys()
+	mac := qbox.NewMac(accessKey, secretKey)
+	bucketManager := storage.NewBucketManager(mac, &storage.Config{
+		UseHTTPS: true,
+	})
+
+	items := make([]storage.ListItem, 0)
+	if items, _, next, hasNext, err = bucketManager.ListFiles(bucket, prefix, "", marker, count); err != nil {
+		return
+	}
+
+	files = make([]*File, len(items))
+	for i, item := range items {
+		files[i] = NewFileFromListItem(item)
+	}
+	return
+}
