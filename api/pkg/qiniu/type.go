@@ -5,7 +5,8 @@ import (
 )
 
 type File struct {
-	Name string `json:"name" bson:"name"`
+	Key  string `json:"key" bson:"key"`
+	Link string `json:"link" bson:"link"`
 	Size int64  `json:"size" bson:"size"`
 	Time int64  `json:"time" bson:"time"`
 }
