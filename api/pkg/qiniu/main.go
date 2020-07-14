@@ -2,6 +2,7 @@ package qiniu
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/qiniu/api.v7/v7/auth/qbox"
@@ -35,8 +36,17 @@ func GenerateToken() (token string) {
 	return
 }
 
-func GetBuckets() (buckets []string, err error) {
+func GetBuckets() (buckets []string, prefix []string, err error) {
 	accessKey, secretKey := getKeys()
+
+	var prefixString string
+	v, err := variable.Get("qiniu_prefix")
+	if err != nil {
+		return
+	}
+	v.SetString("qiniu_prefix", &prefixString)
+	prefix = strings.Split(prefixString, ",")
+
 	mac := qbox.NewMac(accessKey, secretKey)
 	bucketManager := storage.NewBucketManager(mac, &storage.Config{
 		UseHTTPS: true,

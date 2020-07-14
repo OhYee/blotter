@@ -8,13 +8,14 @@ import (
 // GithubReposResponse response for GithubRepos api
 type GetBucketsResponse struct {
 	Buckets []string `json:"buckets"`
+	Prefix  []string `json:"prefix"`
 }
 
 // GetBuckets get buckets name
 func GetBuckets(context register.HandleContext) (err error) {
 
 	res := new(GetBucketsResponse)
-	if res.Buckets, err = qiniu.GetBuckets(); err != nil {
+	if res.Buckets, res.Prefix, err = qiniu.GetBuckets(); err != nil {
 		return
 	}
 
