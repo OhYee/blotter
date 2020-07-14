@@ -10,9 +10,11 @@ type File struct {
 	Time int64  `json:"time" bson:"time"`
 }
 
-func NewFileFromListItem(item storage.ListItem) *File {
+func NewFileFromListItem(item storage.ListItem, domain string) *File {
+
 	return &File{
-		Name: "//static.oyohyee.com/" + item.Key,
+		Key:  item.Key,
+		Link: storage.MakePublicURL(domain, item.Key),
 		Size: item.Fsize,
 		Time: item.PutTime,
 	}

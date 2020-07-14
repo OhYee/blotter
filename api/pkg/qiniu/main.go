@@ -52,6 +52,13 @@ func GetImages(bucket string, prefix string, marker string, count int) (files []
 		UseHTTPS: true,
 	})
 
+	var staticDomain string
+	v, err := variable.Get("qiniu_static_domain")
+	if err != nil {
+		return
+	}
+	v.SetString("qiniu_static_domain", &staticDomain)
+
 	items := make([]storage.ListItem, 0)
 	if items, _, next, hasNext, err = bucketManager.ListFiles(bucket, prefix, "", marker, count); err != nil {
 		return
@@ -59,7 +66,9 @@ func GetImages(bucket string, prefix string, marker string, count int) (files []
 
 	files = make([]*File, len(items))
 	for i, item := range items {
-		files[i] = NewFileFromListItem(item)
+		files[i] = NewFileFromListItem(item, staticDomain)
 	}
+	return
+}
 	return
 }
