@@ -1,7 +1,6 @@
 package qiniu
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/variable"
@@ -15,7 +14,6 @@ func getKeys() (accessKey, secretKey string) {
 	if err != nil {
 		return
 	}
-	fmt.Println(v)
 	if v.SetString("qiniu_access_key", &accessKey) != nil {
 		return
 	}
