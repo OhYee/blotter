@@ -214,4 +214,8 @@ func Register() {
 		"qiniu/token",
 		GetQiniuToken,
 	)
+	register.Register(
+		"qiniu/image/delete",
+		DeleteImage,
+	)
 }

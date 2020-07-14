@@ -80,5 +80,15 @@ func GetImages(bucket string, prefix string, marker string, count int) (files []
 	}
 	return
 }
+
+func DeleteImage(bucket string, key string) (err error) {
+	accessKey, secretKey := getKeys()
+	mac := qbox.NewMac(accessKey, secretKey)
+	bucketManager := storage.NewBucketManager(mac, &storage.Config{
+		UseHTTPS: true,
+	})
+	err = bucketManager.Delete(bucket, key)
+	return
+}
 	return
 }

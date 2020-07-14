@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/OhYee/blotter/api/pkg/qiniu"
 	"github.com/OhYee/blotter/register"
+	"github.com/OhYee/rainbow/errors"
 )
 
 // GithubReposResponse response for GithubRepos api
@@ -64,3 +65,29 @@ func GetQiniuToken(context register.HandleContext) (err error) {
 	err = context.ReturnJSON(res)
 	return
 }
+
+type DeleteImageRequest struct {
+	Bucket string `json:"bucket"`
+	Key    string `json:"key"`
+}
+type DeleteImageResponse SimpleResponse
+
+// DeleteImage get images of bucket
+func DeleteImage(context register.HandleContext) (err error) {
+	args := new(DeleteImageRequest)
+	res := new(DeleteImageResponse)
+	context.RequestArgs(args)
+
+	if err = qiniu.DeleteImage(args.Bucket, args.Key); err != nil {
+		res.Success = false
+		res.Title = "删除失败"
+		res.Content = errors.ShowStack(err)
+	} else {
+		res.Success = true
+		res.Title = "删除成功"
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}
+
