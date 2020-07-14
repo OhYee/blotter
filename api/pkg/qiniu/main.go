@@ -90,5 +90,13 @@ func DeleteImage(bucket string, key string) (err error) {
 	err = bucketManager.Delete(bucket, key)
 	return
 }
+
+func RenameImage(bucket string, key string, newKey string) (err error) {
+	accessKey, secretKey := getKeys()
+	mac := qbox.NewMac(accessKey, secretKey)
+	bucketManager := storage.NewBucketManager(mac, &storage.Config{
+		UseHTTPS: true,
+	})
+	err = bucketManager.Move(bucket, key, bucket, newKey, true)
 	return
 }

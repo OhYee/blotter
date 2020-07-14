@@ -91,3 +91,28 @@ func DeleteImage(context register.HandleContext) (err error) {
 	return
 }
 
+type RenameImageRequest struct {
+	Bucket string `json:"bucket"`
+	Key    string `json:"key"`
+	NewKey string `json:"new_key"`
+}
+type RenameImageResponse SimpleResponse
+
+// RenameImage get images of bucket
+func RenameImage(context register.HandleContext) (err error) {
+	args := new(RenameImageRequest)
+	res := new(RenameImageResponse)
+	context.RequestArgs(args)
+
+	if err = qiniu.RenameImage(args.Bucket, args.Key, args.NewKey); err != nil {
+		res.Success = false
+		res.Title = "重命名失败"
+		res.Content = errors.ShowStack(err)
+	} else {
+		res.Success = true
+		res.Title = "重命名成功"
+	}
+
+	err = context.ReturnJSON(res)
+	return
+}

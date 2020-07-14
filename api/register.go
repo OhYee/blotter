@@ -218,4 +218,8 @@ func Register() {
 		"qiniu/image/delete",
 		DeleteImage,
 	)
+	register.Register(
+		"qiniu/image/rename",
+		RenameImage,
+	)
 }
