@@ -14,7 +14,7 @@ type GetBucketsResponse struct {
 
 // GetBuckets get buckets name
 func GetBuckets(context register.HandleContext) (err error) {
-	if context.GetUser().HasPermission() {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -44,7 +44,7 @@ type GetImagesResponse struct {
 
 // GetImages get images of bucket
 func GetImages(context register.HandleContext) (err error) {
-	if context.GetUser().HasPermission() {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -67,7 +67,7 @@ type GetQiniuTokenResponse struct {
 
 // GetQiniuToken get images of bucket
 func GetQiniuToken(context register.HandleContext) (err error) {
-	if context.GetUser().HasPermission() {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -88,7 +88,7 @@ type DeleteImageResponse SimpleResponse
 
 // DeleteImage get images of bucket
 func DeleteImage(context register.HandleContext) (err error) {
-	if context.GetUser().HasPermission() {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
@@ -119,7 +119,7 @@ type RenameImageResponse SimpleResponse
 
 // RenameImage get images of bucket
 func RenameImage(context register.HandleContext) (err error) {
-	if context.GetUser().HasPermission() {
+	if !context.GetUser().HasPermission() {
 		context.Forbidden()
 		return
 	}
