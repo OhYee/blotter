@@ -12,7 +12,7 @@ class Tinshine(Site):
     def solver(self, url: str):
         res = get(
             "%s/%s" %
-            (url.strip("/"), "front/articles.action?pageCount=1")
+            (url.strip("/"), "front/articles.action?pageCount=0")
         )
         soup = BeautifulSoup(res, features="lxml")
         posts = []
