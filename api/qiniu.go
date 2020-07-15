@@ -14,6 +14,10 @@ type GetBucketsResponse struct {
 
 // GetBuckets get buckets name
 func GetBuckets(context register.HandleContext) (err error) {
+	if context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
 
 	res := new(GetBucketsResponse)
 	if res.Buckets, res.Prefix, err = qiniu.GetBuckets(); err != nil {
@@ -40,6 +44,11 @@ type GetImagesResponse struct {
 
 // GetImages get images of bucket
 func GetImages(context register.HandleContext) (err error) {
+	if context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
+
 	args := new(GetImagesRequest)
 	res := new(GetImagesResponse)
 	context.RequestArgs(args)
@@ -58,6 +67,11 @@ type GetQiniuTokenResponse struct {
 
 // GetQiniuToken get images of bucket
 func GetQiniuToken(context register.HandleContext) (err error) {
+	if context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
+
 	res := new(GetQiniuTokenResponse)
 
 	res.Token = qiniu.GenerateToken()
@@ -74,6 +88,11 @@ type DeleteImageResponse SimpleResponse
 
 // DeleteImage get images of bucket
 func DeleteImage(context register.HandleContext) (err error) {
+	if context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
+
 	args := new(DeleteImageRequest)
 	res := new(DeleteImageResponse)
 	context.RequestArgs(args)
@@ -100,6 +119,11 @@ type RenameImageResponse SimpleResponse
 
 // RenameImage get images of bucket
 func RenameImage(context register.HandleContext) (err error) {
+	if context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
+
 	args := new(RenameImageRequest)
 	res := new(RenameImageResponse)
 	context.RequestArgs(args)
