@@ -3,10 +3,13 @@ package api
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/register"
+
+	gt "github.com/OhYee/goutils/time"
 )
 
 const (
@@ -52,12 +55,17 @@ func RSSXML(context register.HandleContext) (err error) {
 
 	data := make([]string, total)
 	for idx, post := range posts {
+		datetime := post.PublishTime
+		if t, e := time.Parse("2006-01-02 15:04:05", post.PublishTime); e == nil {
+			datetime = t.In(gt.ChinaTimeZone).Format("Mon, Jan 2 2006 15:04:05 -0700 MST")
+		}
+
 		data[idx] = fmt.Sprintf(
 			postFormat,
 			post.Title,
 			fmt.Sprintf("%s/post/%s", root, post.URL),
 			post.Abstract,
-			post.PublishTime,
+			datetime,
 		)
 	}
 
