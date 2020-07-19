@@ -1,5 +1,5 @@
 import feedparser
-
+from dateutil.parser import parse
 from utils import Site, Post, get
 
 
@@ -8,13 +8,15 @@ class RSS(Site):
         super(Site, self)
 
     def matcher(self, url: str):
-        return url[-4:] == '.xml'
+        return True
 
     def solver(self, url: str):
         res = get(url)
         file = feedparser.parse(res)
         entries = file.entries
-        entries.sort(key=lambda x: x.published, reverse=True)
+
+        entries.sort(key=lambda x: parse(
+            x.published).timestamp(), reverse=True)
 
         posts = []
         for f in entries:
