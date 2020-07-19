@@ -17,7 +17,6 @@ from ylink import YLink
 from secnews import SecNews
 
 sites = [
-    RSS(),
     Taifua(),
     Kingmo(),
     Lolimay(),
@@ -31,6 +30,7 @@ sites = [
     JSPang(),
     YLink(),
     SecNews(),
+    RSS(),
 ]
 
 
