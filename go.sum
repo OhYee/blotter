@@ -20,6 +20,8 @@ github.com/OhYee/goldmark-plantuml v1.0.2/go.mod h1:UpiE9tgnv54poMrxaQyH0QKAZphe
 github.com/OhYee/goutils v0.0.0-20200402075346-bfaa3d7ac10e/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/goutils v1.0.0 h1:EBY/x5XkUhyQxJHpQtif0fcoSv4Dxb9CpJhewJlrTpw=
 github.com/OhYee/goutils v1.0.0/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
+github.com/OhYee/goutils v1.0.1 h1:SKD6wOEhORroYooXCuzn1ezCNj1xXRMTnnO34u6LV4c=
+github.com/OhYee/goutils v1.0.1/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/rainbow v1.0.2/go.mod h1:W8viYm/WUrybXqXxbuTtUqvNx6p9mxpTmaI9DH/VNLs=
 github.com/OhYee/rainbow v1.0.3 h1:9aG4N57tppT38S5+mHVKFUoMuhCUe9TQGshev/lV+0Y=
 github.com/OhYee/rainbow v1.0.3/go.mod h1:W8viYm/WUrybXqXxbuTtUqvNx6p9mxpTmaI9DH/VNLs=
