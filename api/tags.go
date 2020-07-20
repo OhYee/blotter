@@ -42,11 +42,12 @@ func Tags(context register.HandleContext) (err error) {
 
 // TagEditRequest request of TagEdit api
 type TagEditRequest struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Short string `json:"short"`
-	Color string `json:"color"`
-	Icon  string `json:"icon"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Short       string `json:"short"`
+	Color       string `json:"color"`
+	Icon        string `json:"icon"`
+	Description string `json:"description"`
 }
 
 // TagEditResponse response of TagEdit api
@@ -66,7 +67,7 @@ func TagEdit(context register.HandleContext) (err error) {
 	res.Success = true
 	if args.ID == "" {
 		res.Title = ""
-		if err = tag.New(args.Name, args.Short, args.Color, args.Icon); err == nil {
+		if err = tag.New(args.Name, args.Short, args.Color, args.Icon, args.Description); err == nil {
 			res.Title = "新标签添加成功"
 		} else {
 			res.Success = false
@@ -75,7 +76,7 @@ func TagEdit(context register.HandleContext) (err error) {
 		}
 
 	} else {
-		if err = tag.Update(args.ID, args.Name, args.Short, args.Color, args.Icon); err == nil {
+		if err = tag.Update(args.ID, args.Name, args.Short, args.Color, args.Icon, args.Description); err == nil {
 			res.Title = "修改标签成功"
 		} else {
 			res.Success = false
