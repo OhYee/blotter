@@ -60,7 +60,7 @@ func GetTags(keyword string, offset int64, number int64, sortField string, sortI
 }
 
 // New tag
-func New(name string, short string, color string, icon string) (err error) {
+func New(name string, short string, color string, icon string, description string) (err error) {
 	exist, err := Existed(primitive.NilObjectID.Hex(), short)
 	if err != nil {
 		return
@@ -76,17 +76,18 @@ func New(name string, short string, color string, icon string) (err error) {
 		"tags",
 		nil,
 		bson.M{
-			"name":  name,
-			"short": short,
-			"color": color,
-			"icon":  icon,
+			"name":        name,
+			"short":       short,
+			"color":       color,
+			"icon":        icon,
+			"description": description,
 		},
 	)
 	return
 }
 
 // Update tag data
-func Update(id string, name string, short string, color string, icon string) (err error) {
+func Update(id string, name string, short string, color string, icon string, description string) (err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return
@@ -107,10 +108,11 @@ func Update(id string, name string, short string, color string, icon string) (er
 		bson.M{"_id": objectID},
 		bson.M{
 			"$set": bson.M{
-				"name":  name,
-				"short": short,
-				"color": color,
-				"icon":  icon,
+				"name":        name,
+				"short":       short,
+				"color":       color,
+				"icon":        icon,
+				"description": description,
 			},
 		},
 		nil,
