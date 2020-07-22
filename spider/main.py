@@ -1,5 +1,6 @@
 import requests
 import pymongo
+import threading
 
 from rss import RSS
 from taifua import Taifua
@@ -35,6 +36,43 @@ sites = [
     RSS(),
 ]
 
+threadLock = threading.Lock()
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["blotter"]
+document = mydb["friends"]
+
+
+class Worker(threading.Thread):
+    def __init__(self, fid, rss):
+        # super()
+        threading.Thread.__init__(self)
+        self.fid = fid
+        self.rss = rss
+
+    def run(self):
+        print("Start", self.rss)
+
+        posts = []
+        try:
+            posts = getSitePosts(self.rss)
+        except Exception as e:
+            err("%s %s" % (self.rss, str(e)))
+
+        threadLock.acquire()
+        document.update_one(
+            {"_id": self.fid},
+            {
+                "$set": {
+                    "error": True,
+                } if len(posts) == 0 else {
+                    "error": False,
+                    "posts": [{"title": post.title, "link": post.link} for post in posts[:5]]
+                }
+            }
+        )
+        threadLock.release()
+        print("Finish", self.rss)
+
 
 def getSitePosts(url: str):
     for site in sites:
@@ -48,25 +86,13 @@ def err(e: str):
 
 
 if __name__ == '__main__':
-    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-    mydb = myclient["blotter"]
-    document = mydb["friends"]
+    threads = [
+        Worker(item["_id"], item["rss"])
+        for item in document.find({})
+        if item["rss"] != ""
+    ]
 
-    for item in document.find({}):
-        if item["rss"] != "":
-            try:
-                posts = getSitePosts(item["rss"])
-                if len(posts) == 0:
-                    err("No posts in %s" % item['rss'])
-                else:
-                    document.update_one(
-                        {"_id": item["_id"]},
-                        {
-                            "$set": {
-                                "posts": [{"title": post.title, "link": post.link} for post in posts[:5]]
-                            }
-                        }
-                    )
-
-            except Exception as e:
-                err("%s %s" % (item["rss"], str(e)))
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()

@@ -10,6 +10,18 @@ headers = {
 
 
 def get(url: str):
+    retry = 10
+    rep = None
+
+    while retry > 0:
+        try:
+            rep = requests.get(
+                url,  timeout=10, verify=False, headers=headers)
+            break
+        except Exception as e:
+            print("Get page error: {}, {} times left...".format(e, retry))
+            retry -= 1
+
     rep = requests.get(url, verify=False, headers=headers)
     rep.encoding = 'utf-8'
     return rep.text
