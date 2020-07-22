@@ -3,3 +3,4 @@ beautifulsoup4
 pymongo
 requests
 lxml
+python-dateutil
