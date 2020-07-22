@@ -15,6 +15,7 @@ from jarviswwong import Jarviswwong
 from jspang import JSPang
 from ylink import YLink
 from secnews import SecNews
+from imyshare import iMyShare
 
 sites = [
     Taifua(),
@@ -30,6 +31,7 @@ sites = [
     JSPang(),
     YLink(),
     SecNews(),
+    iMyShare(),
     RSS(),
 ]
 
