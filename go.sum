@@ -144,6 +144,8 @@ github.com/yuin/goldmark v1.1.30/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.33 h1:Q0PzHNn2h69wYmmE2SukzuQe0VBwErZrgJ5ZB8od6zQ=
 github.com/yuin/goldmark v1.1.33/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
+github.com/yuin/goldmark v1.2.0 h1:WOOcyaJPlzb8fZ8TloxFe8QZkhOOJx87leDa9MIT9dc=
+github.com/yuin/goldmark v1.2.0/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691 h1:VWSxtAiQNh3zgHJpdpkpVYjTPqRE3P6UZCOPa1nRDio=
 github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691/go.mod h1:YLF3kDffRfUH/bTxOxHhV6lxwIB3Vfj91rEwNMS9MXo=
 go.mongodb.org/mongo-driver v1.3.5 h1:S0ZOruh4YGHjD7JoN7mIsTrNjnQbOjrmgrx6l6pZN7I=
