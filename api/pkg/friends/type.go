@@ -13,6 +13,7 @@ type Friend struct {
 	Description string       `json:"description" bson:"description"`
 	RSS         string       `json:"rss" bson:"rss"`
 	Posts       []FriendPost `json:"posts" bson:"posts"`
+	Error       bool         `json:"error" bson:"error"`
 }
 
 // FriendPost post of friend
