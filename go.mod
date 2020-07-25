@@ -20,10 +20,14 @@ require (
 	github.com/mitchellh/mapstructure v1.3.2
 	github.com/qiniu/api.v7 v7.2.5+incompatible
 	github.com/qiniu/api.v7/v7 v7.5.0
+	github.com/yanyiwu/gojieba v1.1.2
 	github.com/yuin/goldmark v1.2.0
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
 	go.mongodb.org/mongo-driver v1.3.5
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208 // indirect
+
 )
+
+replace github.com/yanyiwu/gojieba v1.1.2 => github.com/ttys3/gojieba v1.1.3
