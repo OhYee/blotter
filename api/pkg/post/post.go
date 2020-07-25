@@ -6,9 +6,19 @@ import (
 	"github.com/OhYee/blotter/api/pkg/markdown"
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
+	fp "github.com/OhYee/goutils/functional"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/yanyiwu/gojieba"
 )
+
+var jieba = func() (jb *gojieba.Jieba) {
+	output.Log("Initial Jieba")
+	jb = gojieba.NewJieba()
+	output.Log("Initial Jieba finished")
+	return
+}()
 
 // Query posts of url
 func Query(pipeline []bson.M, res interface{}) (total int64, err error) {
@@ -120,10 +130,18 @@ func getPosts(
 	}
 
 	if searchWord != "" {
-		s := make([]bson.M, len(searchFields))
-		for idx, ss := range searchFields {
-			s[idx] = bson.M{ss: bson.M{"$regex": searchWord, "$options": "i"}}
+		words := fp.FilterString(func(s string) bool {
+			return len(s) != 0
+		}, jieba.CutAll(searchWord))
+
+		s := make([]bson.M, len(searchFields)*len(words))
+
+		for i, ss := range searchFields {
+			for j, word := range words {
+				s[i*j+j] = bson.M{ss: bson.M{"$regex": word, "$options": "i"}}
+			}
 		}
+
 		pipeline = append(
 			pipeline,
 			bson.M{"$match": bson.M{"$or": s}},
