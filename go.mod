@@ -17,7 +17,7 @@ require (
 	github.com/graemephi/goldmark-qjs-katex v0.2.0
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/klauspost/compress v1.10.10 // indirect
-	github.com/mitchellh/mapstructure v1.3.2
+	github.com/mitchellh/mapstructure v1.3.3
 	github.com/qiniu/api.v7 v7.2.5+incompatible
 	github.com/qiniu/api.v7/v7 v7.5.0
 	github.com/yanyiwu/gojieba v1.1.2
