@@ -100,11 +100,11 @@ func getPosts(
 	withoutTags []string,
 	sortField string, sortType int,
 	searchWord string, searchFields []string,
-	posts interface{},
+	res interface{},
 ) (total int64, err error) {
-	sort := bson.M{"$sort": bson.M{"publish_time": -1}}
+	sortQuery := bson.M{"$sort": bson.M{"publish_time": -1}}
 	if sortField != "" && (sortType == 1 || sortType == -1) {
-		sort = bson.M{"$sort": bson.M{sortField: sortType}}
+		sortQuery = bson.M{"$sort": bson.M{sortField: sortType}}
 	}
 	pipeline := []bson.M{}
 
@@ -134,8 +134,9 @@ func getPosts(
 		return len(strings.Replace(s, " ", "", -1)) != 0
 	}, jieba.CutForSearch(searchWord, true))
 
+	if len(words) > 0 {
 		s := make([]bson.M, len(searchFields)*len(words))
-
+		wordsNumber := len(words)
 		for i, ss := range searchFields {
 			for j, word := range words {
 				s[i*wordsNumber+j] = bson.M{ss: bson.M{"$regex": word, "$options": "i"}}
@@ -150,7 +151,7 @@ func getPosts(
 
 	pipeline = append(
 		pipeline,
-		sort,
+		sortQuery,
 	)
 
 	pipeline = append(
@@ -165,7 +166,7 @@ func getPosts(
 		},
 	)
 
-	if offset != 0 || number != 0 {
+	if (offset != 0 || number != 0) && len(words) == 0 {
 		pipeline = append(
 			pipeline,
 			bson.M{"$limit": offset + number},
