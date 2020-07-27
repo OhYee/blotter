@@ -1,6 +1,9 @@
 package post
 
 import (
+	"sort"
+	"strings"
+
 	"github.com/OhYee/blotter/api/pkg/tag"
 	"github.com/OhYee/goutils/time"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -245,4 +248,75 @@ type DB struct {
 	PublicProps `bson:",inline"`
 	EditProps   `bson:",inline"`
 	Tags        []primitive.ObjectID `json:"tags" bson:"tags"`
+}
+
+type SortPost CompleteFieldDB
+
+func (post SortPost) ToCardDB() CardFieldDB {
+	return CardFieldDB{
+		CardDBProps: post.CardDBProps,
+		Tags:        post.Tags,
+	}
+}
+
+func (post SortPost) ToAdminDB() AdminFieldDB {
+	return AdminFieldDB{
+		CardDBProps: post.CardDBProps,
+		ID:          post.ID,
+		Published:   post.Published,
+		Tags:        post.Tags,
+	}
+}
+
+type SortPostArray struct {
+	Array  []SortPost
+	scores []int
+}
+
+func Sort(posts []SortPost, words []string, fields []string) {
+	scores := make([]int, len(posts))
+	for idx, post := range posts {
+		scores[idx] = 0
+		for _, field := range fields {
+			value := ""
+			switch field {
+			case "title":
+				value = strings.ToLower(post.Title)
+			case "abstract":
+				value = strings.ToLower(post.Abstract)
+			case "raw":
+				value = strings.ToLower(post.Raw)
+			}
+			for _, word := range words {
+				if strings.Index(value, strings.ToLower(word)) >= 0 {
+					switch field {
+					case "title":
+						scores[idx] += 4
+					case "abstract":
+						scores[idx] += 2
+					case "raw":
+						scores[idx]++
+					}
+				}
+			}
+		}
+	}
+
+	sort.Sort(SortPostArray{
+		Array:  posts,
+		scores: scores,
+	})
+}
+
+func (arr SortPostArray) Len() int {
+	return len(arr.Array)
+}
+
+func (arr SortPostArray) Less(i, j int) bool {
+	return arr.scores[i] > arr.scores[j]
+}
+
+func (arr SortPostArray) Swap(i, j int) {
+	arr.Array[i], arr.Array[j] = arr.Array[j], arr.Array[i]
+	arr.scores[i], arr.scores[j] = arr.scores[j], arr.scores[i]
 }
