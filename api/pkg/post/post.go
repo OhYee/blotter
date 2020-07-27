@@ -138,7 +138,7 @@ func getPosts(
 
 		for i, ss := range searchFields {
 			for j, word := range words {
-				s[i*j+j] = bson.M{ss: bson.M{"$regex": word, "$options": "i"}}
+				s[i*wordsNumber+j] = bson.M{ss: bson.M{"$regex": word, "$options": "i"}}
 			}
 		}
 
