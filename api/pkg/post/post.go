@@ -173,7 +173,30 @@ func getPosts(
 		)
 	}
 
-	total, err = Query(pipeline, posts)
+	posts := make([]SortPost, 0)
+	total, err = Query(pipeline, &posts)
+
+	if len(words) > 0 {
+		Sort(posts, words, searchFields)
+	}
+
+	if (offset != 0 || number != 0) && len(words) == 0 {
+		posts = posts[offset : offset+number]
+	}
+
+	switch v := res.(type) {
+	case *[]AdminFieldDB:
+		(*v) = make([]AdminFieldDB, len(posts))
+		for idx, p := range posts {
+			(*v)[idx] = p.ToAdminDB()
+		}
+	case *[]CardFieldDB:
+		(*v) = make([]CardFieldDB, len(posts))
+		for idx, p := range posts {
+			(*v)[idx] = p.ToCardDB()
+		}
+	}
+
 	return
 }
 
