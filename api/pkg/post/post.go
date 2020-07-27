@@ -2,6 +2,7 @@ package post
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/markdown"
 	"github.com/OhYee/blotter/mongo"
@@ -129,10 +130,9 @@ func getPosts(
 		)
 	}
 
-	if searchWord != "" {
-		words := fp.FilterString(func(s string) bool {
-			return len(s) != 0
-		}, jieba.CutAll(searchWord))
+	words := fp.FilterString(func(s string) bool {
+		return len(strings.Replace(s, " ", "", -1)) != 0
+	}, jieba.CutForSearch(searchWord, true))
 
 		s := make([]bson.M, len(searchFields)*len(words))
 
