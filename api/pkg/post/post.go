@@ -14,6 +14,13 @@ import (
 	"github.com/yanyiwu/gojieba"
 )
 
+func min(a, b int64) int64 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 var jieba = func() (jb *gojieba.Jieba) {
 	output.Log("Initial Jieba")
 	jb = gojieba.NewJieba()
@@ -102,6 +109,10 @@ func getPosts(
 	searchWord string, searchFields []string,
 	res interface{},
 ) (total int64, err error) {
+	if number < 0 {
+		number = 0
+	}
+
 	sortQuery := bson.M{"$sort": bson.M{"publish_time": -1}}
 	if sortField != "" && (sortType == 1 || sortType == -1) {
 		sortQuery = bson.M{"$sort": bson.M{sortField: sortType}}
@@ -181,8 +192,8 @@ func getPosts(
 		Sort(posts, words, searchFields)
 	}
 
-	if (offset != 0 || number != 0) && len(words) == 0 {
-		posts = posts[offset : offset+number]
+	if (offset != 0 || number != 0) && len(words) != 0 {
+		posts = posts[min(total-1, offset):min(total, offset+number)]
 	}
 
 	switch v := res.(type) {
