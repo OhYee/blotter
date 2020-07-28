@@ -20,6 +20,12 @@ func min(a, b int64) int64 {
 	}
 	return b
 }
+func max(a, b int64) int64 {
+	if a > b {
+		return a
+	}
+	return b
+}
 
 var jieba = func() (jb *gojieba.Jieba) {
 	output.Log("Initial Jieba")
@@ -193,7 +199,7 @@ func getPosts(
 	}
 
 	if (offset != 0 || number != 0) && len(words) != 0 {
-		posts = posts[min(total-1, offset):min(total, offset+number)]
+		posts = posts[min(max(0, total-1), offset):min(total, offset+number)]
 	}
 
 	switch v := res.(type) {
