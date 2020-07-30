@@ -17,6 +17,8 @@ github.com/OhYee/goldmark-image v1.0.0 h1:P0KGG8Zl2IYqaxp/hUpeJwZitegRsswm6fQO17
 github.com/OhYee/goldmark-image v1.0.0/go.mod h1:3xXjk4gZNCi0/9YUWqivZnj08ZIK/yf7YCxz/ketTSg=
 github.com/OhYee/goldmark-plantuml v1.0.2 h1:02Y9Yf8xfS7U6pHT2bOryZdkTm/J1KjfbXH++FqV728=
 github.com/OhYee/goldmark-plantuml v1.0.2/go.mod h1:UpiE9tgnv54poMrxaQyH0QKAZpheiEnvsDPBQGaqaps=
+github.com/OhYee/goldmark-python v0.0.1 h1:ZFcHCLrBFDqDHVdBWgkWsJLFCcFCHvqFvNs8t8D8bIw=
+github.com/OhYee/goldmark-python v0.0.1/go.mod h1:tmVZowu//01lyukzVafn9TdbX59OHbbcjOC7rpWrg3g=
 github.com/OhYee/goutils v0.0.0-20200402075346-bfaa3d7ac10e/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/goutils v1.0.0 h1:EBY/x5XkUhyQxJHpQtif0fcoSv4Dxb9CpJhewJlrTpw=
 github.com/OhYee/goutils v1.0.0/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=

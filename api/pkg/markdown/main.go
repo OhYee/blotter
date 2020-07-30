@@ -8,6 +8,7 @@ import (
 	ext "github.com/OhYee/goldmark-fenced_codeblock_extension"
 	img "github.com/OhYee/goldmark-image"
 	uml "github.com/OhYee/goldmark-plantuml"
+	python "github.com/OhYee/goldmark-python"
 	qjskatex "github.com/graemephi/goldmark-qjs-katex"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
@@ -38,6 +39,10 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 				ext.RenderMap{
 					Languages:      []string{"uml-svg"},
 					RenderFunction: uml.NewUML(50, "uml-svg").Renderer,
+				},
+				ext.RenderMap{
+					Languages:      []string{"python-output"},
+					RenderFunction: python.NewPython(50, "python3", "python-output").Renderer,
 				},
 				ext.RenderMap{
 					Languages: []string{"*"},
