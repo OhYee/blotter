@@ -20,6 +20,30 @@ import (
 	"bytes"
 )
 
+var exts = ext.NewExt(
+	ext.RenderMap{
+		Languages:      []string{"dot-svg"},
+		RenderFunction: dot.NewDot(50, "dot-svg").Renderer,
+	},
+	ext.RenderMap{
+		Languages:      []string{"uml-svg"},
+		RenderFunction: uml.NewUML(50, "uml-svg").Renderer,
+	},
+	ext.RenderMap{
+		Languages:      []string{"python-output"},
+		RenderFunction: python.NewPython(50, "python3", "python-output").Renderer,
+	},
+	ext.RenderMap{
+		Languages: []string{"*"},
+		RenderFunction: ext.GetFencedCodeBlockRendererFunc(
+			highlighting.NewHTMLRenderer(
+				highlighting.WithGuessLanguage(true),
+				highlighting.WithStyle("trac"),
+			),
+		),
+	},
+)
+
 func Render(source string, renderHTML bool) (htmlResult string, err error) {
 	renderOpts := []renderer.Option{html.WithHardWraps()}
 	if renderHTML {
@@ -31,29 +55,7 @@ func Render(source string, renderHTML bool) (htmlResult string, err error) {
 			extension.GFM,
 			extension.DefinitionList,
 			extension.Footnote,
-			ext.NewExt(
-				ext.RenderMap{
-					Languages:      []string{"dot-svg"},
-					RenderFunction: dot.NewDot(50, "dot-svg").Renderer,
-				},
-				ext.RenderMap{
-					Languages:      []string{"uml-svg"},
-					RenderFunction: uml.NewUML(50, "uml-svg").Renderer,
-				},
-				ext.RenderMap{
-					Languages:      []string{"python-output"},
-					RenderFunction: python.NewPython(50, "python3", "python-output").Renderer,
-				},
-				ext.RenderMap{
-					Languages: []string{"*"},
-					RenderFunction: ext.GetFencedCodeBlockRendererFunc(
-						highlighting.NewHTMLRenderer(
-							highlighting.WithGuessLanguage(true),
-							highlighting.WithStyle("trac"),
-						),
-					),
-				},
-			),
+			exts,
 			img.NewImg("image", func(args img.ImgArgs, class string, renderImg img.RenderImgFunc) string {
 				var title = ""
 				if args.Title != "" {
