@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 import json
 
 
@@ -20,8 +20,9 @@ class SecNews(Site):
                 continue
             posts.append(Post(
                 link.get_text(),
-                "%s/%s" % (url.strip("/"), link.get("href").strip("/"))),
-            )
+                "%s/%s" % (url.strip("/"), link.get("href").strip("/")),
+                parseToUnix(item.select_one("td").get_text()),
+            ))
         return posts
 
 

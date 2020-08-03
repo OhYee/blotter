@@ -1,6 +1,8 @@
 
 import requests
 import urllib3
+import datetime
+from dateutil.parser import parse
 
 urllib3.disable_warnings()
 
@@ -45,9 +47,21 @@ class Site:
 
 
 class Post:
-    def __init__(self, title: str, link: str):
+    def __init__(self, title: str, link: str, time: int):
         self.title = title.strip()
         self.link = link
+        self.time = time
 
     def __repr__(self):
-        return "%s - %s" % (self.title, self.link)
+
+        return "(%s - %s - %s)" % (
+            self.title,
+            self.link,
+            datetime.datetime.fromtimestamp(
+                self.time
+            ).strftime("%Y-%m-%d %H:%M:%S"),
+        )
+
+
+def parseToUnix(timeStr: str):
+    return parse(timeStr).timestamp()

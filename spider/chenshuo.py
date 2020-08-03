@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+
+from utils import Site, Post, get, parseToUnix
 
 
 class Chenshuo(Site):
@@ -14,6 +15,17 @@ class Chenshuo(Site):
         soup = BeautifulSoup(res, features="lxml")
         posts = []
         for item in soup.select("a.article-title"):
-            posts.append(Post(item.get_text(), "%s/%s" %
-                              (url.strip("/"), item.get("href").strip("/"))))
+            posts.append(
+                Post(
+                    item.get_text(),
+                    "%s/%s" % (url.strip("/"), item.get("href").strip("/")),
+                    parseToUnix(item.parent.parent.select_one(
+                        "time").get_text())
+                ))
         return posts
+
+
+if __name__ == '__main__':
+    t = Chenshuo()
+    print(t.matcher("http://blog.chenshou.top/"))
+    print(t.solver("http://blog.chenshou.top/"))

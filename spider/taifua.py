@@ -17,7 +17,7 @@ class Taifua(Site):
         soup = BeautifulSoup(res, features="lxml")
         for item in soup.select(".list-title"):
             link = item.select_one("a")
-            posts.append(Post(link.get_text(), link.get("href")))
+            posts.append(Post(link.get_text(), link.get("href"), 0))
 
         res = post(
             "https://taifua.com/wp-admin/admin-ajax.php",
@@ -32,7 +32,7 @@ class Taifua(Site):
         soup = BeautifulSoup(res, features="lxml")
         for item in soup.select(".list-title"):
             link = item.select_one("a")
-            posts.append(Post(link.get_text(), link.get("href")))
+            posts.append(Post(link.get_text(), link.get("href"), 0))
 
         return posts
 

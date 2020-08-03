@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 
 
 class OmegaXYZ(Site):
@@ -16,5 +16,15 @@ class OmegaXYZ(Site):
         posts = []
         for item in soup.select("h3.rpwe-title"):
             link = item.select_one("a")
-            posts.append(Post(link.get_text(), link.get("href")))
+            posts.append(Post(
+                link.get_text(),
+                link.get("href"),
+                parseToUnix(item.parent.select_one("time").get("datetime")),
+            ))
         return posts
+
+
+if __name__ == '__main__':
+    t = OmegaXYZ()
+    print(t.matcher("https://www.omegaxyz.com/"))
+    print(t.solver("https://www.omegaxyz.com/"))

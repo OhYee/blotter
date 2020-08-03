@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 import json
 
 
@@ -18,6 +18,7 @@ class Jarviswwong(Site):
             posts.append(Post(
                 item.select_one("h1").get_text(),
                 item.select_one("a").get("href"),
+                parseToUnix(item.select_one("time").get_text()),
             ))
         return posts
 

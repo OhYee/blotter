@@ -11,3 +11,9 @@ class CSDN(Site):
 
     def solver(self, url: str):
         return RSS().solver("%s/rss/list" % (url.strip("/")))
+
+
+if __name__ == '__main__':
+    t = CSDN()
+    print(t.matcher("https://blog.csdn.net/qq_42673093"))
+    print(t.solver("https://blog.csdn.net/qq_42673093"))

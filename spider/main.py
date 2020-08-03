@@ -66,7 +66,7 @@ class Worker(threading.Thread):
                     "error": True,
                 } if len(posts) == 0 else {
                     "error": False,
-                    "posts": [{"title": post.title, "link": post.link} for post in posts[:5]]
+                    "posts": [{"title": post.title, "link": post.link, "time": post.time} for post in posts[:5]]
                 }
             }
         )

@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 import json
 
 
@@ -19,6 +19,7 @@ class JSPang(Site):
             posts.append(Post(
                 link.get_text(),
                 link.get("href"),
+                parseToUnix(item.parent.select_one("i").parent.get_text()),
             ))
         return posts
 

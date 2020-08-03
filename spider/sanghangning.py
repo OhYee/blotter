@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 import json
 
 
@@ -20,7 +20,8 @@ class Sanghangning(Site):
                 "%s/%s" % (
                     "https://www.sanghangning.cn".strip("/"),
                     post['url'].strip("/")
-                )
+                ),
+                parseToUnix(post["date"]),
             ))
         return posts
 

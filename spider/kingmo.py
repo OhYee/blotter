@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 
 
 class Kingmo(Site):
@@ -14,5 +14,16 @@ class Kingmo(Site):
         soup = BeautifulSoup(res, features="lxml")
         posts = []
         for item in soup.find_all("a", rel="bookmark"):
-            posts.append(Post(item.get_text(), item.get("href")))
+            posts.append(Post(
+                item.get_text(),
+                item.get("href"),
+                parseToUnix(item.parent.parent.parent.select_one(
+                    "time").get("datetime")),
+            ))
         return posts
+
+
+if __name__ == '__main__':
+    t = Kingmo()
+    print(t.matcher("https://www.lizenghai.com/"))
+    print(t.solver("https://www.lizenghai.com/"))

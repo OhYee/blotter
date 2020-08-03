@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 
 
 class Lolimay(Site):
@@ -19,5 +19,12 @@ class Lolimay(Site):
             posts.append(Post(
                 link.get_text(),
                 "%s/%s" % (url.strip("/"), link.get("href").strip("/")),
+                parseToUnix(item.parent.select_one(".post-date").get_text()),
             ))
         return posts
+
+
+if __name__ == '__main__':
+    t = Lolimay()
+    print(t.matcher("https://lolimay.cn/"))
+    print(t.solver("https://lolimay.cn/"))

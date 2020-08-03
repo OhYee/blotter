@@ -1,5 +1,6 @@
+from datetime import datetime
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 
 
 class YLink(Site):
@@ -14,9 +15,14 @@ class YLink(Site):
         soup = BeautifulSoup(res, features="lxml")
         posts = []
         for item in soup.select(".post-title"):
+            timeTuple = list(map(int, item.parent.select_one(
+                ".fa-calendar").parent.get_text().split("/")))
+
             posts.append(Post(
                 item.get_text(),
-                item.select_one("a").get("href")
+                item.select_one("a").get("href"),
+                datetime(2000+timeTuple[0], timeTuple[1],
+                         timeTuple[2]).timestamp(),
             ))
         return posts
 

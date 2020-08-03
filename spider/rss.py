@@ -15,12 +15,14 @@ class RSS(Site):
         file = feedparser.parse(res)
         entries = file.entries
 
-        entries.sort(key=lambda x: parse(
-            x.published).timestamp(), reverse=True)
+        entries.sort(
+            key=lambda x: parse(x.published).timestamp(),
+            reverse=True,
+        )
 
         posts = []
         for f in entries:
-            posts.append(Post(f.title, f.link))
+            posts.append(Post(f.title, f.link, parse(f.published).timestamp()))
         return posts
 
 

@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from utils import Site, Post, get, parseToUnix
 
 
 class iMyShare(Site):
@@ -17,7 +17,10 @@ class iMyShare(Site):
             posts.append(Post(
                 item.select_one("h2").get_text(),
                 "%s/%s" % (url.strip("/"),
-                           item.select_one("a").get("href").strip("/"))
+                           item.select_one("a").get("href").strip("/")),
+                parseToUnix(item.select_one(
+                    ".info-item"
+                ).get_text()),
             ))
         return posts
 
