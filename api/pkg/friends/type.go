@@ -20,6 +20,7 @@ type Friend struct {
 type FriendPost struct {
 	Title string `json:"title" bson:"title"`
 	Link  string `json:"link" bson:"link"`
+	Time  int64  `json:"time" bson:"time"`
 }
 
 // WithIndex friend type with index
