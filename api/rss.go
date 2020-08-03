@@ -57,7 +57,7 @@ func RSSXML(context register.HandleContext) (err error) {
 	for idx, post := range posts {
 		datetime := post.PublishTime
 		if t, e := time.Parse("2006-01-02 15:04:05", post.PublishTime); e == nil {
-			datetime = t.In(gt.ChinaTimeZone).Format("Mon, Jan 2 2006 15:04:05 -0700 MST")
+			datetime = t.In(gt.ChinaTimeZone).Format("Mon, 02 Jan 2006 15:04:05 -0700")
 		}
 
 		data[idx] = fmt.Sprintf(
