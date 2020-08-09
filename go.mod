@@ -11,6 +11,7 @@ require (
 	github.com/OhYee/goldmark-plantuml v1.0.2
 	github.com/OhYee/goldmark-python v0.0.2
 	github.com/OhYee/goutils v1.0.1
+	github.com/OhYee/gowechat v0.0.0-20200809124825-178427c3dbaf
 	github.com/OhYee/rainbow v1.0.3
 	github.com/alecthomas/chroma v0.8.0 // indirect
 	github.com/aws/aws-sdk-go v1.33.16 // indirect
