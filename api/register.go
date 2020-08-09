@@ -223,7 +223,7 @@ func Register() {
 		RenameImage,
 	)
 	register.Register(
-		"wechat/check_permission",
+		"wechat",
 		WechatCheckPermission,
 	)
 }
