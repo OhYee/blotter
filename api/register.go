@@ -222,4 +222,8 @@ func Register() {
 		"qiniu/image/rename",
 		RenameImage,
 	)
+	register.Register(
+		"wechat/check_permission",
+		WechatCheckPermission,
+	)
 }
