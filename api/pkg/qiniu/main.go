@@ -23,11 +23,11 @@ func getKeys() (accessKey, secretKey string) {
 	return
 }
 
-func GenerateToken() (token string) {
+func GenerateToken(bucker string ) (token string) {
 	accessKey, secretKey := getKeys()
 	mac := qbox.NewMac(accessKey, secretKey)
 	putPolicy := storage.PutPolicy{
-		Scope:   "space",
+		Scope:   bucker,
 		Expires: 60,
 	}
 	token = putPolicy.UploadToken(mac)

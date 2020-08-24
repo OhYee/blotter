@@ -61,6 +61,10 @@ func GetImages(context register.HandleContext) (err error) {
 	return
 }
 
+type GetQiniuTokenRequest struct {
+	Bucket string `json:"bucket"`
+}
+
 type GetQiniuTokenResponse struct {
 	Token string `json:"token"`
 }
@@ -71,10 +75,11 @@ func GetQiniuToken(context register.HandleContext) (err error) {
 		context.Forbidden()
 		return
 	}
-
+	args := new(GetQiniuTokenRequest)
 	res := new(GetQiniuTokenResponse)
+	context.RequestArgs(args)
 
-	res.Token = qiniu.GenerateToken()
+	res.Token = qiniu.GenerateToken(args.Bucket)
 
 	err = context.ReturnJSON(res)
 	return
