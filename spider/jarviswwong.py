@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 from utils import Site, Post, get, parseToUnix
 import json
+import re
+import datetime
 
 
 class Jarviswwong(Site):
@@ -14,11 +16,14 @@ class Jarviswwong(Site):
         res = get("https://jarviswwong.com/")
         soup = BeautifulSoup(res, features="lxml")
         posts = []
-        for item in soup.select("li.masonry-item"):
+
+        for item in soup.select(".cardbai"):
+            y, m, d = map(int, re.findall(
+                r'(\d+)', item.select_one(".info-date").select_one("span").get_text()))
             posts.append(Post(
-                item.select_one("h1").get_text(),
+                item.select_one(".card-title").get_text(),
                 item.select_one("a").get("href"),
-                parseToUnix(item.select_one("time").get_text()),
+                datetime.datetime(y, m, d).timestamp(),
             ))
         return posts
 
