@@ -1,6 +1,7 @@
 import requests
 import pymongo
 import threading
+import datetime
 
 from rss import RSS
 from taifua import Taifua
@@ -86,6 +87,7 @@ def err(e: str):
 
 
 if __name__ == '__main__':
+    print(datetime.datetime.now())
     threads = [
         Worker(item["_id"], item["rss"])
         for item in document.find({})
