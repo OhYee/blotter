@@ -147,7 +147,7 @@ func getPosts(
 		)
 	}
 
-	words := fp.FilterString(func(s string) bool {
+	words := fp.FilterString(func(s string, idx int) bool {
 		return len(strings.Replace(s, " ", "", -1)) != 0
 	}, jieba.CutForSearch(searchWord, true))
 
