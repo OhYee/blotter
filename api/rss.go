@@ -8,8 +8,6 @@ import (
 	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/register"
-
-	gt "github.com/OhYee/goutils/time"
 )
 
 const (
@@ -55,10 +53,8 @@ func RSSXML(context register.HandleContext) (err error) {
 
 	data := make([]string, total)
 	for idx, post := range posts {
-		datetime := post.PublishTime
-		if t, e := time.ParseInLocation("2006-01-02 15:04:05", post.PublishTime, gt.ChinaTimeZone); e == nil {
-			datetime = t.Format("Mon, 02 Jan 2006 15:04:05 -0700")
-		}
+		t := time.Unix(post.PublishTime, 0).Local()
+		datetime := t.Format("Mon, 02 Jan 2006 15:04:05 -0700")
 
 		data[idx] = fmt.Sprintf(
 			postFormat,

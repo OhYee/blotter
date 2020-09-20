@@ -39,46 +39,13 @@ func (t Time) ToTimeDB() TimeDB {
 
 // CardProps props of post card
 type CardProps struct {
-	Time      `bson:",inline"`
-	Title     string `json:"title" bson:"title"`
-	Abstract  string `json:"abstract" bson:"abstract"`
-	View      int64  `json:"view" bson:"view"`
-	URL       string `json:"url" bson:"url"`
-	HeadImage string `json:"head_image" bson:"head_image"`
-}
-
-// ToCardDBProps transfer CardProps to CardDBProps
-func (props CardProps) ToCardDBProps() CardDBProps {
-	return CardDBProps{
-		Title:     props.Title,
-		Abstract:  props.Abstract,
-		View:      props.View,
-		URL:       props.URL,
-		HeadImage: props.HeadImage,
-		TimeDB:    props.Time.ToTimeDB(),
-	}
-}
-
-// CardDBProps props of post card database type
-type CardDBProps struct {
-	TimeDB    `bson:",inline"`
-	Title     string `json:"title" bson:"title"`
-	Abstract  string `json:"abstract" bson:"abstract"`
-	View      int64  `json:"view" bson:"view"`
-	URL       string `json:"url" bson:"url"`
-	HeadImage string `json:"head_image" bson:"head_image"`
-}
-
-// ToCardProps transfer CardDBProps to CardProps
-func (props CardDBProps) ToCardProps() CardProps {
-	return CardProps{
-		Title:     props.Title,
-		Abstract:  props.Abstract,
-		View:      props.View,
-		URL:       props.URL,
-		HeadImage: props.HeadImage,
-		Time:      props.TimeDB.ToTime(),
-	}
+	PublishTime int64  `json:"publish_time" bson:"publish_time"`
+	EditTime    int64  `json:"edit_time" bson:"edit_time"`
+	Title       string `json:"title" bson:"title"`
+	Abstract    string `json:"abstract" bson:"abstract"`
+	View        int64  `json:"view" bson:"view"`
+	URL         string `json:"url" bson:"url"`
+	HeadImage   string `json:"head_image" bson:"head_image"`
 }
 
 // PublicProps extra props of public post
@@ -100,20 +67,6 @@ type EditProps struct {
 
 */
 
-// CardFieldDB PostCard type in database
-type CardFieldDB struct {
-	CardDBProps `bson:",inline"`
-	Tags        []tag.Type `json:"tags" bson:"tags"`
-}
-
-// ToCard transfer PostCardDB to PostCard
-func (post CardFieldDB) ToCard() CardField {
-	return CardField{
-		CardProps: post.CardDBProps.ToCardProps(),
-		Tags:      post.Tags,
-	}
-}
-
 // AdminField PostCard type
 type AdminField struct {
 	CardProps `bson:",inline"`
@@ -129,26 +82,26 @@ func (post AdminField) ToCardDB() AdminFieldDB {
 		id = primitive.ObjectID{}
 	}
 	return AdminFieldDB{
-		ID:          id,
-		CardDBProps: post.CardProps.ToCardDBProps(),
-		Published:   post.Published,
-		Tags:        post.Tags,
+		ID:        id,
+		CardProps: post.CardProps,
+		Published: post.Published,
+		Tags:      post.Tags,
 	}
 }
 
 // AdminFieldDB PostCard type in database
 type AdminFieldDB struct {
-	CardDBProps `bson:",inline"`
-	ID          primitive.ObjectID `json:"id" bson:"_id"`
-	Published   bool               `json:"published" bson:"published"`
-	Tags        []tag.Type         `json:"tags" bson:"tags"`
+	CardProps `bson:",inline"`
+	ID        primitive.ObjectID `json:"id" bson:"_id"`
+	Published bool               `json:"published" bson:"published"`
+	Tags      []tag.Type         `json:"tags" bson:"tags"`
 }
 
 // ToCard transfer PostCardDB to PostCard
 func (post AdminFieldDB) ToCard() AdminField {
 	return AdminField{
 		ID:        post.ID.Hex(),
-		CardProps: post.CardDBProps.ToCardProps(),
+		CardProps: post.CardProps,
 		Published: post.Published,
 		Tags:      post.Tags,
 	}
@@ -160,14 +113,6 @@ type CardField struct {
 	Tags      []tag.Type `json:"tags" bson:"tags"`
 }
 
-// ToCardDB transfer PostCard to PostCardDB
-func (post CardField) ToCardDB() CardFieldDB {
-	return CardFieldDB{
-		CardDBProps: post.CardProps.ToCardDBProps(),
-		Tags:        post.Tags,
-	}
-}
-
 /*
 
 	Post
@@ -176,7 +121,7 @@ func (post CardField) ToCardDB() CardFieldDB {
 
 // PublicFieldDB post type in database
 type PublicFieldDB struct {
-	CardDBProps `bson:",inline"`
+	CardProps   `bson:",inline"`
 	PublicProps `bson:",inline"`
 	Tags        []tag.Type `json:"tags" bson:"tags"`
 }
@@ -184,7 +129,7 @@ type PublicFieldDB struct {
 // ToPost transfer PostDB to Post
 func (post PublicFieldDB) ToPost() PublicField {
 	return PublicField{
-		CardProps:   post.CardDBProps.ToCardProps(),
+		CardProps:   post.CardProps,
 		PublicProps: post.PublicProps,
 		Tags:        post.Tags,
 	}
@@ -200,7 +145,7 @@ type PublicField struct {
 // ToDB transfer Post to ToPostDB
 func (post PublicField) ToDB() PublicFieldDB {
 	return PublicFieldDB{
-		CardDBProps: post.CardProps.ToCardDBProps(),
+		CardProps:   post.CardProps,
 		PublicProps: post.PublicProps,
 		Tags:        post.Tags,
 	}
@@ -215,7 +160,7 @@ func (post PublicField) ToDB() PublicFieldDB {
 // CompleteFieldDB post with all field for editing in database
 type CompleteFieldDB struct {
 	ID          primitive.ObjectID `json:"id" bson:"_id"`
-	CardDBProps `bson:",inline"`
+	CardProps   `bson:",inline"`
 	PublicProps `bson:",inline"`
 	EditProps   `bson:",inline"`
 	Tags        []tag.Type `json:"tags" bson:"tags"`
@@ -225,7 +170,7 @@ type CompleteFieldDB struct {
 func (post CompleteFieldDB) ToPost() CompleteField {
 	return CompleteField{
 		ID:          post.ID.Hex(),
-		CardProps:   post.CardDBProps.ToCardProps(),
+		CardProps:   post.CardProps,
 		PublicProps: post.PublicProps,
 		EditProps:   post.EditProps,
 		Tags:        post.Tags,
@@ -244,7 +189,7 @@ type CompleteField struct {
 // DB type in database posts collection
 type DB struct {
 	ID          primitive.ObjectID `json:"id" bson:"_id"`
-	CardDBProps `bson:",inline"`
+	CardProps   `bson:",inline"`
 	PublicProps `bson:",inline"`
 	EditProps   `bson:",inline"`
 	Tags        []primitive.ObjectID `json:"tags" bson:"tags"`
@@ -252,19 +197,19 @@ type DB struct {
 
 type SortPost CompleteFieldDB
 
-func (post SortPost) ToCardDB() CardFieldDB {
-	return CardFieldDB{
-		CardDBProps: post.CardDBProps,
-		Tags:        post.Tags,
+func (post SortPost) ToCard() CardField {
+	return CardField{
+		CardProps: post.CardProps,
+		Tags:      post.Tags,
 	}
 }
 
 func (post SortPost) ToAdminDB() AdminFieldDB {
 	return AdminFieldDB{
-		CardDBProps: post.CardDBProps,
-		ID:          post.ID,
-		Published:   post.Published,
-		Tags:        post.Tags,
+		CardProps: post.CardProps,
+		ID:        post.ID,
+		Published: post.Published,
+		Tags:      post.Tags,
 	}
 }
 

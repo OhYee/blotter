@@ -208,10 +208,10 @@ func getPosts(
 		for idx, p := range posts {
 			(*v)[idx] = p.ToAdminDB()
 		}
-	case *[]CardFieldDB:
-		(*v) = make([]CardFieldDB, len(posts))
+	case *[]CardField:
+		(*v) = make([]CardField, len(posts))
 		for idx, p := range posts {
-			(*v)[idx] = p.ToCardDB()
+			(*v)[idx] = p.ToCard()
 		}
 	}
 
@@ -225,12 +225,12 @@ func GetCardPosts(
 	sortField string, sortType int,
 	searchWord string, searchFields []string,
 ) (total int64, posts []CardField, err error) {
-	postsDB := make([]CardFieldDB, 0)
+	postsDB := make([]CardField, 0)
 	total, err = getPosts(true, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
 
 	posts = make([]CardField, len(postsDB))
 	for idx, post := range postsDB {
-		posts[idx] = post.ToCard()
+		posts[idx] = post
 	}
 	return
 }
