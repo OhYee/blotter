@@ -91,14 +91,14 @@ func View(context register.HandleContext) (err error) {
 	args := PostRequest{}
 	context.RequestArgs(&args)
 
-	if args.URL == "" {
-		go func() {
-			mongo.Update(
-				"blotter", "variables", bson.M{"key": "view"},
-				bson.M{"$inc": bson.M{"value": 1}}, nil,
-			)
-		}()
-	} else {
+	go func() {
+		mongo.Update(
+			"blotter", "variables", bson.M{"key": "view"},
+			bson.M{"$inc": bson.M{"value": 1}}, nil,
+		)
+	}()
+
+	if args.URL != "" {
 		go post.IncView(args.URL)
 	}
 
