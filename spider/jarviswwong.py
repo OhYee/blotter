@@ -16,8 +16,7 @@ class Jarviswwong(Site):
         res = get("https://jarviswwong.com/")
         soup = BeautifulSoup(res, features="lxml")
         posts = []
-
-        for item in soup.select(".cardbai"):
+        for item in soup.select(".cardmao"):
             y, m, d = map(int, re.findall(
                 r'(\d+)', item.select_one(".info-date").select_one("span").get_text()))
             posts.append(Post(
