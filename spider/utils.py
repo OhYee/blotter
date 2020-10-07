@@ -18,7 +18,7 @@ def get(url: str):
     while retry > 0:
         try:
             rep = requests.get(
-                url,  timeout=10, verify=False, headers=headers)
+                url,  timeout=30, verify=False, headers=headers)
             break
         except Exception as e:
             print("Get page error: {}, {} times left...".format(e, retry))
