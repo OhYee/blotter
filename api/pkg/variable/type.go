@@ -92,7 +92,12 @@ func (v Variables) SetArray(key string, value interface{}) (err error) {
 // GetString get string value
 func (v Variables) GetString(key string) (s string, exist bool) {
 	value, exist := v[key]
-	s = value.(string)
+	switch value.(type) {
+	case string:
+		s = value.(string)
+	default:
+		s = ""
+	}
 	return
 }
 
