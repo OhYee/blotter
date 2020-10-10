@@ -23,14 +23,17 @@ require (
 	github.com/klauspost/compress v1.11.0 // indirect
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/qiniu/api.v7/v7 v7.6.0
+	github.com/v2fly/vmessping v0.3.4
 	github.com/yanyiwu/gojieba v1.1.2
 	github.com/yuin/goldmark v1.2.1
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
 	go.mongodb.org/mongo-driver v1.4.1
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
+	golang.org/x/net v0.0.0-20200625001655-4c5254603344 // indirect
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208 // indirect
-	golang.org/x/tools v0.0.0-20200809012840-6f4f008689da // indirect
 
 )
 
 replace github.com/yanyiwu/gojieba v1.1.2 => github.com/ttys3/gojieba v1.1.3
+
+replace v2ray.com/core => github.com/v2fly/v2ray-core v1.24.5-0.20200531043819-9dc12961fac5
