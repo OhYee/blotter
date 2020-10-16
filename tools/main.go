@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/markdown"
+	p "github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,6 +36,7 @@ func rerender(filter bson.M) (err error) {
 			bson.M{
 				"$set": bson.M{
 					"content": html,
+					"length":  int64(p.CalcPostLength(html)),
 				},
 			},
 			nil,
