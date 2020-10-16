@@ -2,6 +2,7 @@ package post
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/markdown"
@@ -33,6 +34,17 @@ var jieba = func() (jb *gojieba.Jieba) {
 	output.Log("Initial Jieba finished")
 	return
 }()
+
+var (
+	htmlEscape, _     = regexp.Compile("<[^>]+>|\\s")
+	charactorMatch, _ = regexp.Compile("[\u007f-\uffff]")
+)
+
+func CalcPostLength(html string) int {
+	text := htmlEscape.ReplaceAllString(html, "")
+	result := charactorMatch.FindAllString(text, -1)
+	return len(result)
+}
 
 // Query posts of url
 func Query(pipeline []bson.M, res interface{}) (total int64, err error) {
@@ -302,6 +314,7 @@ func NewPost(
 	p.Published = published
 	p.HeadImage = headImage
 	p.Images = images
+	p.Length = int64(CalcPostLength(html))
 
 	if Existed(url) {
 		err = fmt.Errorf("Post with url existed: %s", url)
@@ -358,6 +371,8 @@ func UpdatePost(
 	p.Published = published
 	p.HeadImage = headImage
 	p.Images = images
+	p.Length = int64(CalcPostLength(html))
+
 	_, err = mongo.Update("blotter", "posts", bson.M{
 		"_id": objectID,
 	}, bson.M{
