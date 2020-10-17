@@ -18,6 +18,7 @@ from jspang import JSPang
 from ylink import YLink
 from secnews import SecNews
 from imyshare import iMyShare
+from lylblog import Lylblog
 
 sites = [
     Taifua(),
@@ -34,6 +35,7 @@ sites = [
     YLink(),
     SecNews(),
     iMyShare(),
+    Lylblog(),
     RSS(),
 ]
 
