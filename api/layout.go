@@ -26,6 +26,10 @@ type LayoutResponse struct {
 	Avatar   string           `json:"avatar"`
 	Author   string           `json:"author"`
 	From     string           `json:"from"`
+	Head     string           `json:"head"`
+	ADShow   string           `json:"ad_show"`
+	ADInner  string           `json:"ad_inner"`
+	ADText   string           `json:"ad_text"`
 }
 
 // Layout get site base info
@@ -37,7 +41,10 @@ func Layout(context register.HandleContext) (err error) {
 		return
 	}
 
-	m, err := variable.Get("beian", "view", "blog_name", "email", "github", "qq", "grey", "root", "author", "avatar", "from")
+	m, err := variable.Get(
+		"beian", "view", "blog_name", "email", "github", "qq", "grey", "root",
+		"author", "avatar", "from", "head", "ad_inner", "ad_show", "ad_text",
+	)
 	if err != nil {
 		return
 	}
@@ -74,6 +81,18 @@ func Layout(context register.HandleContext) (err error) {
 		return
 	}
 	if err = m.SetString("from", &res.From); err != nil {
+		return
+	}
+	if err = m.SetString("head", &res.Head); err != nil {
+		return
+	}
+	if err = m.SetString("ad_show", &res.ADShow); err != nil {
+		return
+	}
+	if err = m.SetString("ad_inner", &res.ADInner); err != nil {
+		return
+	}
+	if err = m.SetString("ad_text", &res.ADText); err != nil {
 		return
 	}
 
