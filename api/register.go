@@ -47,6 +47,10 @@ func Register() {
 		Markdown,
 	)
 	register.Register(
+		"markdown/ws",
+		MarkdownWS,
+	)
+	register.Register(
 		"comments",
 		Comments,
 	)
