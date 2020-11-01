@@ -1,1 +1,1 @@
-from .utils import Site, Post, get, parseToUnix
+from .utils import Site, Post, get, post, parseToUnix
