@@ -1,5 +1,5 @@
-from rss import RSS
-from utils import Site, Post, get
+from .rss import RSS
+from .utils import Site, Post, get
 
 
 class CSDN(Site):

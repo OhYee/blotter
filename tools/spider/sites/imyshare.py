@@ -1,5 +1,8 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get, parseToUnix
+if __name__ == "__main__":
+    from utils import *
+else:
+    from .utils import *
 
 
 class iMyShare(Site):

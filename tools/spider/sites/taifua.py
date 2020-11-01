@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
-from utils import Site, Post, get, post
+if __name__ == "__main__":
+    from utils import *
+else:
+    from .utils import *
 
 
 class Taifua(Site):

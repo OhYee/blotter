@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from utils import Site, Post, get
+from .utils import Site, Post, get
 
 
 class Tinshine(Site):

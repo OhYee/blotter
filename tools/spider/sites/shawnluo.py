@@ -2,7 +2,10 @@ from datetime import datetime
 import requests
 import re
 from bs4 import BeautifulSoup
-from utils import Site, Post, get, parseToUnix
+if __name__ == "__main__":
+    from utils import *
+else:
+    from .utils import *
 
 regxp = re.compile("(\d+)")
 

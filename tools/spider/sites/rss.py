@@ -1,6 +1,6 @@
 import feedparser
 from dateutil.parser import parse
-from utils import Site, Post, get
+from .utils import Site, Post, get
 
 
 class RSS(Site):

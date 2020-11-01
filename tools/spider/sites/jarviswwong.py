@@ -1,8 +1,12 @@
-from bs4 import BeautifulSoup
-from utils import Site, Post, get, parseToUnix
-import json
-import re
 import datetime
+import re
+import json
+from bs4 import BeautifulSoup
+
+if __name__ == "__main__":
+    from utils import *
+else:
+    from .utils import *
 
 
 class Jarviswwong(Site):
@@ -16,7 +20,7 @@ class Jarviswwong(Site):
         res = get("https://jarviswwong.com/")
         soup = BeautifulSoup(res, features="lxml")
         posts = []
-        for item in soup.select(".cardmao"):
+        for item in soup.select(".ajaxcard"):
             y, m, d = map(int, re.findall(
                 r'(\d+)', item.select_one(".info-date").select_one("span").get_text()))
             posts.append(Post(
