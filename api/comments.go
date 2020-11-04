@@ -49,7 +49,7 @@ type CommentAddRequest struct {
 // CommentAdd add comment api
 func CommentAdd(context register.HandleContext) (err error) {
 	args := new(CommentAddRequest)
-	context.RequestArgs(args)
+	context.RequestArgs(args, "post")
 
 	if m, e := regexp.MatchString(
 		"^([A-Za-z0-9_\\-\\.\u4e00-\u9fa5])+\\@([A-Za-z0-9_\\-\\.])+\\.([A-Za-z]{2,8})$",
