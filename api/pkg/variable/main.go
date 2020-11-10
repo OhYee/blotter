@@ -35,19 +35,20 @@ func Get(keys ...string) (res Variables, err error) {
 }
 
 // GetAll variables
-func GetAll() (res []Type, err error) {
+func GetAll() (res BlotterVariables, err error) {
 	defer errors.Wrapper(&err)
 
 	temp := make([]map[string]interface{}, 0)
-	_, err = mongo.Find(
+	if _, err = mongo.Find(
 		"blotter",
 		"variables",
 		variablesFilter,
 		nil,
 		&temp,
-	)
-
-	res = FromMapSliceToTypeSlice(temp)
+	); err != nil {
+		return
+	}
+	res, err = NewBlotterVariables(temp)
 	return
 }
 
