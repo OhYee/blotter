@@ -1,6 +1,8 @@
 package variable
 
 import (
+	"encoding/json"
+
 	"github.com/mitchellh/mapstructure"
 
 	"github.com/OhYee/blotter/output"
@@ -136,4 +138,57 @@ type Award struct {
 	Name  string `json:"name"`
 	Level string `json:"level"`
 	Count int64  `json:"count"`
+}
+type BlotterVariables struct {
+	ADInner           string       `json:"ad_inner" bson:"ad_inner"`
+	ADShow            string       `json:"ad_show" bson:"ad_show"`
+	ADText            string       `json:"ad_text" bson:"ad_text"`
+	Author            string       `json:"author" bson:"author"`
+	Avatar            string       `json:"avatar" bson:"avatar"`
+	Awards            []Award      `json:"awards" bson:"awards"`
+	Beian             string       `json:"beian" bson:"beian"`
+	BlogName          string       `json:"blog_name" bson:"blog_name"`
+	Description       string       `json:"description" bson:"description"`
+	Edu               []Experience `json:"edu" bson:"edu"`
+	Email             string       `json:"email" bson:"email"`
+	From              string       `json:"from" bson:"from"`
+	Github            string       `json:"github" bson:"github"`
+	GithubID          string       `json:"github_id" bson:"github_id"`
+	GithubRedirect    string       `json:"github_redirect" bson:"github_redirect"`
+	GithubSecret      string       `json:"github_secret" bson:"github_secret"`
+	Grey              bool         `json:"grey" bson:"grey"`
+	Head              string       `json:"head" bson:"head"`
+	QiniuAccessKey    string       `json:"qiniu_access_key" bson:"qiniu_access_key"`
+	QiniuPrefix       string       `json:"qiniu_prefix" bson:"qiniu_prefix"`
+	QiniuSecretKey    string       `json:"qiniu_secret_key" bson:"qiniu_secret_key"`
+	QiniuStaticDomain string       `json:"qiniu_static_domain" bson:"qiniu_static_domain"`
+	QQ                string       `json:"qq" bson:"qq"`
+	QQID              string       `json:"qq_id" bson:"qq_id"`
+	QQKey             string       `json:"qq_key" bson:"qq_key"`
+	QQRedirect        string       `json:"qq_redirect" bson:"qq_redirect"`
+	QQRobot           string       `json:"qqrobot" bson:"qqrobot"`
+	Quote             string       `json:"quote" bson:"quote"`
+	Root              string       `json:"root" bson:"root"`
+	SMTPAddress       string       `json:"smtp_address" bson:"smtp_address"`
+	SMTPPassword      string       `json:"smtp_password" bson:"smtp_password"`
+	SMTPUser          string       `json:"smtp_user" bson:"smtp_user"`
+	SMTPUsername      string       `json:"smtp_username" bson:"smtp_username"`
+	View              int          `json:"view" bson:"view"`
+	Vmess             string       `json:"vmess" bson:"vmess"`
+	Zhihu             string       `json:"zhihu" bson:"zhihu"`
+}
+
+func NewBlotterVariables(vars []map[string]interface{}) (res BlotterVariables, err error) {
+	m := make(map[string]interface{})
+	for _, v := range vars {
+		m[v["key"].(string)] = v["value"]
+	}
+	output.Debug("%+v", m)
+	b, err := json.Marshal(m)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(b, &res)
+	return
 }
