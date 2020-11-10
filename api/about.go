@@ -5,31 +5,17 @@ import (
 	"github.com/OhYee/blotter/register"
 )
 
-// Experience for about api
-type Experience struct {
-	Name  string `json:"name"`
-	Major string `json:"major"`
-	Time  string `json:"time"`
-}
-
-// Award for about api
-type Award struct {
-	Name  string `json:"name"`
-	Level string `json:"level"`
-	Count int64  `json:"count"`
-}
-
 // AboutResponse response of avatar api
 type AboutResponse struct {
-	QQ          string       `json:"qq"`
-	Github      string       `json:"github"`
-	Email       string       `json:"email"`
-	Zhihu       string       `json:"zhihu"`
-	Author      string       `json:"author"`
-	Quote       string       `json:"quote"`
-	Description string       `json:"description"`
-	Edu         []Experience `json:"edu"`
-	Awards      []Award      `json:"awards"`
+	QQ          string                `json:"qq"`
+	Github      string                `json:"github"`
+	Email       string                `json:"email"`
+	Zhihu       string                `json:"zhihu"`
+	Author      string                `json:"author"`
+	Quote       string                `json:"quote"`
+	Description string                `json:"description"`
+	Edu         []variable.Experience `json:"edu"`
+	Awards      []variable.Award      `json:"awards"`
 }
 
 // About get avatar of emial

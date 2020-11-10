@@ -123,3 +123,17 @@ func FromMapSliceToTypeSlice(ms []map[string]interface{}) (ts []Type) {
 	}
 	return
 }
+
+// Experience for about api
+type Experience struct {
+	Name  string `json:"name"`
+	Major string `json:"major"`
+	Time  string `json:"time"`
+}
+
+// Award for about api
+type Award struct {
+	Name  string `json:"name"`
+	Level string `json:"level"`
+	Count int64  `json:"count"`
+}
