@@ -20,14 +20,17 @@ class Jarviswwong(Site):
         res = get("https://jarviswwong.com/")
         soup = BeautifulSoup(res, features="lxml")
         posts = []
-        for item in soup.select(".ajaxcard"):
-            y, m, d = map(int, re.findall(
-                r'(\d+)', item.select_one(".info-date").select_one("span").get_text()))
-            posts.append(Post(
-                item.select_one(".card-title").get_text(),
-                item.select_one("a").get("href"),
-                datetime.datetime(y, m, d).timestamp(),
-            ))
+        for item in soup.select_one(".postList").select(".mdui-card"):
+            try:
+                _, y, m, d = map(int, re.findall(
+                    r'(\d+)', item.select_one("span.info").get_text()))
+                posts.append(Post(
+                    item.select_one(".mdui-card-primary-title").get_text(),
+                    item.select_one("a").get("href"),
+                    datetime.datetime(y, m, d).timestamp(),
+                ))
+            except:
+                pass
         return posts
 
 
