@@ -14,7 +14,7 @@ require (
 	github.com/OhYee/gowechat v0.0.1
 	github.com/OhYee/rainbow v1.0.6
 	github.com/alecthomas/chroma v0.8.2 // indirect
-	github.com/aws/aws-sdk-go v1.35.33 // indirect
+	github.com/aws/aws-sdk-go v1.36.1 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
@@ -22,21 +22,22 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/graemephi/goldmark-qjs-katex v0.3.0
 	github.com/klauspost/compress v1.11.3 // indirect
-	github.com/mitchellh/mapstructure v1.3.3
-	github.com/qiniu/api.v7/v7 v7.6.0
+	github.com/mitchellh/mapstructure v1.4.0
+	github.com/qiniu/api.v7/v7 v7.7.0
 	github.com/refraction-networking/utls v0.0.0-20201112193908-f7e7360167ed // indirect
 	github.com/v2fly/vmessping v0.3.4
 	github.com/yanyiwu/gojieba v1.1.2
 	github.com/yuin/goldmark v1.2.1
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
-	go.mongodb.org/mongo-driver v1.4.3
-	go.starlark.net v0.0.0-20201118183435-e55f603d8c79 // indirect
-	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9 // indirect
+	go.mongodb.org/mongo-driver v1.4.4
+	go.starlark.net v0.0.0-20201202183632-a7839910dcbe // indirect
+	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c // indirect
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
-	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
+	golang.org/x/sys v0.0.0-20201202213521-69691e467435 // indirect
 	golang.org/x/text v0.3.4 // indirect
-	google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4 // indirect
-	google.golang.org/grpc v1.33.2 // indirect
+	google.golang.org/genproto v0.0.0-20201203001206-6486ece9c497 // indirect
+	google.golang.org/grpc v1.34.0 // indirect
 
 )
 
