@@ -24,6 +24,8 @@ class Worker(threading.Thread):
         posts = []
         try:
             posts = getSitePosts(self.rss)
+            if len(posts) > 5:
+                posts = posts[:5]
         except Exception as e:
             err("%s %s" % (self.rss, str(e)))
 
@@ -35,7 +37,7 @@ class Worker(threading.Thread):
                     "error": True,
                 } if len(posts) == 0 else {
                     "error": False,
-                    "posts": [{"title": post.title, "link": post.link, "time": post.time} for post in posts[:5]]
+                    "posts": [{"title": post.title, "link": post.link, "time": post.time} for post in posts]
                 }
             }
         )
