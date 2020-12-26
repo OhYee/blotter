@@ -5,4 +5,4 @@
 
 SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 
-python3 $SHELL_FOLDER/main.py 1>>$SHELL_FOLDER/log.log 2>>$SHELL_FOLDER/error.log%
+python3 $SHELL_FOLDER/main.py 1>>$SHELL_FOLDER/log.log 2>>$SHELL_FOLDER/error.log
