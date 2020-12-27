@@ -24,7 +24,7 @@ class Worker(threading.Thread):
         posts = []
         try:
             posts = getSitePosts(self.rss)
-            posts.sort(key=lambda x: x.time)
+            posts.sort(key=lambda x: x.time, reverse=True)
             if len(posts) > 5:
                 posts = posts[:5]
         except Exception as e:
