@@ -11,29 +11,41 @@ _headers = {
 }
 
 
-def get(url: str, headers={}):
+def auto_retry(sub):
     retry = 10
     rep = None
 
     while retry > 0:
         try:
-            rep = requests.get(
-                url,  timeout=30, verify=False, headers={**_headers, **headers})
+            rep = sub()
             break
         except Exception as e:
             print("Get page error: {}, {} times left...".format(e, retry))
             retry -= 1
 
-    rep = requests.get(url, verify=False, headers=headers)
     rep.encoding = 'utf-8'
     return rep.text
-    
+
+
+def get(url: str, headers={}):
+    return auto_retry(
+        lambda: requests.get(
+            url,
+            timeout=30,
+            verify=False,
+            headers={**_headers, **headers}),
+    )
 
 
 def post(url: str, data: object, headers={}):
-    rep = requests.post(url, data, verify=False, headers={**_headers, **headers})
-    rep.encoding = 'utf-8'
-    return rep.text
+    return auto_retry(
+        lambda: requests.post(
+            url,
+            data,
+            timeout=30,
+            verify=False,
+            headers={**_headers, **headers}),
+    )
 
 
 class Site:
