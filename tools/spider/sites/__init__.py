@@ -15,6 +15,7 @@ from .secnews import SecNews
 from .imyshare import iMyShare
 from .lylblog import Lylblog
 from .icskkk import ICSKKK
+from .wanglingyue import Wanglingyue
 
 sites = [
     Taifua(),
@@ -32,6 +33,8 @@ sites = [
     SecNews(),
     iMyShare(),
     ICSKKK(),
+    Wanglingyue(),
+    
     Lylblog(),
     RSS(),
 ]
