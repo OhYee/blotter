@@ -6,19 +6,19 @@ from dateutil.parser import parse
 
 urllib3.disable_warnings()
 
-headers = {
+_headers = {
     'User-Agent': 'OhYee Spider',
 }
 
 
-def get(url: str):
+def get(url: str, headers={}):
     retry = 10
     rep = None
 
     while retry > 0:
         try:
             rep = requests.get(
-                url,  timeout=30, verify=False, headers=headers)
+                url,  timeout=30, verify=False, headers={**_headers, **headers})
             break
         except Exception as e:
             print("Get page error: {}, {} times left...".format(e, retry))
@@ -27,10 +27,11 @@ def get(url: str):
     rep = requests.get(url, verify=False, headers=headers)
     rep.encoding = 'utf-8'
     return rep.text
+    
 
 
-def post(url: str, data: object):
-    rep = requests.post(url, data, verify=False, headers=headers)
+def post(url: str, data: object, headers={}):
+    rep = requests.post(url, data, verify=False, headers={**_headers, **headers})
     rep.encoding = 'utf-8'
     return rep.text
 
