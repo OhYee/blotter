@@ -1,5 +1,9 @@
-from .rss import RSS
-from .utils import Site, Post, get
+if __name__ == "__main__":
+    from utils import *
+    from rss import RSS
+else:
+    from .utils import *
+    from .rss import RSS
 
 
 class CSDN(Site):
