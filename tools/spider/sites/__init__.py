@@ -16,6 +16,7 @@ from .imyshare import iMyShare
 from .lylblog import Lylblog
 from .icskkk import ICSKKK
 from .wanglingyue import Wanglingyue
+from .yvonnecheung import Yvonnecheung
 
 sites = [
     Taifua(),
@@ -34,6 +35,7 @@ sites = [
     iMyShare(),
     ICSKKK(),
     Wanglingyue(),
+    Yvonnecheung(),
     
     Lylblog(),
     RSS(),
