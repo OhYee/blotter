@@ -176,6 +176,7 @@ type BlotterVariables struct {
 	View              int          `json:"view" bson:"view"`
 	Vmess             string       `json:"vmess" bson:"vmess"`
 	Zhihu             string       `json:"zhihu" bson:"zhihu"`
+	ServerChan        string       `json:"server_chan" bson:"server_chan"`
 }
 
 func NewBlotterVariables(vars []map[string]interface{}) (res BlotterVariables, err error) {

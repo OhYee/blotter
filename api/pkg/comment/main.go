@@ -14,6 +14,7 @@ import (
 	"github.com/OhYee/blotter/api/pkg/avatar"
 	"github.com/OhYee/blotter/api/pkg/email"
 	"github.com/OhYee/blotter/api/pkg/markdown"
+	"github.com/OhYee/blotter/api/pkg/serverchan"
 	"github.com/OhYee/blotter/mongo"
 )
 
@@ -168,7 +169,7 @@ func Add(url string, reply string, email string, recv bool, raw string) (err err
 	if err != nil {
 		return
 	}
-	go SendEmail(url, html, replyObjectID)
+	go SendEmail(url, raw, html, replyObjectID)
 
 	return
 }
@@ -240,7 +241,7 @@ func GetInfo(url string, id primitive.ObjectID) Info {
 }
 
 // SendEmail for comment
-func SendEmail(url string, html string, replyObjectID primitive.ObjectID) {
+func SendEmail(url string, raw string, html string, replyObjectID primitive.ObjectID) {
 	emailAddr, user, username, password, address, root, blogName, err := email.GetSMTPData()
 	if err != nil {
 		return
@@ -255,6 +256,8 @@ func SendEmail(url string, html string, replyObjectID primitive.ObjectID) {
 	if info.Recv {
 		to = append(to, info.Email)
 	}
+
+	go serverchan.Notify("新评论提醒", fmt.Sprintf("%s 在 [%s](%s) 发布了一条评论\n\n\n\n%s", info.Email, info.Title, root+url, raw))
 
 	output.Debug("Send email to %+v", to)
 	err = email.Send(
