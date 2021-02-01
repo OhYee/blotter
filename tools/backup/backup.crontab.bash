@@ -1,9 +1,11 @@
 #!/bin/bash
+export PATH=$PATH:/bin/:/sbin/:/usr/bin/:/usr/sbin/:/usr/local/bin/:/usr/local/sbin/:~/.local/bin/
+
 SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 NAME=`date '+%Y_%m_%d'`
 FILENAME="${SHELL_FOLDER}/backup/${NAME}"
-ONEDRIVE=$(cat tools/tools.conf | grep -E '^OneDrive\s+.+$' | tr -s " " | cut -d " " -f 2)
-SERVERCHAN=$(cat tools/tools.conf | grep -E '^ServerChan\s+.+$' | tr -s " " | cut -d " " -f 2)
+ONEDRIVE=$(cat ${SHELL_FOLDER}/../tools.conf | grep -E '^OneDrive\s+.+$' | tr -s " " | cut -d " " -f 2)
+SERVERCHAN=$(cat ${SHELL_FOLDER}/../tools.conf | grep -E '^ServerChan\s+.+$' | tr -s " " | cut -d " " -f 2)
 
 function notify() {
     if [[ -n ${SERVERCHAN} ]]; then
