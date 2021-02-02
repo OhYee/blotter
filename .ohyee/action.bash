@@ -41,7 +41,7 @@ else
     cd $FOLDER
 
     SCREEN_NAME="back"
-    bash $FOLDER/build.bash &>>$LOG_FILE
+    go generate &>>$LOG_FILE
     screen -S ${SCREEN_NAME} -X quit &>>$LOG_FILE
     screen -dmS ${SCREEN_NAME} ./blotter &>>$LOG_FILE
 
