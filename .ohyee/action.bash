@@ -19,7 +19,6 @@ if [[ -z $OHYEE_ACTION_AFTER_PULL ]]; then
         func_log "Update files"
 
         # 强制更新
-        cd $FOLDER
         git stash
         git fetch --all
         git reset --hard origin/master
@@ -38,8 +37,6 @@ else
     func_log "run action script"
 
     # 重新编译，并关闭原有程序，在 screen 启动当前程序
-    cd $FOLDER
-
     SCREEN_NAME="back"
     go generate &>>$LOG_FILE
     screen -S ${SCREEN_NAME} -X quit &>>$LOG_FILE
