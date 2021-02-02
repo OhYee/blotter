@@ -119,3 +119,8 @@ func (context *WebSocketContext) TemporarilyMoved(url string) {
 func (context *WebSocketContext) GetUser() *user.TypeDB {
 	return nil
 }
+
+// GetContext get global context
+func (context *WebSocketContext) GetContext(key string) (value interface{}, ok bool) {
+	return getContext(key)
+}

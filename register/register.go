@@ -2,14 +2,32 @@ package register
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/rainbow/errors"
 )
 
 var (
-	apiMap = make(map[string]HandleFunc)
+	apiMap   = make(map[string]HandleFunc)
+	ctx      = make(map[string]interface{})
+	ctxMutex = new(sync.RWMutex)
 )
+
+func getContext(key string) (value interface{}, ok bool) {
+	ctxMutex.RLock()
+	defer ctxMutex.RUnlock()
+	value, ok = ctx[key]
+	return
+}
+
+// SetContext set global context
+func SetContext(key string, value interface{}) {
+	ctxMutex.Lock()
+	defer ctxMutex.Unlock()
+	ctx[key] = value
+	return
+}
 
 // HandleFunc handle function type
 type HandleFunc func(context HandleContext) (err error)

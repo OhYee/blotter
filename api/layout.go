@@ -30,11 +30,22 @@ type LayoutResponse struct {
 	ADShow   string           `json:"ad_show"`
 	ADInner  string           `json:"ad_inner"`
 	ADText   string           `json:"ad_text"`
+	Version  string           `json:"back_version"`
 }
 
 // Layout get site base info
 func Layout(context register.HandleContext) (err error) {
 	res := LayoutResponse{}
+
+	v, ok := context.GetContext("version")
+	if !ok {
+		v = "UNKNOWN"
+	}
+	vs, ok := v.(string)
+	if !ok {
+		vs = "UNKNOWN"
+	}
+	res.Version = vs
 
 	res.Menus, err = menu.Get()
 	if err != nil {

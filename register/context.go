@@ -47,4 +47,7 @@ type HandleContext interface {
 
 	// GetUser get current user info
 	GetUser() *user.TypeDB
+
+	// GetContext get global context
+	GetContext(key string) (interface{}, bool)
 }
