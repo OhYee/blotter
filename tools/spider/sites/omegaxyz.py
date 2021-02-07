@@ -14,7 +14,7 @@ class OmegaXYZ(Site):
         return url == "https://www.omegaxyz.com/"
 
     def solver(self, url: str):
-        res = get(url)
+        res = get("%s/archive" % url.strip("/"))
         soup = BeautifulSoup(res, features="lxml")
         posts = []
         for item in soup.select("h3.rpwe-title"):
