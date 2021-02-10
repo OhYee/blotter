@@ -35,6 +35,7 @@ def auto_retry(method: str, url: str, timeout=30, verify=False, headers=_headers
             # 当站点编码方式设置错误时，可能会导致无法正确解码
             try:
                 rep = requests.request(
+                    method,
                     url,
                     timeout=timeout,
                     verify=verify,
