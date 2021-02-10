@@ -11,17 +11,40 @@ _headers = {
 }
 
 
-def auto_retry(sub):
+def auto_retry(method: str, url: str, timeout=30, verify=False, headers=_headers, **kwargs,):
     retry = 10
     rep = None
 
+    def gotException():
+        nonlocal retry
+        print("Get page error: {}, {} times left...".format(e, retry))
+        retry -= 1
+
     while retry > 0:
         try:
-            rep = sub()
+            rep = requests.request(
+                method,
+                url,
+                timeout=timeout,
+                verify=verify,
+                headers=headers,
+                **kwargs,
+            )
             break
+        except requests.exceptions.ContentDecodingError as e:
+            # 当站点编码方式设置错误时，可能会导致无法正确解码
+            try:
+                rep = requests.reques(
+                    url,
+                    timeout=timeout,
+                    verify=verify,
+                    headers={**headers, **{"Accept-Encoding": ""}}
+                )
+                break
+            except Exception as e:
+                gotException()
         except Exception as e:
-            print("Get page error: {}, {} times left...".format(e, retry))
-            retry -= 1
+            gotException()
 
     rep.encoding = 'utf-8'
     return rep.text
@@ -29,22 +52,18 @@ def auto_retry(sub):
 
 def get(url: str, headers={}):
     return auto_retry(
-        lambda: requests.get(
-            url,
-            timeout=30,
-            verify=False,
-            headers={**_headers, **headers}),
+        "get",
+        url,
+        headers={**_headers, **headers},
     )
 
 
 def post(url: str, data: object, headers={}):
     return auto_retry(
-        lambda: requests.post(
-            url,
-            data,
-            timeout=30,
-            verify=False,
-            headers={**_headers, **headers}),
+        "post",
+        url,
+        data=data,
+        headers={**_headers, **headers},
     )
 
 
