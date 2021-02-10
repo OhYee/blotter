@@ -34,7 +34,7 @@ def auto_retry(method: str, url: str, timeout=30, verify=False, headers=_headers
         except requests.exceptions.ContentDecodingError as e:
             # 当站点编码方式设置错误时，可能会导致无法正确解码
             try:
-                rep = requests.reques(
+                rep = requests.request(
                     url,
                     timeout=timeout,
                     verify=verify,
