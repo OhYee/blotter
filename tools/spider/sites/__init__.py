@@ -17,6 +17,7 @@ from .lylblog import Lylblog
 from .icskkk import ICSKKK
 from .wanglingyue import Wanglingyue
 from .yvonnecheung import Yvonnecheung
+from .summerfire import SummerFire
 
 sites = [
     Taifua(),
@@ -36,6 +37,7 @@ sites = [
     ICSKKK(),
     Wanglingyue(),
     Yvonnecheung(),
+    SummerFire(),
     
     Lylblog(),
     RSS(),
