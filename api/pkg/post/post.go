@@ -11,8 +11,6 @@ import (
 	fp "github.com/OhYee/goutils/functional"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	"github.com/yanyiwu/gojieba"
 )
 
 func min(a, b int64) int64 {
@@ -27,13 +25,6 @@ func max(a, b int64) int64 {
 	}
 	return b
 }
-
-var jieba = func() (jb *gojieba.Jieba) {
-	output.Log("Initial Jieba")
-	jb = gojieba.NewJieba()
-	output.Log("Initial Jieba finished")
-	return
-}()
 
 var (
 	htmlEscape, _     = regexp.Compile("<[^>]+>|\\s")
@@ -161,7 +152,7 @@ func getPosts(
 
 	words := fp.FilterString(func(s string, idx int) bool {
 		return len(strings.Replace(s, " ", "", -1)) != 0
-	}, jieba.CutForSearch(searchWord, true))
+	}, getJieba().CutForSearch(searchWord, true))
 
 	if len(words) > 0 {
 		s := make([]bson.M, len(searchFields)*len(words))
