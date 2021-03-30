@@ -41,7 +41,7 @@ else
     go generate &>>$LOG_FILE
     screen -S ${SCREEN_NAME} -X quit &>>$LOG_FILE
     screen -wipe &>>$LOG_FILE
-    screen -dmS ${SCREEN_NAME} ./blotter &>>$LOG_FILE
+    screen -dmS ${SCREEN_NAME} './blotter 1>>back.log 2>>back.err' &>>$LOG_FILE
 
     func_log "rebuild at $(date -u '+%Y-%m-%d %H:%M:%S')"
 fi
