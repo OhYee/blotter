@@ -7,6 +7,7 @@ import (
 	dot "github.com/OhYee/goldmark-dot"
 	ext "github.com/OhYee/goldmark-fenced_codeblock_extension"
 	img "github.com/OhYee/goldmark-image"
+	mermaid "github.com/OhYee/goldmark-mermaid"
 	uml "github.com/OhYee/goldmark-plantuml"
 	python "github.com/OhYee/goldmark-python"
 	qjskatex "github.com/graemephi/goldmark-qjs-katex"
@@ -21,6 +22,10 @@ import (
 )
 
 var exts = ext.NewExt(
+	ext.RenderMap{
+		Languages:      []string{"mermaid"},
+		RenderFunction: mermaid.NewMermaid(50, "mermaid").Renderer,
+	},
 	ext.RenderMap{
 		Languages:      []string{"dot-svg"},
 		RenderFunction: dot.NewDot(50, "dot-svg").Renderer,

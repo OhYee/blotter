@@ -8,6 +8,7 @@ require (
 	github.com/OhYee/goldmark-dot v1.0.3
 	github.com/OhYee/goldmark-fenced_codeblock_extension v1.0.0
 	github.com/OhYee/goldmark-image v1.0.0
+	github.com/OhYee/goldmark-mermaid v0.0.1
 	github.com/OhYee/goldmark-plantuml v1.0.3
 	github.com/OhYee/goldmark-python v0.0.3
 	github.com/OhYee/goutils v1.1.1
@@ -34,11 +35,9 @@ require (
 	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c // indirect
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
-	golang.org/x/sys v0.0.0-20201202213521-69691e467435 // indirect
 	golang.org/x/text v0.3.4 // indirect
 	google.golang.org/genproto v0.0.0-20201203001206-6486ece9c497 // indirect
 	google.golang.org/grpc v1.34.0 // indirect
-
 )
 
 replace github.com/yanyiwu/gojieba v1.1.2 => github.com/ttys3/gojieba v1.1.3
