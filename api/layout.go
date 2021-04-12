@@ -5,6 +5,7 @@ import (
 	"github.com/OhYee/blotter/api/pkg/menu"
 	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/variable"
+	"github.com/OhYee/rainbow/log"
 
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/register"
@@ -14,7 +15,7 @@ import (
 // LayoutResponse response of layout api
 type LayoutResponse struct {
 	Menus    []menu.Type      `json:"menus"`
-	View     int              `json:"view"`
+	View     int64            `json:"view"`
 	Beian    string           `json:"beian"`
 	BlogName string           `json:"blog_name"`
 	Friends  []friends.Simple `json:"friends"`
@@ -59,55 +60,57 @@ func Layout(context register.HandleContext) (err error) {
 	if err != nil {
 		return
 	}
-	res.View = int(m["view"].(float64))
 
+	if err = m.SetInt64("view", &res.View); err != nil {
+		log.Error.Println(err)
+	}
 	if err = m.SetString("beian", &res.Beian); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("blog_name", &res.BlogName); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("email", &res.Email); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("github", &res.Github); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("qq", &res.QQ); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if res.Friends, err = friends.GetSimpleFriends(); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetBool("grey", &res.Grey, false); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("root", &res.Root); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("avatar", &res.Avatar); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("author", &res.Author); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("from", &res.From); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("head", &res.Head); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("ad_show", &res.ADShow); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("ad_inner", &res.ADInner); err != nil {
-		return
+		log.Error.Println(err)
 	}
 	if err = m.SetString("ad_text", &res.ADText); err != nil {
-		return
+		log.Error.Println(err)
 	}
 
-	context.ReturnJSON(res)
+	err = context.ReturnJSON(res)
 	return
 }
 

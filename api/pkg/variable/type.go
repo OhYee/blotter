@@ -53,11 +53,28 @@ func (v Variables) SetInt64(key string, value *int64) (err error) {
 		err = errors.New("Can not get value of %s", key)
 		return
 	}
-	if *value, ok = t.(int64); !ok {
+
+	switch t.(type) {
+	case int:
+		*value = int64(t.(int))
+	case int8:
+		*value = int64(t.(int8))
+	case int16:
+		*value = int64(t.(int16))
+	case int32:
+		*value = int64(t.(int32))
+	case int64:
+		*value = int64(t.(int64))
+	case float32:
+		*value = int64(t.(float32))
+	case float64:
+		*value = int64(t.(float64))
+	default:
 		err = errors.New("Value of %s is %s %T, not %t", key, t, *value)
 		return
 	}
-	return err
+
+	return
 }
 
 // SetArray set value of key to int64
