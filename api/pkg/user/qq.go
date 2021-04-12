@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// QQConn QQ connect object
-var QQConn = func() (conn *qq.Connect) {
+// GetQQConn QQ connect object
+func GetQQConn() (conn *qq.Connect) {
 	conn = qq.New("", "", "")
 
 	var id, key, redirect string
@@ -30,20 +30,22 @@ var QQConn = func() (conn *qq.Connect) {
 	}
 	conn = qq.New(id, key, redirect)
 	return
-}()
+}
 
 // QQConnect connect qq and return user data
 func QQConnect(code string) (token, openID, unionID string, res qq.UserInfo, err error) {
-	token, err = QQConn.Auth(code)
+	qqConn := GetQQConn()
+
+	token, err = qqConn.Auth(code)
 	if err != nil {
 		return
 	}
 
-	_, openID, unionID, err = QQConn.OpenID(token)
+	_, openID, unionID, err = qqConn.OpenID(token)
 	if err != nil {
 		return
 	}
-	res, err = QQConn.Info(token, openID)
+	res, err = qqConn.Info(token, openID)
 	if err != nil {
 		return
 	}

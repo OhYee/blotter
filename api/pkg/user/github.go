@@ -8,8 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// GithubConn github connect object
-var GithubConn = func() (conn *github.Connect) {
+func GetGithubConnect() (conn *github.Connect) {
 	conn = github.New("", "", "")
 
 	var id, secret, redirect string
@@ -28,15 +27,17 @@ var GithubConn = func() (conn *github.Connect) {
 	}
 	conn = github.New(id, secret, redirect)
 	return
-}()
+}
 
 // GithubConnect connect github and return user data
 func GithubConnect(code string, state string) (token string, res github.UserInfo, err error) {
-	token, err = GithubConn.Auth(code, state)
+	githubConn := GetGithubConnect()
+
+	token, err = githubConn.Auth(code, state)
 	if err != nil {
 		return
 	}
-	res, err = GithubConn.Info(token)
+	res, err = githubConn.Info(token)
 	if err != nil {
 		return
 	}

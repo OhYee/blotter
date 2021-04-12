@@ -10,8 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var clientOptions = options.Client().ApplyURI("mongodb://127.0.0.1:27017")
-
 type countResult struct {
 	Count int64 `bson:"count"`
 }
@@ -29,7 +27,7 @@ func NewConn(databaseName string, collectionName string) (conn *Conn, err error)
 	}()
 	conn = &Conn{}
 
-	conn.Client, err = mongo.Connect(context.TODO(), clientOptions)
+	conn.Client, err = mongo.Connect(context.TODO(), getClientOptions())
 	if err != nil {
 		return
 	}

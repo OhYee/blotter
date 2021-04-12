@@ -115,7 +115,7 @@ func JumpToQQ(context register.HandleContext) (err error) {
 	context.RequestArgs(args)
 
 	context.TemporarilyMoved(
-		user.QQConn.LoginPage(
+		user.GetQQConn().LoginPage(
 			condition.IfString(
 				args.State == "",
 				context.GetRequest().Header.Get("referer"),
@@ -297,14 +297,16 @@ func RegisterUser(context register.HandleContext) (err error) {
 }
 
 func SyncQQAvatar(context register.HandleContext) (err error) {
+	qqConn := user.GetQQConn()
+
 	u := context.GetUser()
 	if u == nil {
-		context.TemporarilyMoved(user.QQConn.LoginPage("avatar"))
+		context.TemporarilyMoved(qqConn.LoginPage("avatar"))
 		return
 	}
-	res, err := user.QQConn.Info(u.QQToken, u.QQOpenID)
+	res, err := qqConn.Info(u.QQToken, u.QQOpenID)
 	if err != nil {
-		context.TemporarilyMoved(user.QQConn.LoginPage("avatar"))
+		context.TemporarilyMoved(qqConn.LoginPage("avatar"))
 		return
 	}
 	if err = u.UpdateFields(map[string]string{"avatar": strings.Replace(res.FigQQ, "http://", "https://", 1)}); err != nil {
@@ -324,7 +326,7 @@ func JumpToGithub(context register.HandleContext) (err error) {
 	context.RequestArgs(args)
 
 	context.TemporarilyMoved(
-		user.GithubConn.LoginPage(
+		user.GetGithubConnect().LoginPage(
 			condition.IfString(
 				args.State == "",
 				context.GetRequest().Header.Get("referer"),
