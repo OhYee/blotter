@@ -57,9 +57,10 @@ type PublicProps struct {
 
 // EditProps extra props for editing
 type EditProps struct {
-	Raw       string   `json:"raw" bson:"raw"`
-	Keywords  []string `json:"keywords" bson:"keywords"`
-	Published bool     `json:"published" bson:"published"`
+	Raw      string   `json:"raw" bson:"raw"`
+	Keywords []string `json:"keywords" bson:"keywords"`
+	Status   int8     `json:"status" bson:"status"`
+	// Published bool     `json:"published" bson:"published"`
 }
 
 /*
@@ -72,8 +73,9 @@ type EditProps struct {
 type AdminField struct {
 	CardProps `bson:",inline"`
 	ID        string     `json:"id" bson:"_id"`
-	Published bool       `json:"published" bson:"published"`
+	Status    int8       `json:"status" bson:"status"`
 	Tags      []tag.Type `json:"tags" bson:"tags"`
+	// Published bool       `json:"published" bson:"published"`
 }
 
 // ToCardDB transfer PostCard to PostCardDB
@@ -85,7 +87,7 @@ func (post AdminField) ToCardDB() AdminFieldDB {
 	return AdminFieldDB{
 		ID:        id,
 		CardProps: post.CardProps,
-		Published: post.Published,
+		Status:    post.Status,
 		Tags:      post.Tags,
 	}
 }
@@ -94,8 +96,9 @@ func (post AdminField) ToCardDB() AdminFieldDB {
 type AdminFieldDB struct {
 	CardProps `bson:",inline"`
 	ID        primitive.ObjectID `json:"id" bson:"_id"`
-	Published bool               `json:"published" bson:"published"`
+	Status    int8               `json:"status" bson:"status"`
 	Tags      []tag.Type         `json:"tags" bson:"tags"`
+	Published bool               `json:"published" bson:"published"`
 }
 
 // ToCard transfer PostCardDB to PostCard
@@ -103,7 +106,7 @@ func (post AdminFieldDB) ToCard() AdminField {
 	return AdminField{
 		ID:        post.ID.Hex(),
 		CardProps: post.CardProps,
-		Published: post.Published,
+		Status:    post.Status,
 		Tags:      post.Tags,
 	}
 }
@@ -209,7 +212,7 @@ func (post SortPost) ToAdminDB() AdminFieldDB {
 	return AdminFieldDB{
 		CardProps: post.CardProps,
 		ID:        post.ID,
-		Published: post.Published,
+		Status:    post.Status,
 		Tags:      post.Tags,
 	}
 }

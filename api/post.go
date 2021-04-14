@@ -148,10 +148,11 @@ type PostEditRequest struct {
 	View        int64    `json:"view"`
 	PublishTime int64    `json:"publish_time"`
 	EditTime    int64    `json:"edit_time"`
-	Published   bool     `json:"published"`
+	Status      int8     `json:"status"`
 	Raw         string   `json:"raw"`
 	Tags        []string `json:"tags"`
 	Images      []string `json:"images"`
+	// Published   bool     `json:"published"`
 }
 
 func PostEdit(context register.HandleContext) (err error) {
@@ -176,7 +177,7 @@ func PostEdit(context register.HandleContext) (err error) {
 			args.Raw,
 			args.Tags,
 			[]string{},
-			args.Published,
+			args.Status,
 			args.HeadImage,
 			args.Images,
 		)
@@ -198,7 +199,7 @@ func PostEdit(context register.HandleContext) (err error) {
 			args.Raw,
 			args.Tags,
 			[]string{},
-			args.Published,
+			args.Status,
 			args.HeadImage,
 			args.Images,
 		)

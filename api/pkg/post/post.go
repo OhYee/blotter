@@ -51,7 +51,7 @@ func Query(pipeline []bson.M, res interface{}) (total int64, err error) {
 }
 
 // QueryByURL query post by url
-func QueryByURL(url string, post interface{}, project bson.M) (total int64, err error) {
+func QueryByURL(url string, post interface{}, statusPipeline bson.M, project bson.M) (total int64, err error) {
 	pipeline := []bson.M{
 		{
 			"$match": bson.M{
@@ -70,6 +70,9 @@ func QueryByURL(url string, post interface{}, project bson.M) (total int64, err 
 			},
 		},
 	}
+	if statusPipeline != nil {
+		pipeline = append(pipeline, statusPipeline)
+	}
 	if project != nil {
 		pipeline = append(pipeline, bson.M{"$project": project})
 	}
@@ -82,7 +85,7 @@ func QueryByURL(url string, post interface{}, project bson.M) (total int64, err 
 // GetAllFieldPost get all field post
 func GetAllFieldPost(url string) (post CompleteField, err error) {
 	postsDB := make([]CompleteFieldDB, 0)
-	cnt, err := QueryByURL(url, &postsDB, nil)
+	cnt, err := QueryByURL(url, &postsDB, nil, nil)
 	if cnt > 0 {
 		post = postsDB[0].ToPost()
 	}
@@ -92,7 +95,12 @@ func GetAllFieldPost(url string) (post CompleteField, err error) {
 // GetPublicFieldPost get all field post
 func GetPublicFieldPost(url string) (post PublicField, err error) {
 	postsDB := make([]PublicFieldDB, 0)
-	cnt, err := QueryByURL(url, &postsDB, nil)
+	cnt, err := QueryByURL(url, &postsDB, bson.M{
+		"$match": bson.M{"$or": []bson.M{
+			{"status": 1}, // 隐藏
+			{"status": 2}, // 发布
+		}},
+	}, nil)
 	if cnt > 0 {
 		post = postsDB[0].ToPost()
 	}
@@ -110,7 +118,7 @@ func IncView(url string) {
 }
 
 func getPosts(
-	publishedOnly bool,
+	status int8,
 	offset int64, number int64,
 	withTags []string,
 	withoutTags []string,
@@ -128,10 +136,10 @@ func getPosts(
 	}
 	pipeline := []bson.M{}
 
-	if publishedOnly {
+	if status != -1 {
 		pipeline = append(
 			pipeline,
-			bson.M{"$match": bson.M{"published": true}},
+			bson.M{"$match": bson.M{"status": status}},
 		)
 	}
 
@@ -229,7 +237,7 @@ func GetCardPosts(
 	searchWord string, searchFields []string,
 ) (total int64, posts []CardField, err error) {
 	postsDB := make([]CardField, 0)
-	total, err = getPosts(true, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
+	total, err = getPosts(2, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
 
 	posts = make([]CardField, len(postsDB))
 	for idx, post := range postsDB {
@@ -247,7 +255,7 @@ func GetAdminPosts(
 	searchWord string, searchFields []string,
 ) (total int64, posts []AdminField, err error) {
 	postsDB := make([]AdminFieldDB, 0)
-	total, err = getPosts(false, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
+	total, err = getPosts(-1, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
 
 	posts = make([]AdminField, len(postsDB))
 	for idx, post := range postsDB {
@@ -274,7 +282,8 @@ func NewPost(
 	raw string,
 	tags []string,
 	keywords []string,
-	published bool,
+	status int8,
+	// published bool,
 	headImage string,
 	images []string,
 ) (err error) {
@@ -302,7 +311,8 @@ func NewPost(
 	p.Raw = raw
 	p.Tags = tagsID
 	p.Keywords = keywords
-	p.Published = published
+	p.Status = status
+	// p.Published = published
 	p.HeadImage = headImage
 	p.Images = images
 	p.Length = int64(CalcPostLength(html))
@@ -328,7 +338,8 @@ func UpdatePost(
 	raw string,
 	tags []string,
 	keywords []string,
-	published bool,
+	// published bool,
+	status int8,
 	headImage string,
 	images []string,
 ) (err error) {
@@ -359,7 +370,8 @@ func UpdatePost(
 	p.Raw = raw
 	p.Tags = tagsID
 	p.Keywords = keywords
-	p.Published = published
+	p.Status = status
+	// p.Published = published
 	p.HeadImage = headImage
 	p.Images = images
 	p.Length = int64(CalcPostLength(html))
