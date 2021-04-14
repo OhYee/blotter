@@ -14,24 +14,25 @@ import (
 
 // LayoutResponse response of layout api
 type LayoutResponse struct {
-	Menus    []menu.Type      `json:"menus"`
-	View     int64            `json:"view"`
-	Beian    string           `json:"beian"`
-	BlogName string           `json:"blog_name"`
-	Friends  []friends.Simple `json:"friends"`
-	Email    string           `json:"email"`
-	QQ       string           `json:"qq"`
-	Github   string           `json:"github"`
-	Grey     bool             `json:"grey"`
-	Root     string           `json:"root"`
-	Avatar   string           `json:"avatar"`
-	Author   string           `json:"author"`
-	From     string           `json:"from"`
-	Head     string           `json:"head"`
-	ADShow   string           `json:"ad_show"`
-	ADInner  string           `json:"ad_inner"`
-	ADText   string           `json:"ad_text"`
-	Version  string           `json:"back_version"`
+	Menus     []menu.Type      `json:"menus"`
+	View      int64            `json:"view"`
+	Beian     string           `json:"beian"`
+	BlogName  string           `json:"blog_name"`
+	Friends   []friends.Simple `json:"friends"`
+	Email     string           `json:"email"`
+	QQ        string           `json:"qq"`
+	Github    string           `json:"github"`
+	Grey      bool             `json:"grey"`
+	Root      string           `json:"root"`
+	Avatar    string           `json:"avatar"`
+	Author    string           `json:"author"`
+	From      string           `json:"from"`
+	Head      string           `json:"head"`
+	ADShow    string           `json:"ad_show"`
+	ADInner   string           `json:"ad_inner"`
+	ADText    string           `json:"ad_text"`
+	Version   string           `json:"back_version"`
+	EasterEgg string           `json:"easter_egg"`
 }
 
 // Layout get site base info
@@ -56,6 +57,7 @@ func Layout(context register.HandleContext) (err error) {
 	m, err := variable.Get(
 		"beian", "view", "blog_name", "email", "github", "qq", "grey", "root",
 		"author", "avatar", "from", "head", "ad_inner", "ad_show", "ad_text",
+		"easter_egg",
 	)
 	if err != nil {
 		return
@@ -107,6 +109,9 @@ func Layout(context register.HandleContext) (err error) {
 		log.Error.Println(err)
 	}
 	if err = m.SetString("ad_text", &res.ADText); err != nil {
+		log.Error.Println(err)
+	}
+	if err = m.SetString("easter_egg", &res.EasterEgg); err != nil {
 		log.Error.Println(err)
 	}
 
