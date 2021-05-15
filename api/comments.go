@@ -130,3 +130,33 @@ func AdminCommentSet(context register.HandleContext) (err error) {
 	err = context.ReturnJSON(res)
 	return
 }
+
+// AdminCommentDeleteRequest request for AdminCommentDelete api
+type AdminCommentDeleteRequest struct {
+	ID string `json:"id" bson:"id"`
+}
+
+// AdminCommentDeleteResponse response for AdminCommentDelete api
+type AdminCommentDeleteResponse SimpleResponse
+
+// AdminCommentDelete api for updating admin comments page
+func AdminCommentDelete(context register.HandleContext) (err error) {
+	if !context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
+
+	args := new(AdminCommentDeleteRequest)
+	res := new(AdminCommentDeleteResponse)
+	context.RequestArgs(args)
+
+	if err = comment.Delete(args.ID); err != nil {
+		return
+	}
+
+	res.Success = true
+	res.Title = "删除成功"
+
+	err = context.ReturnJSON(res)
+	return
+}

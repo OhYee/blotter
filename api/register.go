@@ -147,6 +147,10 @@ func Register() {
 		AdminCommentSet,
 	)
 	register.Register(
+		"admin/comment/delete",
+		AdminCommentDelete,
+	)
+	register.Register(
 		"user/qq_connect",
 		QQ,
 	)
