@@ -7,6 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+const databaseName = "variables"
+
 var variablesFilter = bson.M{
 	"key": bson.M{"$nin": []string{"token", "password"}},
 }
@@ -18,7 +20,7 @@ func Get(keys ...string) (res Variables, err error) {
 	data := make([]map[string]interface{}, 0)
 	_, err = mongo.Find(
 		"blotter",
-		"variables",
+		databaseName,
 		bson.M{
 			"key": bson.M{
 				"$in": keys,
@@ -41,7 +43,7 @@ func GetAll() (res BlotterVariables, err error) {
 	temp := make([]map[string]interface{}, 0)
 	if _, err = mongo.Find(
 		"blotter",
-		"variables",
+		databaseName,
 		variablesFilter,
 		nil,
 		&temp,
@@ -58,7 +60,7 @@ func SetMany(vars ...Type) (err error) {
 
 	_, err = mongo.Remove(
 		"blotter",
-		"variables",
+		databaseName,
 		variablesFilter,
 		nil,
 	)
@@ -68,7 +70,7 @@ func SetMany(vars ...Type) (err error) {
 
 	_, err = mongo.Add(
 		"blotter",
-		"variables",
+		databaseName,
 		nil,
 		transfer.ToInterfaceSlice(vars)...,
 	)

@@ -289,3 +289,13 @@ func Set(id string, ad bool, show bool, recv bool) (err error) {
 	}, nil)
 	return
 }
+
+// Delete comment state by id
+func Delete(id string) (err error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return
+	}
+	_, err = mongo.Remove("blotter", "comments", bson.M{"_id": objectID}, nil)
+	return
+}
