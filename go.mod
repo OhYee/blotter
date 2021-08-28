@@ -10,8 +10,8 @@ require (
 	github.com/OhYee/goldmark-image v1.0.0
 	github.com/OhYee/goldmark-mermaid v0.0.1
 	github.com/OhYee/goldmark-plantuml v1.0.3
-	github.com/OhYee/goldmark-python v0.0.3
-	github.com/OhYee/goutils v1.1.1
+	github.com/OhYee/goldmark-python v0.0.5
+	github.com/OhYee/goutils v1.1.5
 	github.com/OhYee/gowechat v0.0.1
 	github.com/OhYee/rainbow v1.0.6
 	github.com/alecthomas/chroma v0.8.2 // indirect
@@ -26,6 +26,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.0
 	github.com/qiniu/api.v7/v7 v7.7.0
 	github.com/refraction-networking/utls v0.0.0-20201112193908-f7e7360167ed // indirect
+	github.com/robfig/cron v1.2.0 // indirect
 	github.com/v2fly/vmessping v0.3.4
 	github.com/yanyiwu/gojieba v1.1.2
 	github.com/yuin/goldmark v1.2.1
