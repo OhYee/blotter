@@ -233,3 +233,23 @@ func StringToObjectIDs(idStrings ...string) (ids []primitive.ObjectID) {
 	}
 	return ids
 }
+
+func CollectionExists(databaseName string, collectionName string) (exist bool, err error) {
+	conn, err := NewConn(databaseName, collectionName)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	db := conn.Client.Database(databaseName)
+
+	cursor, err := db.ListCollections(context.TODO(), bson.M{"name": collectionName})
+	defer cursor.Close(context.TODO())
+
+	if err != nil {
+		return
+	}
+
+	exist = cursor.TryNext(context.TODO())
+	return
+}
