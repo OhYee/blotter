@@ -5,8 +5,10 @@
 _date=$(date '+%Y-%m-%d %H:%M:%S')
 _branch=$(git rev-parse --abbrev-ref HEAD); _branch="${_branch}@"
 _version=$(git describe --abbrev=0 --tags 2>/dev/null); if [[ -z $_version ]]; then _version="v0.0.0"; fi
-_ldflags="${_branch}${_version} (${_date})"
+_blotter_version="${_branch}${_version} (${_date})"
 
-go build -ldflags "-X 'main._version=${_ldflags}'"
+echo ${_blotter_version}
 
-unset _date _branch _version _ldflags
+CGO_ENABLED=1 go build -ldflags "-X 'main._version=${_blotter_version}' -extldflags '-static -s -w -fpic'" 
+
+unset _date _branch _version _blotter_version
