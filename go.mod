@@ -31,12 +31,11 @@ require (
 	github.com/yanyiwu/gojieba v1.1.2
 	github.com/yuin/goldmark v1.2.1
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
-	go.mongodb.org/mongo-driver v1.4.4
+	go.mongodb.org/mongo-driver v1.5.1
 	go.starlark.net v0.0.0-20201202183632-a7839910dcbe // indirect
 	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c // indirect
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
-	golang.org/x/text v0.3.4 // indirect
 	google.golang.org/genproto v0.0.0-20201203001206-6486ece9c497 // indirect
 	google.golang.org/grpc v1.34.0 // indirect
 )
