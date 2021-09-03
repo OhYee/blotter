@@ -195,6 +195,7 @@ type BlotterVariables struct {
 	Zhihu             string       `json:"zhihu" bson:"zhihu"`
 	ServerChan        string       `json:"server_chan" bson:"server_chan"`
 	EasterEgg         string       `json:"easter_egg"`
+	Notification      string       `json:"notification"`
 }
 
 func NewBlotterVariables(vars []map[string]interface{}) (res BlotterVariables, err error) {
