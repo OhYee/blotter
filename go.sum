@@ -22,14 +22,10 @@ github.com/OhYee/goldmark-mermaid v0.0.1 h1:JMz6Cf56Ufhnl1LkpbOOs58El4LqapkKDdfo
 github.com/OhYee/goldmark-mermaid v0.0.1/go.mod h1:0yEa4f17mT1oFoJ9VywD492b72fPGKWxvvZ66X0zAzo=
 github.com/OhYee/goldmark-plantuml v1.0.3 h1:389cHtH62y5dkR6koDIwHGVjumEDRoqZHDeGDKII50s=
 github.com/OhYee/goldmark-plantuml v1.0.3/go.mod h1:zE5P5zsEryMcwTTM5UP+tqB0fSxlb9f2shF7tyOeRB4=
-github.com/OhYee/goldmark-python v0.0.3 h1:7XuVVGVxmIy8911daieNlTku7EPgHQOhVC81Qf6c1wI=
-github.com/OhYee/goldmark-python v0.0.3/go.mod h1:JsCOXNYWrZ7+2i7J1astUN4exClzVci38Y4saHXZMRI=
-github.com/OhYee/goldmark-python v0.0.4 h1:GPI6/mVB+5KVSEYmaK0T5gL4oK3fGqCAVRgmyQs7ULA=
-github.com/OhYee/goldmark-python v0.0.4/go.mod h1:JsCOXNYWrZ7+2i7J1astUN4exClzVci38Y4saHXZMRI=
+github.com/OhYee/goldmark-python v0.0.5 h1:rZNqa623Kc6L4PHSi6f5hlutIV71Zu5+Jp/N15+lX3U=
+github.com/OhYee/goldmark-python v0.0.5/go.mod h1:JsCOXNYWrZ7+2i7J1astUN4exClzVci38Y4saHXZMRI=
 github.com/OhYee/goutils v0.0.0-20200402075346-bfaa3d7ac10e/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/goutils v1.1.0/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
-github.com/OhYee/goutils v1.1.1 h1:bYFaT03KsT6Jry+5bkA9ySZvkvsyqQF8tHRV6l5LOU0=
-github.com/OhYee/goutils v1.1.1/go.mod h1:RqaQ1bD+sQAq7zQ/1vAtaojWoFznhAFdWDsMZr7SgkA=
 github.com/OhYee/goutils v1.1.5 h1:53RGxlfc8pgDP+ipBjh+Vb7TCpdaE9mooyNviOGG9SA=
 github.com/OhYee/goutils v1.1.5/go.mod h1:a0LN8uy8eh26x+65ArEr6MKYCPl5ndy+yrEecBH3Pz8=
 github.com/OhYee/gowechat v0.0.1 h1:4xWbGkLwQqTv9naoz4Y8q81X1o9Y+5yPIcqgYaBe304=
@@ -242,8 +238,6 @@ github.com/yuin/goldmark v1.1.22/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.1.30/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1 h1:ruQGxdhGHe7FWOJPT0mKs5+pD2Xs1Bm/kdGlHO04FmM=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
-github.com/yuin/goldmark v1.4.0 h1:OtISOGfH6sOWa1/qXqqAiOIAO6Z5J3AEAE18WAq6BiQ=
-github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691 h1:VWSxtAiQNh3zgHJpdpkpVYjTPqRE3P6UZCOPa1nRDio=
 github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691/go.mod h1:YLF3kDffRfUH/bTxOxHhV6lxwIB3Vfj91rEwNMS9MXo=
 go.mongodb.org/mongo-driver v1.4.4 h1:bsPHfODES+/yx2PCWzUYMH8xj6PVniPI8DQrsJuSXSs=

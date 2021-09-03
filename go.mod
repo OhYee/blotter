@@ -26,7 +26,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.0
 	github.com/qiniu/api.v7/v7 v7.7.0
 	github.com/refraction-networking/utls v0.0.0-20201112193908-f7e7360167ed // indirect
-	github.com/robfig/cron v1.2.0 // indirect
+	github.com/robfig/cron v1.2.0
 	github.com/v2fly/vmessping v0.3.4
 	github.com/yanyiwu/gojieba v1.1.2
 	github.com/yuin/goldmark v1.2.1
