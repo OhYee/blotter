@@ -39,3 +39,21 @@ func SetFriends(fs []Friend) (err error) {
 	)
 	return
 }
+
+func SetFriendPosts(url string, posts []FriendPost) (err error) {
+	_, err = mongo.Update(
+		"blotter",
+		"friends",
+		bson.M{
+			"link": url,
+		},
+		bson.M{
+			"$set": bson.M{
+				"posts": posts,
+				"error": len(posts) == 0,
+			},
+		},
+		nil,
+	)
+	return
+}

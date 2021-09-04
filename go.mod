@@ -16,6 +16,7 @@ require (
 	github.com/OhYee/rainbow v1.0.6
 	github.com/alecthomas/chroma v0.8.2 // indirect
 	github.com/aws/aws-sdk-go v1.36.1 // indirect
+	github.com/chromedp/chromedp v0.7.4 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
@@ -24,6 +25,7 @@ require (
 	github.com/graemephi/goldmark-qjs-katex v0.3.0
 	github.com/klauspost/compress v1.11.3 // indirect
 	github.com/mitchellh/mapstructure v1.4.0
+	github.com/mmcdole/gofeed v1.1.3 // indirect
 	github.com/qiniu/api.v7/v7 v7.7.0
 	github.com/refraction-networking/utls v0.0.0-20201112193908-f7e7360167ed // indirect
 	github.com/robfig/cron v1.2.0

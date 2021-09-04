@@ -2,14 +2,15 @@ package output
 
 import (
 	"fmt"
+	"runtime"
+
 	"github.com/OhYee/rainbow/color"
 	"github.com/OhYee/rainbow/log"
-	"runtime"
 )
 
 var (
 	// ErrOutput meesage output
-	ErrOutput = log.New().SetColor(color.New().SetFrontRed().SetFontBold())
+	ErrOutput = log.New().SetColor(color.New().SetFrontRed().SetFontBold()).SetPrefix(withInfo)
 	// LogOutput message output
 	LogOutput = log.New().SetSuffix(withNewLine)
 	// DebugOutput debug message output
@@ -36,8 +37,7 @@ func withNewLine(s string) string {
 }
 
 func withInfo(s string) string {
-
-	_, file, line, ok := runtime.Caller(4)
+	_, file, line, ok := runtime.Caller(3)
 	if ok {
 		return color.New().SetFontBold().Colorful(
 			fmt.Sprintf("%s:%d\n\t", file, line),

@@ -119,6 +119,10 @@ func Register() {
 		SetFriends,
 	)
 	register.Register(
+		"admin/friends/spider",
+		CrawlPosts,
+	)
+	register.Register(
 		"view",
 		View,
 	)
