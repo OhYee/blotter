@@ -2,52 +2,35 @@ package spider
 
 import (
 	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	utime "github.com/OhYee/goutils/time"
 )
 
 type timeFinder struct {
-	Regexp     *regexp.Regexp
-	TimeFormat string
+	Regexp         *regexp.Regexp
+	TimeFormat     string
+	TimeFormatFunc func(string) *time.Time
 }
 
 var timeFinders = []timeFinder{
 	{
-		Regexp:     regexp.MustCompile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}"),
-		TimeFormat: "2006-01-02 15:04:05",
+		Regexp:         regexp.MustCompile("\\d{2,4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}"),
+		TimeFormatFunc: func(s string) *time.Time { return splitDateTime(s, "-", ":", " ") },
 	},
 	{
-		Regexp:     regexp.MustCompile("\\d{4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}"),
-		TimeFormat: "2006-1-2 15:4:5",
+		Regexp:         regexp.MustCompile("\\d{2,4}/\\d{1,2}/\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}"),
+		TimeFormatFunc: func(s string) *time.Time { return splitDateTime(s, "/", ":", " ") },
 	},
 	{
-		Regexp:     regexp.MustCompile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}"),
-		TimeFormat: "2006/01/02 15:04:05",
+		Regexp:         regexp.MustCompile("\\d{2,4}-\\d{1,2}-\\d{1,2}"),
+		TimeFormatFunc: func(s string) *time.Time { return splitDate(s, "-") },
 	},
 	{
-		Regexp:     regexp.MustCompile("\\d{4}/\\d{1,2}/\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}"),
-		TimeFormat: "2006/1/2 15:4:5",
-	},
-	{
-		Regexp:     regexp.MustCompile("\\d{4}-\\d{2}-\\d{2}"),
-		TimeFormat: "2006-01-02",
-	},
-	{
-		Regexp:     regexp.MustCompile("\\d{4}-\\d{1,2}-\\d{1,2}"),
-		TimeFormat: "2006-1-2",
-	},
-	{
-		Regexp:     regexp.MustCompile("\\d{4}/\\d{2}/\\d{2}"),
-		TimeFormat: "2006/01/02",
-	},
-	{
-		Regexp:     regexp.MustCompile("\\d{4}/\\d{1,2}/\\d{1,2}"),
-		TimeFormat: "2006/1/2",
-	},
-	{
-		Regexp:     regexp.MustCompile("\\d{2}/\\d{1,2}/\\d{1,2}"),
-		TimeFormat: "06/1/2",
+		Regexp:         regexp.MustCompile("\\d{2,4}/\\d{1,2}/\\d{1,2}"),
+		TimeFormatFunc: func(s string) *time.Time { return splitDate(s, "/") },
 	},
 	{
 		Regexp:     regexp.MustCompile("[a-zA-Z]{2,4} \\d{2}, \\d{4}"),
@@ -63,10 +46,14 @@ func parseTime(s string) *time.Time {
 	for _, r := range timeFinders {
 		result := r.Regexp.FindAllString(s, -1)
 		for _, timeString := range result {
-			t, err := time.ParseInLocation(r.TimeFormat, timeString, utime.ChinaTimeZone)
-			// output.DebugOutput.Println(timeString, err)
-			if err == nil {
-				return &t
+			if r.TimeFormatFunc == nil {
+				if t, err := time.ParseInLocation(r.TimeFormat, timeString, utime.ChinaTimeZone); err == nil {
+					return &t
+				}
+			} else {
+				if t := r.TimeFormatFunc(timeString); t != nil {
+					return t
+				}
 			}
 		}
 	}
@@ -78,4 +65,63 @@ func toUnix(t *time.Time) int64 {
 		return 0
 	}
 	return t.Unix()
+}
+
+func toInt(s string) int {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return 0
+	}
+	return n
+}
+
+func splitInts(s string, char string) (int, int, int) {
+	slice := strings.Split(s, char)
+	if len(slice) != 3 {
+		return 0, 0, 0
+	}
+	return toInt(slice[0]), toInt(slice[1]), toInt(slice[2])
+}
+
+func splitDate(s string, char string) *time.Time {
+	slice := strings.Split(s, char)
+	if len(slice) != 3 {
+		return nil
+	}
+
+	year, month, day := splitInts(s, char)
+	if year == 0 || month < 1 || month > 12 || day < 1 || day > 31 {
+		return nil
+	}
+	if year < 100 {
+		year += 2000
+	}
+
+	t := time.Date(year, time.Month(month), day, 0, 0, 0, 0, utime.ChinaTimeZone)
+	return &t
+}
+
+func splitDateTime(s string, char string, char2 string, char3 string) *time.Time {
+	slice := strings.Split(s, char)
+	if len(slice) != 3 {
+		return nil
+	}
+
+	dateSlice := strings.Split(s, char3)
+	if len(dateSlice) != 2 {
+		return nil
+	}
+
+	year, month, day := splitInts(dateSlice[0], char)
+	hour, minute, second := splitInts(dateSlice[1], char2)
+	if year == 0 || month < 1 || month > 12 || day < 1 || day > 31 ||
+		hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59 {
+		return nil
+	}
+	if year < 100 {
+		year += 2000
+	}
+
+	t := time.Date(year, time.Month(month), day, hour, minute, second, 0, utime.ChinaTimeZone)
+	return &t
 }

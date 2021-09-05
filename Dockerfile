@@ -1,11 +1,20 @@
-FROM golang:1.16.3 AS builder
+# syntax=docker/dockerfile:experimental
 
-COPY ./ /data/blotter
+FROM golang:1.17.0 AS builder
 
 WORKDIR /data/blotter
 
-RUN go get
-RUN go generate
+# deps cache
+COPY ./go.mod ./go.sum /data/blotter/
+RUN go mod download -x 
+RUN go build all
+
+# build code
+# build with cache: https://github.com/golang/go/issues/27719
+COPY ./ /data/blotter
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go generate
 
 # FROM golang:1.16.3 AS prod
 FROM ubuntu AS prod
@@ -19,7 +28,6 @@ RUN apt update && \
     python3-pip && \
     python3 -m pip install matplotlib && \
     rm -rf /var/lib/apt/lists/*
-
 
 # Headless chrome from https://hub.docker.com/r/justinribeiro/chrome-headless/dockerfile/
 RUN apt update && \
@@ -44,19 +52,18 @@ RUN apt update && \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-ENV mongoURI="mongodb:27017"
 
 COPY --from=builder /data/blotter/blotter /data/blotter/blotter
 
-# # gojieba 字典文件
+# gojieba 字典文件
 COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/hmm_model.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/hmm_model.utf8
 COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/idf.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/idf.utf8
 COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/jieba.dict.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/jieba.dict.utf8
 COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/stop_words.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/stop_words.utf8
 COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/user.dict.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/user.dict.utf8
 
-
-
 WORKDIR /data/blotter
+
+ENV mongoURI="mongodb:27017"
 
 ENTRYPOINT [ "./blotter", "-address", "0.0.0.0:50000" ]

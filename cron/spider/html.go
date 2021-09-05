@@ -2,15 +2,10 @@ package spider
 
 import (
 	"bytes"
-	"context"
-	"fmt"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/OhYee/blotter/api/pkg/friends"
-	"github.com/OhYee/blotter/output"
-	"github.com/chromedp/chromedp"
 	"golang.org/x/net/html"
 
 	"net/url"
@@ -109,69 +104,6 @@ func CheckPost(v []*html.Node) bool {
 	return true
 }
 
-func getChromePath() string {
-	env := os.Environ()
-	for _, s := range env {
-		ss := strings.Split(s, "=")
-		if len(ss) >= 2 {
-			key := ss[0]
-			value := strings.Join(ss[1:], "")
-			if strings.ToUpper(key) == "CHROME_PATH" {
-				return value
-			}
-		}
-	}
-	return ""
-}
-func GetHTML(u string) string {
-	opts := []func(*chromedp.ExecAllocator){
-		chromedp.Flag("headless", true),
-		chromedp.Flag("blink-settings", "imagesEnabled=false"),
-		chromedp.UserAgent(UserAgent),
-		chromedp.Flag("ignore-certificate-errors", true),
-	}
-
-	chromePath := getChromePath()
-	if len(chromePath) > 0 {
-		opts = append(
-			opts,
-			chromedp.ExecPath(
-				fmt.Sprintf(
-					"%s/%s",
-					strings.TrimRight(chromePath, "/"),
-					"chrome",
-				),
-			),
-		)
-	}
-
-	ctx, cancel := chromedp.NewExecAllocator(
-		context.Background(),
-
-		opts...,
-	)
-	defer cancel()
-
-	ctx2, cancel2 := chromedp.NewContext(
-		ctx,
-	)
-	defer cancel2()
-
-	ctx3, cancel3 := context.WithTimeout(ctx2, Timeout)
-	defer cancel3()
-
-	var res string
-	err := chromedp.Run(
-		ctx3,
-		chromedp.Navigate(u),
-		chromedp.OuterHTML("html", &res, chromedp.ByQuery),
-	)
-	if err != nil {
-		output.ErrOutput.Println(u, err)
-	}
-	return res
-}
-
 func elementFindTime(node *html.Node) *time.Time {
 	t := node
 	parentCount := 0
@@ -190,11 +122,18 @@ func elementFindTime(node *html.Node) *time.Time {
 	return nil
 }
 
-func ReadHTML(u string) []friends.FriendPost {
+func ReadHTML(u string, retry int) []friends.FriendPost {
 	hostURL, _ := url.Parse(u)
 
-	c := GetHTML(u)
-	doc, _ := html.Parse(bytes.NewBufferString(c))
+	content := ""
+	if retry%2 == 0 {
+		content = getHTML(u)
+	} else {
+		content = getHTMLWithJS(u)
+	}
+	// output.DebugOutput.Println(c)
+
+	doc, _ := html.Parse(bytes.NewBufferString(content))
 	m := make(map[string][]*html.Node)
 	dfs(doc, []string{}, m)
 
@@ -217,11 +156,24 @@ func ReadHTML(u string) []friends.FriendPost {
 		}
 
 		titles := elementInnterText(item)
+
+		// output.DebugOutput.Println(titles)
 		if len(titles) <= 0 {
 			continue
 		}
+
+		title := ""
+		for _, t := range titles {
+			if parseTime(t) == nil {
+				title = t
+			}
+		}
+		if title == "" {
+			title = titles[0]
+		}
+
 		posts = append(posts, friends.FriendPost{
-			Title: titles[0],
+			Title: title,
 			Link:  u.String(),
 			Time:  toUnix(elementFindTime(item)),
 		})

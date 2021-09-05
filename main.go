@@ -17,6 +17,7 @@ var (
 	addr   = "127.0.0.1:50000"
 	prefix = "/api/"
 	tool   = ""
+	url    = ""
 )
 
 var (
@@ -28,6 +29,7 @@ var (
 func parseFlags() {
 	flag.StringVar(&addr, "address", "127.0.0.1:50000", "listen address")
 	flag.StringVar(&prefix, "prefix", "/api/", "api url prefix")
+	flag.StringVar(&url, "url", "", "spider url")
 
 	keys := make([]string, len(cron.CronMap))
 	pos := 0
@@ -42,6 +44,9 @@ func parseFlags() {
 
 func main() {
 	parseFlags()
+	register.SetContext("version", _version)
+	register.SetContext("spiderURL", url)
+
 	if tool != "" {
 		f, e := cron.CronMap[tool]
 		if !e {
@@ -52,7 +57,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	register.SetContext("version", _version)
 
 	cron.Start()
 	defer cron.Stop()

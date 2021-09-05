@@ -9,6 +9,6 @@ _blotter_version="${_branch}${_version} (${_date})"
 
 echo ${_blotter_version}
 
-CGO_ENABLED=1 go build -ldflags "-X 'main._version=${_blotter_version}' -extldflags '-static -s -w -fpic'" 
+CGO_ENABLED=1 go build -v -ldflags "-X 'main._version=${_blotter_version}' -extldflags '-static -s -w -fpic'" 
 
 unset _date _branch _version _blotter_version

@@ -41,18 +41,27 @@ func SetFriends(fs []Friend) (err error) {
 }
 
 func SetFriendPosts(url string, posts []FriendPost) (err error) {
+	op := bson.M{
+		"$set": bson.M{
+			"posts": posts,
+			"error": false,
+		},
+	}
+	if len(posts) == 0 {
+		op = bson.M{
+			"$set": bson.M{
+				"error": true,
+			},
+		}
+	}
+
 	_, err = mongo.Update(
 		"blotter",
 		"friends",
 		bson.M{
 			"link": url,
 		},
-		bson.M{
-			"$set": bson.M{
-				"posts": posts,
-				"error": len(posts) == 0,
-			},
-		},
+		op,
 		nil,
 	)
 	return

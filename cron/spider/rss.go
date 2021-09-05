@@ -1,49 +1,62 @@
 package spider
 
 import (
-	"crypto/tls"
-	"io/ioutil"
-	"net/http"
+	"bytes"
 
 	"github.com/OhYee/blotter/api/pkg/friends"
 	"github.com/OhYee/blotter/output"
 	"github.com/mmcdole/gofeed"
+	"golang.org/x/net/html"
 )
 
-func ReadRSS(u string) (posts []friends.FriendPost) {
+func findTitle(n *html.Node, arr []*html.Node) {
+	t := n
+	for t != nil {
+		if t.Type == html.ElementNode && t.Data == "title" {
+			arr = append(arr, t)
+		}
+		findTitle(t.FirstChild, arr)
+		t = t.NextSibling
+	}
+}
+
+func htmlParser(content string) (feed *gofeed.Feed, err error) {
+	root, err := html.Parse(bytes.NewReader([]byte(content)))
+	if err != nil {
+		return
+	}
+	titles := make([]*html.Node, 0)
+	findTitle(root, titles)
+
+	feed = &gofeed.Feed{}
+	feed.Items = make([]*gofeed.Item, len(titles))
+	for i, title := range titles {
+		feed.Items[i] = &gofeed.Item{
+			Title:     title.Data,
+			Link:      "",
+			Updated:   "",
+			Published: "",
+		}
+	}
+	return
+}
+
+func ReadRSS(u string, retry int) (posts []friends.FriendPost) {
 	// output.DebugOutput.Println(u)
 	posts = make([]friends.FriendPost, 0, 5)
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-		Timeout: Timeout,
+	content := ""
+	if retry%2 == 0 {
+		content = getHTML(u)
+	} else {
+		content = getHTMLWithJS(u)
 	}
-	req, err := http.NewRequest("GET", u, nil)
-	if err != nil {
-		output.ErrOutput.Println(u, err)
+	if len(content) == 0 {
 		return
 	}
-
-	req.Header.Set("User-Agent", UserAgent)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		output.ErrOutput.Println(u, err)
-		return
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		output.ErrOutput.Println(u, err)
-		return
-	}
-
-	// output.DebugOutput.Println(string(b))
 
 	fp := gofeed.NewParser()
-	feed, err := fp.ParseString(string(b))
+	feed, err := fp.ParseString(content)
 	if err != nil {
 		output.ErrOutput.Println(u, err)
 		return

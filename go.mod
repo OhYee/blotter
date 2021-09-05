@@ -16,7 +16,7 @@ require (
 	github.com/OhYee/rainbow v1.0.6
 	github.com/alecthomas/chroma v0.8.2 // indirect
 	github.com/aws/aws-sdk-go v1.36.1 // indirect
-	github.com/chromedp/chromedp v0.7.4 // indirect
+	github.com/chromedp/chromedp v0.7.4
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
@@ -25,7 +25,7 @@ require (
 	github.com/graemephi/goldmark-qjs-katex v0.3.0
 	github.com/klauspost/compress v1.11.3 // indirect
 	github.com/mitchellh/mapstructure v1.4.0
-	github.com/mmcdole/gofeed v1.1.3 // indirect
+	github.com/mmcdole/gofeed v1.1.3
 	github.com/qiniu/api.v7/v7 v7.7.0
 	github.com/refraction-networking/utls v0.0.0-20201112193908-f7e7360167ed // indirect
 	github.com/robfig/cron v1.2.0
@@ -36,7 +36,7 @@ require (
 	go.mongodb.org/mongo-driver v1.4.4
 	go.starlark.net v0.0.0-20201202183632-a7839910dcbe // indirect
 	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c // indirect
-	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
 	golang.org/x/text v0.3.4 // indirect
 	google.golang.org/genproto v0.0.0-20201203001206-6486ece9c497 // indirect

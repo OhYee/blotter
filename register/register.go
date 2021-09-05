@@ -14,7 +14,7 @@ var (
 	ctxMutex = new(sync.RWMutex)
 )
 
-func getContext(key string) (value interface{}, ok bool) {
+func GetContext(key string) (value interface{}, ok bool) {
 	ctxMutex.RLock()
 	defer ctxMutex.RUnlock()
 	value, ok = ctx[key]

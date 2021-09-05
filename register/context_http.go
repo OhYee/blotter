@@ -203,5 +203,5 @@ func (context *HTTPContext) GetUser() *user.TypeDB {
 
 // GetContext get global context
 func (context *HTTPContext) GetContext(key string) (value interface{}, ok bool) {
-	return getContext(key)
+	return GetContext(key)
 }
