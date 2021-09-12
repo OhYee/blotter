@@ -1,5 +1,7 @@
 package api
 
+// TODO: Remove
+
 import (
 	"github.com/OhYee/blotter/register"
 
