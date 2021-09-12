@@ -2,6 +2,8 @@ package spider
 
 import (
 	"bytes"
+	"strings"
+	"time"
 
 	"github.com/OhYee/blotter/api/pkg/friends"
 	"github.com/OhYee/blotter/output"
@@ -20,7 +22,8 @@ func findTitle(n *html.Node, arr []*html.Node) {
 	}
 }
 
-func htmlParser(content string) (feed *gofeed.Feed, err error) {
+// htmlParser 以 html 格式解析 RSS
+func htmlParser(host, content string) (feed *gofeed.Feed, err error) {
 	root, err := html.Parse(bytes.NewReader([]byte(content)))
 	if err != nil {
 		return
@@ -31,35 +34,54 @@ func htmlParser(content string) (feed *gofeed.Feed, err error) {
 	feed = &gofeed.Feed{}
 	feed.Items = make([]*gofeed.Item, len(titles))
 	for i, title := range titles {
+		pointer := title
+		for pointer.PrevSibling != nil {
+			pointer = pointer.PrevSibling
+		}
+
+		var ts *time.Time = nil
+		link := ""
+
+		for pointer != nil {
+			// 判断是否是日期
+			value := pointer.Data
+			if ts == nil {
+				if tmp := parseTime(value); tmp != nil {
+					ts = tmp
+				}
+			}
+
+			// 判断是否是 link
+			if link == "" {
+				if strings.HasPrefix(value, "https://") ||
+					strings.HasPrefix(value, "http://") ||
+					strings.HasPrefix(value, "//") {
+					link = value
+				}
+			}
+		}
 		feed.Items[i] = &gofeed.Item{
-			Title:     title.Data,
-			Link:      "",
-			Updated:   "",
-			Published: "",
+			Title:         title.Data,
+			Link:          link,
+			UpdatedParsed: ts,
 		}
 	}
 	return
 }
 
-func ReadRSS(u string, retry int) (posts []friends.FriendPost) {
-	// output.DebugOutput.Println(u)
+func readRSS(link, content string) (posts []friends.FriendPost) {
+	output.DebugOutput.Println(link, "readRSS")
 	posts = make([]friends.FriendPost, 0, 5)
-
-	content := ""
-	if retry%2 == 0 {
-		content = getHTML(u)
-	} else {
-		content = getHTMLWithJS(u)
-	}
-	if len(content) == 0 {
-		return
-	}
 
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseString(content)
 	if err != nil {
-		output.ErrOutput.Println(u, err)
-		return
+		output.ErrOutput.Println(link, err)
+		// gofeed 解析失败，换用 html 形式解析
+		if feed, err = htmlParser(link, content); err != nil {
+			output.ErrOutput.Println(link, err)
+			return
+		}
 	}
 
 	for _, p := range feed.Items {
@@ -81,8 +103,5 @@ func ReadRSS(u string, retry int) (posts []friends.FriendPost) {
 		})
 	}
 
-	if len(posts) > 5 {
-		return posts[:5]
-	}
 	return posts
 }

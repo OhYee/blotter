@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/OhYee/blotter/api/pkg/friends"
+	"github.com/OhYee/blotter/output"
 	"golang.org/x/net/html"
 
 	"net/url"
@@ -122,16 +123,8 @@ func elementFindTime(node *html.Node) *time.Time {
 	return nil
 }
 
-func ReadHTML(u string, retry int) []friends.FriendPost {
-	hostURL, _ := url.Parse(u)
-
-	content := ""
-	if retry%2 == 0 {
-		content = getHTML(u)
-	} else {
-		content = getHTMLWithJS(u)
-	}
-	// output.DebugOutput.Println(c)
+func readHTML(link, content string) []friends.FriendPost {
+	output.DebugOutput.Println(link, "readHTML")
 
 	doc, _ := html.Parse(bytes.NewBufferString(content))
 	m := make(map[string][]*html.Node)
@@ -149,11 +142,7 @@ func ReadHTML(u string, retry int) []friends.FriendPost {
 	}
 
 	for _, item := range postList {
-		u, _ := url.Parse(elementHref(item))
-		if u.Host == "" {
-			u.Scheme = hostURL.Scheme
-			u.Host = hostURL.Host
-		}
+		path := elementHref(item)
 
 		titles := elementInnterText(item)
 
@@ -174,12 +163,9 @@ func ReadHTML(u string, retry int) []friends.FriendPost {
 
 		posts = append(posts, friends.FriendPost{
 			Title: title,
-			Link:  u.String(),
+			Link:  makeAbsURL(link, path),
 			Time:  toUnix(elementFindTime(item)),
 		})
-		if len(posts) >= 5 {
-			break
-		}
 	}
 
 	return posts

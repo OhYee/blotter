@@ -21,7 +21,7 @@ var client = &http.Client{
 	Timeout: Timeout,
 }
 
-func getHTML(u string) (content string) {
+func getHTML(u string) (content string, isJSON bool) {
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		output.ErrOutput.Println(u, err)
@@ -46,6 +46,7 @@ func getHTML(u string) (content string) {
 	}
 
 	content = string(b)
+	isJSON = strings.Contains(resp.Header.Get("Content-Type"), "json")
 	return
 }
 
@@ -70,7 +71,7 @@ func getHTMLWithJS(u string) string {
 		chromedp.Flag("ignore-certificate-errors", true),
 		chromedp.Flag("no-sandbox", true),
 		chromedp.Flag("disable-gpu", true),
-		chromedp.Flag("default-browser-check ", true),
+		chromedp.Flag("default-browser-check ", false),
 		chromedp.UserAgent(UserAgent),
 	}
 

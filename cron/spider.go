@@ -1,10 +1,9 @@
 package cron
 
 import (
+	"sort"
 	"sync"
 	"time"
-
-	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/friends"
 	"github.com/OhYee/blotter/cron/spider"
@@ -25,16 +24,12 @@ func spiderSite(f friends.Friend, wg *sync.WaitGroup) {
 	retry := 0
 	for retry = 0; retry < 5; retry++ {
 		output.LogOutput.Println(time.Now().Format("2006-01-02 15:04:05"), "Spider", friendName, friendURL, "retry", retry)
-		if friendURL == "" ||
-			strings.Index(friendURL, "rss") != -1 ||
-			strings.Index(friendURL, "atom") != -1 ||
-			strings.Index(friendURL, "feed") != -1 ||
-			strings.Index(friendURL, "xml") != -1 {
-			posts = spider.ReadRSS(friendURL, retry)
-		} else {
-			posts = spider.ReadHTML(friendURL, retry)
-		}
+		posts = spider.Do(friendURL, retry)
 		if len(posts) != 0 {
+			if len(posts) > 5 {
+				sort.SliceStable(posts, func(i, j int) bool { return posts[i].Time > posts[j].Time })
+				posts = posts[:5]
+			}
 			break
 		}
 	}
