@@ -34,6 +34,7 @@ type LayoutResponse struct {
 	Version      string           `json:"back_version"`
 	EasterEgg    string           `json:"easter_egg"`
 	Notification string           `json:"notification"`
+	Footer       string           `json:"footer"`
 }
 
 // Layout get site base info
@@ -58,7 +59,7 @@ func Layout(context register.HandleContext) (err error) {
 	m, err := variable.Get(
 		"beian", "view", "blog_name", "email", "github", "qq", "grey", "root",
 		"author", "avatar", "from", "head", "ad_inner", "ad_show", "ad_text",
-		"easter_egg", "notification",
+		"easter_egg", "notification", "footer",
 	)
 	if err != nil {
 		return
@@ -116,6 +117,9 @@ func Layout(context register.HandleContext) (err error) {
 		log.Error.Println(err)
 	}
 	if err = m.SetString("notification", &res.Notification); err != nil {
+		log.Error.Println(err)
+	}
+	if err = m.SetString("footer", &res.Footer); err != nil {
 		log.Error.Println(err)
 	}
 
