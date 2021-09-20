@@ -85,15 +85,15 @@ func readRSS(link, content string) (posts []friends.FriendPost) {
 	}
 
 	for _, p := range feed.Items {
-		updateTime := p.UpdatedParsed
+		updateTime := p.PublishedParsed
 		if updateTime == nil {
-			updateTime = p.PublishedParsed
-		}
-		if updateTime == nil {
-			updateTime = parseTime(p.Updated)
+			updateTime = p.UpdatedParsed
 		}
 		if updateTime == nil {
 			updateTime = parseTime(p.Published)
+		}
+		if updateTime == nil {
+			updateTime = parseTime(p.Updated)
 		}
 		// output.DebugOutput.Println(p)
 		posts = append(posts, friends.FriendPost{
