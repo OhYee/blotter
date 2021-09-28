@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 const defaultAvatar = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
@@ -24,7 +25,9 @@ func makeHTTPClient() *http.Client {
 		}
 	}
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
 	if proxy != "" {
 		client.Transport = &http.Transport{
 			Proxy: func(_ *http.Request) (*url.URL, error) {
