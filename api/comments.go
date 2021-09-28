@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"regexp"
 
 	"github.com/OhYee/blotter/api/pkg/comment"
@@ -60,9 +61,12 @@ func CommentAdd(context register.HandleContext) (err error) {
 	}
 
 	if err = comment.Add(args.URL, args.Reply, args.Email, args.Recv, args.Raw); err != nil {
-		return
+		if errors.Is(err, comment.ErrShake) {
+			context.ReturnJSON(SimpleResponse{Success: true, Title: "评论已存在", Content: "5 分钟内已存在相同的评论，因此新评论已被忽略"})
+			err = nil
+			return
+		}
 	}
-
 	context.ReturnJSON(SimpleResponse{Success: true, Title: "评论发布成功"})
 
 	return

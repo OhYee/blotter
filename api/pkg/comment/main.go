@@ -1,10 +1,13 @@
 package comment
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"time"
 
 	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/blotter/utils/lru"
 	"github.com/OhYee/rainbow/errors"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,6 +21,7 @@ import (
 	"github.com/OhYee/blotter/mongo"
 )
 
+var ErrShake = fmt.Errorf("anti-shake")
 var defaultObjectID = primitive.ObjectID{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 // Get comment of url
@@ -143,6 +147,11 @@ func MakeRelation(_comments []TypeDB) (comments []*Type) {
 
 // Add a new comment
 func Add(url string, reply string, email string, recv bool, raw string) (err error) {
+	if antiShake(url, email, raw) {
+		// shake!
+		return ErrShake
+	}
+
 	html, err := markdown.Render(raw, false)
 	if err != nil {
 		html = raw
@@ -298,4 +307,25 @@ func Delete(id string) (err error) {
 	}
 	_, err = mongo.Remove("blotter", "comments", bson.M{"_id": objectID}, nil)
 	return
+}
+
+var shakeMap = make(map[string]struct{})
+var expired = lru.NewExpired()
+
+func antiShake(url, email, raw string) bool {
+	h := sha256.New()
+	h.Write([]byte(fmt.Sprintf("%s|%s|%s", url, email, raw)))
+	key := hex.EncodeToString(h.Sum([]byte{}))
+	now := time.Now()
+
+	for _, k := range expired.Expire(now.Unix()) {
+		delete(shakeMap, k)
+	}
+	if _, exists := shakeMap[key]; exists {
+		return true
+	}
+
+	expired.Add(key, now.Add(5*time.Minute).Unix())
+	shakeMap[key] = struct{}{}
+	return false
 }
