@@ -52,15 +52,10 @@ RUN apt update && \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+# gojieba 字典文件
+COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict
 
 COPY --from=builder /data/blotter/blotter /data/blotter/blotter
-
-# gojieba 字典文件
-COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/hmm_model.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/hmm_model.utf8
-COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/idf.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/idf.utf8
-COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/jieba.dict.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/jieba.dict.utf8
-COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/stop_words.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/stop_words.utf8
-COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/user.dict.utf8 /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict/user.dict.utf8
 
 WORKDIR /data/blotter
 
