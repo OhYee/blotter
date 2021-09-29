@@ -17,27 +17,62 @@ type timeFinder struct {
 
 var timeFinders = []timeFinder{
 	{
-		Regexp:         regexp.MustCompile("\\d{2,4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}"),
+		Regexp: regexp.MustCompile("^\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(.\\d{3})*(Z([+\\-]\\d+)*)*$"),
+		TimeFormatFunc: func(s string) *time.Time {
+			datePart := s
+			timeZone := 0
+			withTimeZone := false
+
+			// 分离时区
+			lst := strings.Split(s, "Z")
+			if len(lst) > 1 {
+				datePart = lst[0]
+				timeZonePart := lst[1]
+				withTimeZone = true
+				if len(timeZonePart) > 1 {
+					timeZone = toInt(timeZonePart[1:])
+					if timeZonePart[0] == '-' {
+						timeZone = -timeZone
+					}
+				}
+			}
+
+			// 忽略毫秒
+			lst = strings.Split(datePart, ".")
+			if len(lst) > 1 {
+				datePart = lst[0]
+			}
+
+			t := splitDateTime(datePart, "-", ":", "T")
+			if t != nil && withTimeZone {
+				tt := t.Add(time.Duration(8-timeZone) * time.Hour)
+				return &tt
+			}
+			return t
+		},
+	},
+	{
+		Regexp:         regexp.MustCompile("^\\d{2,4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}$"),
 		TimeFormatFunc: func(s string) *time.Time { return splitDateTime(s, "-", ":", " ") },
 	},
 	{
-		Regexp:         regexp.MustCompile("\\d{2,4}/\\d{1,2}/\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}"),
+		Regexp:         regexp.MustCompile("^\\d{2,4}/\\d{1,2}/\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}$"),
 		TimeFormatFunc: func(s string) *time.Time { return splitDateTime(s, "/", ":", " ") },
 	},
 	{
-		Regexp:         regexp.MustCompile("\\d{2,4}-\\d{1,2}-\\d{1,2}"),
+		Regexp:         regexp.MustCompile("^\\d{2,4}-\\d{1,2}-\\d{1,2}$"),
 		TimeFormatFunc: func(s string) *time.Time { return splitDate(s, "-") },
 	},
 	{
-		Regexp:         regexp.MustCompile("\\d{2,4}/\\d{1,2}/\\d{1,2}"),
+		Regexp:         regexp.MustCompile("^\\d{2,4}/\\d{1,2}/\\d{1,2}$"),
 		TimeFormatFunc: func(s string) *time.Time { return splitDate(s, "/") },
 	},
 	{
-		Regexp:     regexp.MustCompile("[a-zA-Z]{2,4} \\d{2}, \\d{4}"),
+		Regexp:     regexp.MustCompile("^[a-zA-Z]{2,4} \\d{2}, \\d{4}$"),
 		TimeFormat: "Jan 02, 2006",
 	},
 	{
-		Regexp:     regexp.MustCompile("\\d{2} \\d{2},\\d{4}"),
+		Regexp:     regexp.MustCompile("^\\d{2} \\d{2},\\d{4}$"),
 		TimeFormat: "01 02,2006",
 	},
 }
