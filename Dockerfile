@@ -52,13 +52,14 @@ RUN apt update && \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# gojieba 字典文件
-COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict
-
-COPY --from=builder /data/blotter/blotter /data/blotter/blotter
 
 WORKDIR /data/blotter
 
 ENV mongoURI="mongodb:27017"
 
 ENTRYPOINT [ "./blotter", "-address", "0.0.0.0:50000" ]
+
+# gojieba 字典文件
+COPY --from=builder /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict /go/pkg/mod/github.com/ttys3/gojieba@v1.1.3/dict
+
+COPY --from=builder /data/blotter/blotter /data/blotter/blotter
