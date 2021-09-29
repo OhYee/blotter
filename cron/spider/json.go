@@ -38,21 +38,20 @@ func rangeJSON(data interface{}) []friends.FriendPost {
 
 func rangeObject(data jsonObject) []friends.FriendPost {
 	posts := make([]friends.FriendPost, 0)
-	if v, ok := data["title"]; ok {
-		if _, ok2 := v.(string); ok2 {
-			title, link, ts := parsePostObject(data)
-			if len(title) > 0 && len(link) > 0 {
-				timestamp := int64(0)
-				if ts != nil {
-					timestamp = ts.Unix()
-				}
-				posts = append(posts, friends.FriendPost{
-					Title: title,
-					Link:  link,
-					Time:  timestamp,
-				})
+	if _, ok := data["title"]; ok {
+		title, link, ts := parsePostObject(data)
+		if len(title) > 0 && len(link) > 0 {
+			timestamp := int64(0)
+			if ts != nil {
+				timestamp = ts.Unix()
 			}
+			posts = append(posts, friends.FriendPost{
+				Title: title,
+				Link:  link,
+				Time:  timestamp,
+			})
 		}
+
 	}
 	for _, v := range data {
 		posts = append(posts, rangeJSON(v)...)
@@ -69,6 +68,17 @@ func rangeArray(data []interface{}) []friends.FriendPost {
 }
 
 func parsePostObject(data jsonObject) (title, link string, ts *time.Time) {
+	switch v := data["title"].(type) {
+	case string:
+		title = v
+	case jsonObject:
+		for _, value := range v {
+			if valueString, isString := value.(string); isString {
+				title += valueString
+			}
+		}
+	}
+
 	if v, ok := data["title"]; ok {
 		if _, ok2 := v.(string); ok2 {
 			title = v.(string)

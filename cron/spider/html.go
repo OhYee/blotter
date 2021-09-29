@@ -157,15 +157,16 @@ func readHTML(link, content string) []friends.FriendPost {
 				title = t
 			}
 		}
-		if title == "" {
-			title = titles[0]
+
+		// 避免误把时间读取为标题
+		if title != "" {
+			posts = append(posts, friends.FriendPost{
+				Title: title,
+				Link:  makeAbsURL(link, path),
+				Time:  toUnix(elementFindTime(item)),
+			})
 		}
 
-		posts = append(posts, friends.FriendPost{
-			Title: title,
-			Link:  makeAbsURL(link, path),
-			Time:  toUnix(elementFindTime(item)),
-		})
 	}
 
 	return posts
