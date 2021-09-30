@@ -75,6 +75,26 @@ var timeFinders = []timeFinder{
 		Regexp:     regexp.MustCompile("^\\d{2} \\d{2},\\d{4}$"),
 		TimeFormat: "01 02,2006",
 	},
+	{
+		Regexp: regexp.MustCompile("^\\d+$"),
+		TimeFormatFunc: func(s string) *time.Time {
+			// time.Now().Unix 			// 946656000
+			// time.Now().UnixMilli() 	// 946656000000
+			// time.Now().UnixMicro() 	// 946656000000000
+			// time.Now().UnixNano() 	// 946656000000000000
+			now := time.Now().Unix()
+			tsInt64 := toInt64(s)
+			base := int64(1000000000)
+			for i := 0; i < 4; i++ {
+				if tsInt64 > year2000*base && tsInt64 < now*base {
+					temp := time.Unix(0, tsInt64*base)
+					return &temp
+				}
+				base /= 1000
+			}
+			return nil
+		},
+	},
 }
 
 func parseTime(s string) *time.Time {

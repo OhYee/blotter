@@ -93,36 +93,24 @@ func parsePostObject(data jsonObject) (title, link string, ts *time.Time) {
 		}
 	}
 
-	// time.Now().Unix 			// 946656000
-	// time.Now().UnixMilli() 	// 946656000000
-	// time.Now().UnixMicro() 	// 946656000000000
-	// time.Now().UnixNano() 	// 946656000000000000
-	now := time.Now().Unix()
-	for _, value := range data {
-		switch t := value.(type) {
-		case uint, uint8, uint16, uint32, uint64,
-			int, int8, int16, int32, int64,
-			float32, float64:
-			tsInt64 := toInt64(t)
-			base := int64(1000000000)
-			for i := 0; i < 4; i++ {
-				if tsInt64 > year2000*base && tsInt64 < now*base {
-					temp := time.Unix(0, tsInt64*base)
-					ts = &temp
-					break
-				}
-				base /= 1000
-			}
-		case string:
-			ts = parseTime(t)
+	for _, timeKey := range timeKeys {
+		if timeValue, ok := data[timeKey]; ok {
+			ts = parseTime(fmt.Sprint(timeValue))
 			if ts != nil {
 				break
 			}
 		}
-		if ts != nil {
-			break
+	}
+
+	if ts == nil {
+		for _, value := range data {
+			ts = parseTime(fmt.Sprint(value))
+			if ts != nil {
+				break
+			}
 		}
 	}
+
 	return
 }
 
