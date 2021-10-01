@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 
 	"github.com/OhYee/blotter/api/pkg/comment"
@@ -157,6 +158,38 @@ func AdminCommentDelete(context register.HandleContext) (err error) {
 	if err = comment.Delete(args.ID); err != nil {
 		return
 	}
+
+	res.Success = true
+	res.Title = "删除成功"
+
+	err = context.ReturnJSON(res)
+	return
+}
+
+// AdminCommentsAvatarRequest request for AdminCommentsAvatar api
+// type AdminCommentsAvatarRequest struct {
+// 	ID string `json:"id" bson:"id"`
+// }
+
+// AdminCommentsAvatarResponse response for AdminCommentsAvatar api
+type AdminCommentsAvatarResponse SimpleResponse
+
+// AdminCommentsAvatar api for updating admin comments page
+func AdminCommentsAvatar(context register.HandleContext) (err error) {
+	if !context.GetUser().HasPermission() {
+		context.Forbidden()
+		return
+	}
+
+	// args := new(AdminCommentAvatarRequest)
+	res := new(AdminCommentsAvatarResponse)
+	// context.RequestArgs(args)
+
+	success, total := comment.UpdateAvatar()
+
+	res.Success = true
+	res.Title = fmt.Sprintf("更新成功")
+	res.Content = fmt.Sprintf("共更新 %d/%d 条评论", success, total)
 
 	res.Success = true
 	res.Title = "删除成功"

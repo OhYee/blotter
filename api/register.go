@@ -238,4 +238,8 @@ func Register() {
 		"wechat",
 		WechatCheckPermission,
 	)
+	register.Register(
+		"admin/comments/avatar",
+		AdminCommentsAvatar,
+	)
 }

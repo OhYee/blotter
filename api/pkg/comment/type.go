@@ -1,7 +1,11 @@
 package comment
 
 import (
+	"github.com/OhYee/blotter/api/pkg/avatar"
+	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/goutils/time"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -48,6 +52,29 @@ type Type struct {
 	Ad       bool               `json:"ad" bson:"ad"`
 	Show     bool               `json:"show" bson:"show"`
 	Recv     bool               `json:"recv" bson:"recv"`
+}
+
+func (c *Type) UpdateAvatar() (err error) {
+	oldAvatar := c.Avatar
+	c.Avatar = avatar.Get(c.Email)
+	if c.Avatar != "" && c.Avatar != oldAvatar && c.Avatar != avatar.DefaultAvatar {
+		objectID, err := primitive.ObjectIDFromHex(c.ID)
+		if err != nil {
+			return err
+		}
+		result, err := mongo.Update(
+			DatabaseName, CollectionName,
+			bson.M{"_id": objectID},
+			bson.M{
+				"$set": bson.M{
+					"avatar": c.Avatar,
+				},
+			}, nil,
+		)
+		output.DebugOutput.Printf("Update avatar %s => %s\n%+v %+v\n%+v", oldAvatar, c.Avatar, result, err, c)
+
+	}
+	return
 }
 
 // AdminDB comment database Type

@@ -4,9 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/OhYee/blotter/output"
+	pool "github.com/OhYee/blotter/utils/goroutine_pool"
 	"github.com/OhYee/blotter/utils/lru"
 	"github.com/OhYee/rainbow/errors"
 
@@ -21,9 +24,6 @@ import (
 	"github.com/OhYee/blotter/mongo"
 )
 
-var ErrShake = fmt.Errorf("anti-shake")
-var defaultObjectID = primitive.ObjectID{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-
 // Get comment of url
 func Get(url string) (total int64, comments []TypeDB, err error) {
 	defer errors.Wrapper(&err)
@@ -31,8 +31,8 @@ func Get(url string) (total int64, comments []TypeDB, err error) {
 	comments = make([]TypeDB, 0)
 
 	total, err = mongo.Find(
-		"blotter",
-		"comments",
+		DatabaseName,
+		CollectionName,
 		bson.M{
 			"url": url,
 		},
@@ -97,12 +97,12 @@ func GetAdmin(offset int64, number int64) (total int64, comments []Admin, err er
 			"$sort": bson.M{"time": -1},
 		},
 	}
-	if number != 0 {
+	if number > 0 {
 		pipeline = append(pipeline, mongo.AggregateOffset(offset, number)...)
 	}
 	total, err = mongo.Aggregate(
-		"blotter",
-		"comments",
+		DatabaseName,
+		CollectionName,
 		pipeline,
 		nil,
 		&commentsDB,
@@ -309,23 +309,41 @@ func Delete(id string) (err error) {
 	return
 }
 
-var shakeMap = make(map[string]struct{})
-var expired = lru.NewExpired()
+var shakeMap = lru.NewMap().WithExpired()
 
 func antiShake(url, email, raw string) bool {
 	h := sha256.New()
 	h.Write([]byte(fmt.Sprintf("%s|%s|%s", url, email, raw)))
 	key := hex.EncodeToString(h.Sum([]byte{}))
-	now := time.Now()
 
-	for _, k := range expired.Expire(now.Unix()) {
-		delete(shakeMap, k)
-	}
-	if _, exists := shakeMap[key]; exists {
+	if _, exists := shakeMap.Get(key); exists {
 		return true
 	}
 
-	expired.Add(key, now.Add(5*time.Minute).Unix())
-	shakeMap[key] = struct{}{}
+	shakeMap.PutWithExpired(key, struct{}{}, 5*time.Minute)
 	return false
+}
+
+func UpdateAvatar() (int, int) {
+	_, comments, err := GetAdmin(0, -1)
+	if err != nil {
+		return 0, 0
+	}
+	wg := sync.WaitGroup{}
+	var success int64
+	for _, c := range comments {
+		wg.Add(1)
+		func(c Admin) {
+			pool.Do(func() {
+				defer wg.Done()
+				if err := c.UpdateAvatar(); err == nil {
+					atomic.AddInt64(&success, 1)
+				} else {
+					output.ErrOutput.Println(err)
+				}
+			})
+		}(c)
+	}
+	wg.Wait()
+	return int(success), len(comments)
 }
