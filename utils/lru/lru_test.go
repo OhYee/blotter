@@ -2,25 +2,34 @@ package lru
 
 import (
 	"testing"
+
+	"github.com/alecthomas/assert"
 )
 
 func TestLRU(t *testing.T) {
 	lru := NewLRU(5)
 
-	assert := func(want, add string) {
-		poped := lru.Add(add)
-		if want != poped {
-			t.Errorf("add %s, want %s, got %s", add, want, poped)
-		}
+	assertPush := func(want, add string) {
+		poped := lru.Push(add)
+		assert.Equal(t, want, poped)
 	}
 
-	assert("", "key1")
-	assert("", "key2")
-	assert("", "key3")
-	assert("", "key4")
-	assert("", "key5")
-	assert("key1", "key6")
-	lru.Visit("key2")
-	assert("", "key3")
-	assert("key4", "key7")
+	assertPush("", "key1")
+	assertPush("", "key2")
+	assertPush("", "key3")
+	assertPush("", "key4")
+	assertPush("", "key5")
+	assertPush("key1", "key6")
+	lru.Push("key2")
+	assertPush("", "key3")
+	assertPush("key4", "key7")
+	lru.Remove("key5")
+	assertPush("", "key8")
+
+	assert.Equal(t, "key6", lru.Pop())
+	assert.Equal(t, "key2", lru.Pop())
+	assert.Equal(t, "key3", lru.Pop())
+	assert.Equal(t, "key7", lru.Pop())
+	assert.Equal(t, "key8", lru.Pop())
+	assert.Equal(t, "", lru.Pop())
 }

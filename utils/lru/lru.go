@@ -1,55 +1,43 @@
 package lru
 
 import (
-	"container/heap"
 	"sync/atomic"
 )
 
 type LRU struct {
+	heap    *Heap
 	counter int64
-	heap    *keyValueHeap
-	m       map[string]*keyValue
 	cap     int
 }
 
 func NewLRU(cap int) *LRU {
 	return &LRU{
 		counter: 0,
-		heap:    newKeyValueHeap(0),
-		m:       make(map[string]*keyValue),
+		heap:    NewHeap(),
 		cap:     cap,
 	}
 }
 
-func (l *LRU) Add(key string) string {
+func (l *LRU) Push(key string) string {
 	id := atomic.AddInt64(&l.counter, 1)
 
-	if item, exists := l.m[key]; exists {
-		item.expiredTime = id
-		heap.Fix(l.heap, item.pos)
-		return ""
-	}
-
 	poped := ""
-	if l.heap.Len() == l.cap {
-		poped = heap.Pop(l.heap).(*keyValue).key
-		delete(l.m, poped)
+	for l.heap.Len() >= l.cap && !l.Has(key) {
+		poped = l.Pop()
 	}
 
-	item := &keyValue{
-		key:         key,
-		expiredTime: id,
-	}
-	l.m[key] = item
-	heap.Push(l.heap, item)
+	l.heap.Push(key, id)
 	return poped
 }
 
-func (l *LRU) Visit(key string) bool {
-	item, exist := l.m[key]
-	if exist {
-		item.expiredTime = atomic.AddInt64(&l.counter, 1)
-		heap.Fix(l.heap, item.pos)
-	}
-	return exist
+func (l *LRU) Pop() string {
+	return l.heap.Pop()
+}
+
+func (l *LRU) Has(key string) bool {
+	return l.heap.Has(key)
+}
+
+func (l *LRU) Remove(key string) {
+	l.heap.Remove(key)
 }
