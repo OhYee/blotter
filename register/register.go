@@ -1,6 +1,7 @@
 package register
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
@@ -50,6 +51,14 @@ func DebugApiMap() {
 
 // Call function
 func Call(name string, context *HTTPContext) (err error) {
+	defer func() {
+		rec := recover()
+		if rec != nil {
+			err = fmt.Errorf("Recover error: %+v", rec)
+			output.ErrOutput.Println(err)
+		}
+	}()
+
 	output.Log("%s:%s [%s] %s\nCall api %s, %s, %s [%s]",
 		context.Request.Method,
 		context.Request.Host,
