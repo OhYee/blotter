@@ -3,6 +3,7 @@ package output
 import (
 	"fmt"
 	"runtime"
+	"strings"
 
 	"github.com/OhYee/rainbow/color"
 	"github.com/OhYee/rainbow/log"
@@ -37,11 +38,17 @@ func withNewLine(s string) string {
 }
 
 func withInfo(s string) string {
-	_, file, line, ok := runtime.Caller(3)
-	if ok {
-		return color.New().SetFontBold().Colorful(
-			fmt.Sprintf("%s:%d\n\t", file, line),
-		)
+	pc := make([]uintptr, 10)
+	n := runtime.Callers(4, pc)
+	thisFile := ""
+	callers := make([]string, n)
+	for i := 0; i < n; i++ {
+		f := runtime.FuncForPC(pc[i])
+		file, line := f.FileLine(pc[i])
+		if thisFile == "" {
+			thisFile = file
+		}
+		callers[i] = fmt.Sprintf("%s:%d %s", file, line, f.Name())
 	}
-	return ""
+	return fmt.Sprintf("%s\n\t", strings.Join(callers, "\n"))
 }
