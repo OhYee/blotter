@@ -9,11 +9,14 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"time"
+
+	"github.com/OhYee/blotter/utils/lru"
 )
 
-const defaultAvatar = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+const DefaultAvatar = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
 
 func makeHTTPClient() *http.Client {
 	keys := []string{"HTTP_PROXY", "HTTPS_PROXY", "PROXY", "http_proxy", "https_proxy", "proxy"}
@@ -98,7 +101,7 @@ func GetGravatar(email string) (avatar string) {
 	avatar = fmt.Sprintf(
 		"https://www.gravatar.com/avatar/%s?size=640&default=%s",
 		hex.EncodeToString(hash.Sum(nil)),
-		url.QueryEscape(defaultAvatar),
+		url.QueryEscape(DefaultAvatar),
 	)
 
 	req, err := makeHTTPClient().Get(avatar)
@@ -109,14 +112,44 @@ func GetGravatar(email string) (avatar string) {
 	return
 }
 
+var qqRegexp = regexp.MustCompile("^\\d+$")
+
+func GetQQAvatar(email string) (avatar string) {
+	if strings.HasSuffix(email, "@qq.com") {
+		qq := email[:len(email)-7]
+		if qqRegexp.MatchString(qq) {
+			avatar = fmt.Sprintf("https://q1.qlogo.cn/g?b=qq&nk=%s&s=640", qq)
+		}
+	}
+	return
+}
+
+type avatarGetter = func(string) string
+
+var avatarGetters = []avatarGetter{
+	GetGithubAvatar,
+	GetGravatar,
+	GetQQAvatar,
+}
+
+var avatarMap = lru.NewMap().WithLRU(50).WithExpired()
+
 // Get avatar url of the email
 func Get(email string) (avatar string) {
-	avatar = GetGithubAvatar(email)
-	if avatar == "" {
-		avatar = GetGravatar(email)
+	value, exists := avatarMap.Get(email)
+	if exists {
+		avatar = value.(string)
+		return
 	}
-	if avatar == "" {
-		avatar = defaultAvatar
+
+	for _, getter := range avatarGetters {
+		avatar = getter(email)
+		if avatar != "" {
+			break
+		}
+	}
+	if avatar != "" {
+		avatarMap.PutWithExpired(email, avatar, time.Hour*24*7)
 	}
 	return
 }
