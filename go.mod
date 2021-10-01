@@ -14,6 +14,7 @@ require (
 	github.com/OhYee/goutils v1.1.5
 	github.com/OhYee/gowechat v0.0.1
 	github.com/OhYee/rainbow v1.0.6
+	github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38
 	github.com/alecthomas/chroma v0.8.2 // indirect
 	github.com/aws/aws-sdk-go v1.36.1 // indirect
 	github.com/chromedp/chromedp v0.7.4
