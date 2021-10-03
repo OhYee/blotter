@@ -2,6 +2,7 @@ package lru
 
 import (
 	"container/heap"
+	"math/rand"
 )
 
 type keyValue struct {
@@ -25,12 +26,17 @@ func (h keyValueHeap) Swap(i, j int) {
 	h[i].pos = i
 	h[j].pos = j
 }
-func (h keyValueHeap) Less(i, j int) bool     { return h[i].value < h[j].value }
-func (h *keyValueHeap) Push(item interface{}) { *h = append(*h, item.(*keyValue)) }
+func (h keyValueHeap) Less(i, j int) bool { return h[i].value < h[j].value }
+func (h *keyValueHeap) Push(item interface{}) {
+	*h = append(*h, item.(*keyValue))
+	l := h.Len()
+	(*h)[l-1].pos = l - 1
+}
 func (h *keyValueHeap) Pop() interface{} {
 	l := h.Len()
 	t := (*h)[l-1]
 	(*h) = (*h)[:l-1]
+	t.pos = -1
 	return t
 }
 
@@ -96,6 +102,11 @@ func (h *Heap) PopUntil(value int64) []string {
 }
 
 func (h *Heap) gc() {
+	// 10% 概率执行一次 gc
+	if rand.Float64() > 0.1 {
+		return
+	}
+
 	temp := h.m
 	h.m = make(map[string]*keyValue)
 	for k, v := range temp {

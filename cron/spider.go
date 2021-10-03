@@ -10,6 +10,7 @@ import (
 	"github.com/OhYee/blotter/cron/spider"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
+	pool "github.com/OhYee/blotter/utils/goroutine_pool"
 )
 
 func spiderSite(f friends.Friend, wg *sync.WaitGroup) {
@@ -108,18 +109,18 @@ func Spider() {
 
 	if spiderURL == "" {
 		wg := &sync.WaitGroup{}
-		// fs, _ := friends.GetFriends()
-		// for _, f := range fs {
-		// 	if f.RSS == "" {
-		// 		continue
-		// 	}
-		// 	wg.Add(1)
-		// 	func(f friends.Friend, wg *sync.WaitGroup) {
-		// 		pool.Do(func() {
-		// 			spiderSite(f, wg)
-		// 		})
-		// 	}(f, wg)
-		// }
+		fs, _ := friends.GetFriends()
+		for _, f := range fs {
+			if f.RSS == "" {
+				continue
+			}
+			wg.Add(1)
+			func(f friends.Friend, wg *sync.WaitGroup) {
+				pool.Do(func() {
+					spiderSite(f, wg)
+				})
+			}(f, wg)
+		}
 		wg.Wait()
 		sortFriends()
 	} else {
