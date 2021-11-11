@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/OhYee/blotter/api/pkg/friends"
@@ -18,6 +19,10 @@ func toInt64(v interface{}) int64 {
 		return reflect.ValueOf(t).Int()
 	case float32, float64:
 		return int64(reflect.ValueOf(t).Float())
+	case string:
+		if i, err := strconv.ParseInt(t, 10, 64); err == nil {
+			return i
+		}
 	}
 	return 0
 }
@@ -95,7 +100,7 @@ func parsePostObject(data jsonObject) (title, link string, ts *time.Time) {
 
 	for _, timeKey := range timeKeys {
 		if timeValue, ok := data[timeKey]; ok {
-			ts = parseTime(fmt.Sprint(timeValue))
+			ts = parseTime(timeValue)
 			if ts != nil {
 				break
 			}
@@ -104,7 +109,7 @@ func parsePostObject(data jsonObject) (title, link string, ts *time.Time) {
 
 	if ts == nil {
 		for _, value := range data {
-			ts = parseTime(fmt.Sprint(value))
+			ts = parseTime(value)
 			if ts != nil {
 				break
 			}

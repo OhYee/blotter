@@ -15,6 +15,9 @@ func Test_toInt64(t *testing.T) {
 		{100.1, 100},
 		{uint8(100), 100},
 		{"a100", 0},
+		{1.2, 1},
+		{1e5, 100000},
+		{1.2e5, 120000},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%#v -> %#v", tt.args, tt.want), func(t *testing.T) {

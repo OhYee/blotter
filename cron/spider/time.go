@@ -17,7 +17,7 @@ type timeFinder struct {
 
 var timeFinders = []timeFinder{
 	{
-		Regexp: regexp.MustCompile("^\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(.\\d{3})*(Z([+\\-]\\d+)*)*$"),
+		Regexp: regexp.MustCompile(`^\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(.\\d{3})*(Z([+\\-]\\d+)*)*$`),
 		TimeFormatFunc: func(s string) *time.Time {
 			datePart := s
 			timeZone := 0
@@ -52,66 +52,56 @@ var timeFinders = []timeFinder{
 		},
 	},
 	{
-		Regexp:         regexp.MustCompile("^\\d{2,4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}$"),
+		Regexp:         regexp.MustCompile(`^\d{2,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}$`),
 		TimeFormatFunc: func(s string) *time.Time { return splitDateTime(s, "-", ":", " ") },
 	},
 	{
-		Regexp:         regexp.MustCompile("^\\d{2,4}/\\d{1,2}/\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}$"),
+		Regexp:         regexp.MustCompile(`^\d{2,4}/\d{1,2}/\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}$`),
 		TimeFormatFunc: func(s string) *time.Time { return splitDateTime(s, "/", ":", " ") },
 	},
 	{
-		Regexp:         regexp.MustCompile("^\\d{2,4}-\\d{1,2}-\\d{1,2}$"),
+		Regexp:         regexp.MustCompile(`^\d{2,4}-\d{1,2}-\d{1,2}$`),
 		TimeFormatFunc: func(s string) *time.Time { return splitDate(s, "-") },
 	},
 	{
-		Regexp:         regexp.MustCompile("^\\d{2,4}/\\d{1,2}/\\d{1,2}$"),
+		Regexp:         regexp.MustCompile(`^\d{2,4}/\d{1,2}/\d{1,2}$`),
 		TimeFormatFunc: func(s string) *time.Time { return splitDate(s, "/") },
 	},
 	{
-		Regexp:     regexp.MustCompile("^[a-zA-Z]{2,4} \\d{2}, \\d{4}$"),
+		Regexp:     regexp.MustCompile(`^[a-zA-Z]{2,4} \d{2}, \d{4}$`),
 		TimeFormat: "Jan 02, 2006",
 	},
 	{
-		Regexp:     regexp.MustCompile("^\\d{2} \\d{2},\\d{4}$"),
+		Regexp:     regexp.MustCompile(`^\d{2} \d{2},\d{4}$`),
 		TimeFormat: "01 02,2006",
 	},
 	{
-		Regexp: regexp.MustCompile("^\\d+$"),
-		TimeFormatFunc: func(s string) *time.Time {
-			// time.Now().Unix 			// 946656000
-			// time.Now().UnixMilli() 	// 946656000000
-			// time.Now().UnixMicro() 	// 946656000000000
-			// time.Now().UnixNano() 	// 946656000000000000
-			now := time.Now().Unix()
-			tsInt64 := toInt64(s)
-			base := int64(1000000000)
-			for i := 0; i < 4; i++ {
-				if tsInt64 > year2000*base && tsInt64 < now*base {
-					temp := time.Unix(0, tsInt64*base)
-					return &temp
-				}
-				base /= 1000
-			}
-			return nil
-		},
+		Regexp:         regexp.MustCompile(`^\d+$`),
+		TimeFormatFunc: func(s string) *time.Time { return parseInt64(toInt64(s)) },
 	},
 }
 
-func parseTime(s string) *time.Time {
-	for _, r := range timeFinders {
-		result := r.Regexp.FindAllString(s, -1)
-		for _, timeString := range result {
-			if r.TimeFormatFunc == nil {
-				if t, err := time.ParseInLocation(r.TimeFormat, timeString, utime.ChinaTimeZone); err == nil {
-					return &t
-				}
-			} else {
-				if t := r.TimeFormatFunc(timeString); t != nil {
-					return t
+func parseTime(s interface{}) *time.Time {
+	switch value := s.(type) {
+	case string:
+		for _, r := range timeFinders {
+			result := r.Regexp.FindAllString(value, -1)
+			for _, timeString := range result {
+				if r.TimeFormatFunc == nil {
+					if t, err := time.ParseInLocation(r.TimeFormat, timeString, utime.ChinaTimeZone); err == nil {
+						return &t
+					}
+				} else {
+					if t := r.TimeFormatFunc(timeString); t != nil {
+						return t
+					}
 				}
 			}
 		}
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
+		return parseInt64(toInt64(value))
 	}
+
 	return nil
 }
 
@@ -179,4 +169,21 @@ func splitDateTime(s string, char string, char2 string, char3 string) *time.Time
 
 	t := time.Date(year, time.Month(month), day, hour, minute, second, 0, utime.ChinaTimeZone)
 	return &t
+}
+
+func parseInt64(tsInt64 int64) *time.Time {
+	// time.Now().Unix 			// 946656000
+	// time.Now().UnixMilli() 	// 946656000000
+	// time.Now().UnixMicro() 	// 946656000000000
+	// time.Now().UnixNano() 	// 946656000000000000
+	now := time.Now().Unix()
+	base := int64(1000000000)
+	for i := 0; i < 4; i++ {
+		if tsInt64 > year2000*base && tsInt64 < now*base {
+			temp := time.Unix(tsInt64/base, 0)
+			return &temp
+		}
+		base /= 1000
+	}
+	return nil
 }

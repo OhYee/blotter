@@ -13,7 +13,7 @@ import (
 	pool "github.com/OhYee/blotter/utils/goroutine_pool"
 )
 
-func spiderSite(f friends.Friend, wg *sync.WaitGroup) {
+func spiderSite(f friends.Friend, wg *sync.WaitGroup) []friends.FriendPost {
 	if wg != nil {
 		defer wg.Done()
 	}
@@ -36,13 +36,10 @@ func spiderSite(f friends.Friend, wg *sync.WaitGroup) {
 		}
 	}
 
-	friends.SetFriendPosts(
-		f.Link,
-		posts,
-	)
 	output.DebugOutput.Println(posts)
 
 	output.LogOutput.Println(time.Now().Format("2006-01-02 15:04:05"), "Spider", friendName, friendURL, "Finished", retry)
+	return posts
 }
 
 func sortFriends() {
@@ -117,7 +114,11 @@ func Spider() {
 			wg.Add(1)
 			func(f friends.Friend, wg *sync.WaitGroup) {
 				pool.Do(func() {
-					spiderSite(f, wg)
+					posts := spiderSite(f, wg)
+					friends.SetFriendPosts(
+						f.Link,
+						posts,
+					)
 				})
 			}(f, wg)
 		}
