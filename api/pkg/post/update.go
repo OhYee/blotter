@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/OhYee/blotter/mongo"
+	"github.com/OhYee/blotter/utils/initial"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -35,5 +36,5 @@ func updatePublishedToStatus() {
 }
 
 func init() {
-	go updatePublishedToStatus()
+	initial.Register(updatePublishedToStatus)
 }

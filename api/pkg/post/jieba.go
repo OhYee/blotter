@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/blotter/utils/initial"
 	"github.com/yanyiwu/gojieba"
 )
 
@@ -31,5 +32,5 @@ func getJieba() *gojieba.Jieba {
 }
 
 func init() {
-	go initJieba()
+	initial.Register(initJieba)
 }

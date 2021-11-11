@@ -3,6 +3,7 @@ package menu
 import (
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/blotter/utils/initial"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -10,9 +11,11 @@ import (
 const DatabaseName = "pages"
 
 func init() {
-	if exists, _ := mongo.CollectionExists("blotter", DatabaseName); exists == false {
-		initMenus()
-	}
+	initial.Register(func() {
+		if exists, _ := mongo.CollectionExists("blotter", DatabaseName); exists == false {
+			initMenus()
+		}
+	})
 }
 
 func initMenus() {

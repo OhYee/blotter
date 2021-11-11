@@ -11,6 +11,7 @@ import (
 	"github.com/OhYee/blotter/http"
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
+	"github.com/OhYee/blotter/utils/initial"
 )
 
 var (
@@ -55,13 +56,14 @@ func main() {
 		}
 		f()
 		os.Exit(0)
+		return
 	}
-
 
 	cron.Start()
 	defer cron.Stop()
 
 	api.Register()
+	initial.Run()
 	// queue.Register().Register("extensions/queue")
 	// register.DebugApiMap()
 	output.Log("Server will start at http://%s", addr)

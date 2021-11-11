@@ -5,6 +5,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/OhYee/blotter/utils/initial"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -32,5 +33,5 @@ func getClientOptions() *options.ClientOptions {
 }
 
 func init() {
-	go initClientOptions()
+	initial.Register(initClientOptions)
 }
