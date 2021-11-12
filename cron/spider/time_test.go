@@ -113,6 +113,10 @@ func Test_parseTime(t *testing.T) {
 			s:    "946771200000000000",
 			want: 946771200,
 		},
+		{
+			s:    "2021-10-20T22:47:37",
+			want: -1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.s, func(t *testing.T) {

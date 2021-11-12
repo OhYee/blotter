@@ -17,7 +17,7 @@ type timeFinder struct {
 
 var timeFinders = []timeFinder{
 	{
-		Regexp: regexp.MustCompile(`^\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(.\\d{3})*(Z([+\\-]\\d+)*)*$`),
+		Regexp: regexp.MustCompile(`^\d{2,4}-\d{1,2}-\d{1,2}T\d{1,2}:\d{1,2}:\d{1,2}(.\d{3})*(Z([+\-]\d+)*)*$`),
 		TimeFormatFunc: func(s string) *time.Time {
 			datePart := s
 			timeZone := 0
