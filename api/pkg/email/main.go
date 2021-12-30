@@ -34,7 +34,6 @@ func Send(hostWithPort, username, user, password string, ssl bool, subject, body
 			return
 		}
 	}
-	fmt.Println("a ...interface{12}")
 
 	// initiate connection
 	client, err := smtp.NewClient(conn, host)
@@ -86,7 +85,7 @@ func Send(hostWithPort, username, user, password string, ssl bool, subject, body
 // GetSMTPData get smtp information from database
 func GetSMTPData() (email, user, username, password, address string, ssl bool, root, blogName string, err error) {
 	v, err := variable.Get(
-		"email", "smtp_user", "smtp_password", "smtp_address", "ssl",
+		"email", "smtp_user", "smtp_password", "smtp_address", "smtp_ssl",
 		"smtp_username", "root", "blog_name",
 	)
 	if err != nil {
