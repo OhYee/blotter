@@ -190,6 +190,7 @@ type BlotterVariables struct {
 	SMTPPassword      string       `json:"smtp_password" bson:"smtp_password"`
 	SMTPUser          string       `json:"smtp_user" bson:"smtp_user"`
 	SMTPUsername      string       `json:"smtp_username" bson:"smtp_username"`
+	SMTPSSL           bool         `json:"smtp_ssl" bson:"smtp_ssl"`
 	View              int          `json:"view" bson:"view"`
 	Vmess             string       `json:"vmess" bson:"vmess"`
 	Zhihu             string       `json:"zhihu" bson:"zhihu"`

@@ -27,6 +27,7 @@ require (
 	github.com/klauspost/compress v1.11.3 // indirect
 	github.com/mitchellh/mapstructure v1.4.0
 	github.com/mmcdole/gofeed v1.1.3
+	github.com/pkg/errors v0.9.1
 	github.com/qiniu/api.v7/v7 v7.7.0
 	github.com/refraction-networking/utls v0.0.0-20201112193908-f7e7360167ed // indirect
 	github.com/robfig/cron v1.2.0

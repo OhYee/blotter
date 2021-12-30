@@ -1,18 +1,70 @@
 package email
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net"
 	"net/smtp"
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/variable"
+	"github.com/pkg/errors"
 )
 
 // Send email
-func Send(host, username, user, password, subject, body string, to ...string) error {
-	hp := strings.Split(host, ":")
-	auth := smtp.PlainAuth("", user, password, hp[0])
+func Send(hostWithPort, username, user, password string, ssl bool, subject, body string, to ...string) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.Wrap(err, "Send email failed")
+		}
+	}()
+	hp := strings.Split(hostWithPort, ":")
+	host := hp[0]
 
+	// make connection
+	var conn net.Conn
+	if ssl {
+		conn, err = tls.Dial("tcp", hostWithPort, nil)
+		if err != nil {
+			return
+		}
+	} else {
+		conn, err = net.Dial("tcp", hostWithPort)
+		if err != nil {
+			return
+		}
+	}
+	fmt.Println("a ...interface{12}")
+
+	// initiate connection
+	client, err := smtp.NewClient(conn, host)
+	if err != nil {
+		return
+	}
+
+	// smtp auth
+	auth := smtp.PlainAuth("", user, password, host)
+	if err = client.Auth(auth); err != nil {
+		return
+	}
+
+	// set sender
+	if err = client.Mail(user); err != nil {
+		return
+	}
+
+	// set receiver
+	for _, receiver := range to {
+		if err = client.Rcpt(receiver); err != nil {
+			return
+		}
+	}
+
+	// Write data
+	w, err := client.Data()
+	if err != nil {
+		return
+	}
 	msg := []byte(fmt.Sprintf(
 		"To: %s\r\nFrom: %s<%s>\r\nSubject: %s\r\nContent-Type: text/html;charset=UTF-8\r\n\r\n%s",
 		strings.Join(to, ","),
@@ -20,14 +72,21 @@ func Send(host, username, user, password, subject, body string, to ...string) er
 
 		subject, body,
 	))
-	err := smtp.SendMail(host, auth, user, to, msg)
+	if _, err = w.Write(msg); err != nil {
+		return
+	}
+	if err = w.Close(); err != nil {
+		return
+	}
+
+	err = client.Quit()
 	return err
 }
 
 // GetSMTPData get smtp information from database
-func GetSMTPData() (email, user, username, password, address, root, blogName string, err error) {
+func GetSMTPData() (email, user, username, password, address string, ssl bool, root, blogName string, err error) {
 	v, err := variable.Get(
-		"email", "smtp_user", "smtp_password", "smtp_address",
+		"email", "smtp_user", "smtp_password", "smtp_address", "ssl",
 		"smtp_username", "root", "blog_name",
 	)
 	if err != nil {
@@ -47,6 +106,9 @@ func GetSMTPData() (email, user, username, password, address, root, blogName str
 		return
 	}
 	if err = v.SetString("smtp_address", &address); err != nil {
+		return
+	}
+	if err = v.SetBool("smtp_ssl", &ssl, false); err != nil {
 		return
 	}
 	if err = v.SetString("root", &root); err != nil {

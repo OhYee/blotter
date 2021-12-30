@@ -251,7 +251,7 @@ func GetInfo(url string, id primitive.ObjectID) Info {
 
 // SendEmail for comment
 func SendEmail(url string, raw string, html string, replyObjectID primitive.ObjectID) {
-	emailAddr, user, username, password, address, root, blogName, err := email.GetSMTPData()
+	emailAddr, user, username, password, address, ssl, root, blogName, err := email.GetSMTPData()
 	if err != nil {
 		return
 	}
@@ -270,7 +270,7 @@ func SendEmail(url string, raw string, html string, replyObjectID primitive.Obje
 
 	output.Debug("Send email to %+v", to)
 	err = email.Send(
-		address, username, user, password, "博客评论通知",
+		address, username, user, password, ssl, "博客评论通知",
 		fmt.Sprintf(
 			"<html><body>您在<a href='%s'>《%s》</a>( %s )的评论收到一条回复<br><br>%s</body></html>",
 			root+url, info.Title, root+url, html,
