@@ -17,6 +17,13 @@ import (
 )
 
 const DefaultAvatar = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+const DefaultAvatarMD5 = "1fbf1eeb622038a1ea2e62036d33788a"
+
+func md5Encode(source []byte) string {
+	hash := md5.New()
+	hash.Write(source)
+	return hex.EncodeToString(hash.Sum(nil))
+}
 
 func makeHTTPClient() *http.Client {
 	keys := []string{"HTTP_PROXY", "HTTPS_PROXY", "PROXY", "http_proxy", "https_proxy", "proxy"}
@@ -93,14 +100,30 @@ func GetGithubAvatar(email string) (avatar string) {
 	return
 }
 
+// GetCravatar get Gravatar of the gmail
+func GetCravatar(email string) (avatar string) {
+	avatar = fmt.Sprintf(
+		"https://cravatar.cn/avatar/%s?s=640&d=404",
+		md5Encode([]byte(strings.ToLower(email))),
+	)
+
+	resp, err := makeHTTPClient().Get(avatar)
+	if err != nil || resp == nil || resp.StatusCode == 404 {
+		avatar = ""
+		return
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil || md5Encode(body) == DefaultAvatarMD5 {
+		avatar = ""
+	}
+	return
+}
+
 // GetGravatar get Gravatar of the gmail
 func GetGravatar(email string) (avatar string) {
-	hash := md5.New()
-	hash.Write([]byte(strings.ToLower(email)))
-
 	avatar = fmt.Sprintf(
 		"https://www.gravatar.com/avatar/%s?size=640&default=%s",
-		hex.EncodeToString(hash.Sum(nil)),
+		md5Encode([]byte(strings.ToLower(email))),
 		url.QueryEscape(DefaultAvatar),
 	)
 
@@ -112,7 +135,7 @@ func GetGravatar(email string) (avatar string) {
 	return
 }
 
-var qqRegexp = regexp.MustCompile("^\\d+$")
+var qqRegexp = regexp.MustCompile(`^\d+$`)
 
 func GetQQAvatar(email string) (avatar string) {
 	if strings.HasSuffix(email, "@qq.com") {
@@ -128,6 +151,7 @@ type avatarGetter = func(string) string
 
 var avatarGetters = []avatarGetter{
 	GetGithubAvatar,
+	GetCravatar,
 	GetGravatar,
 	GetQQAvatar,
 }
@@ -148,6 +172,10 @@ func Get(email string) (avatar string) {
 			break
 		}
 	}
+	if avatar == "" {
+		avatar = DefaultAvatar
+	}
+
 	if avatar != "" {
 		avatarMap.PutWithExpired(email, avatar, time.Hour*24*7)
 	}

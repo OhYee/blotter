@@ -16,9 +16,10 @@ func (handle Handle) ServeHTTP(rep http.ResponseWriter, req *http.Request) {
 	context := register.NewHTTPContext(req, rep)
 
 	// CORS
-	context.AddHeader("Access-Control-Allow-Origin", "*")
+	context.AddHeader("Access-Control-Allow-Origin", req.Header.Get("Origin"))
 	context.AddHeader("Access-Control-Allow-Headers", "*")
 	context.AddHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
+	context.AddHeader("Access-Control-Allow-Credentials", "true")
 	if context.Request.Method == "OPTIONS" {
 		context.Success()
 		return

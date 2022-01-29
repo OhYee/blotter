@@ -65,10 +65,9 @@ func Send(hostWithPort, username, user, password string, ssl bool, subject, body
 		return
 	}
 	msg := []byte(fmt.Sprintf(
-		"To: %s\r\nFrom: %s<%s>\r\nSubject: %s\r\nContent-Type: text/html;charset=UTF-8\r\n\r\n%s",
+		"To: %s\r\nFrom: %s<%s>\r\nSubject: =?UTF-8?B?%s?=\r\nContent-Type: text/html;charset=UTF-8\r\n\r\n%s",
 		strings.Join(to, ","),
 		username, user,
-
 		subject, body,
 	))
 	if _, err = w.Write(msg); err != nil {

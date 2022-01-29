@@ -5,8 +5,6 @@ import (
 	"github.com/OhYee/blotter/register"
 )
 
-const defaultAvatar = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-
 // AvatarRequest request of avatar api
 type AvatarRequest struct {
 	Email string `json:"email"`
