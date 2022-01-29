@@ -104,7 +104,6 @@ type Admin struct {
 
 // Info base info of comment
 type Info struct {
-	Title string `json:"title" bson:"title"`
 	Recv  bool   `json:"recv" bson:"recv"`
 	Email string `json:"email" bson:"email"`
 }

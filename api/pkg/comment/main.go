@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -20,6 +21,7 @@ import (
 	"github.com/OhYee/blotter/api/pkg/avatar"
 	"github.com/OhYee/blotter/api/pkg/email"
 	"github.com/OhYee/blotter/api/pkg/markdown"
+	"github.com/OhYee/blotter/api/pkg/post"
 	"github.com/OhYee/blotter/api/pkg/serverchan"
 	"github.com/OhYee/blotter/mongo"
 )
@@ -184,69 +186,29 @@ func Add(url string, reply string, email string, recv bool, raw string) (err err
 }
 
 // GetInfo get comment info
-func GetInfo(url string, id primitive.ObjectID) Info {
-	info := make([]Info, 0)
-	cnt, err := mongo.Aggregate(
-		"blotter", "comments",
-		[]bson.M{
-			{
-				"$match": bson.M{
-					"_id": id,
-				},
-			},
-			{
-				"$set": bson.M{
-					"url": func(path string) string {
-						if len(path) > 6 {
-							path = path[6:]
-						}
-						return path
-					}(url),
-				},
-			},
-			{
-				"$lookup": bson.M{
-					"from":         "posts",
-					"localField":   "url",
-					"foreignField": "url",
-					"as":           "posts",
-				},
-			},
-			{
-				"$set": bson.M{
-					"title": "$posts.title",
-					"size":  bson.M{"$size": "$posts"},
-				},
-			},
-			{
-				"$project": bson.M{
-					"title": 1,
-					"email": 1,
-					"recv":  1,
-					"size":  1,
-				},
-			},
-			{
-				"$set": bson.M{
-					"title": bson.M{
-						"$cond": bson.M{
-							"if": bson.M{
-								"$eq": []interface{}{"$size", 0},
-							},
-							"then": []interface{}{""},
-							"else": "$title",
-						},
-					},
-				},
-			},
-			{
-				"$unwind": "$title",
-			},
-		}, nil, &info)
-	if err == nil && cnt > 0 {
-		return info[0]
+func GetInfo(url string, id primitive.ObjectID) (info Info, title string) {
+	// query title
+	if strings.HasPrefix(url, "/post/") {
+		url = url[6:]
 	}
-	return Info{}
+	p, err := post.GetPublicFieldPost(url)
+	if err == nil {
+		title = p.Title
+	}
+
+	// query reply info
+	infoArr := make([]Info, 0)
+	_, err = mongo.Aggregate("blotter", "comments", []bson.M{
+		{
+			"$match": bson.M{
+				"_id": id,
+			},
+		},
+	}, nil, &infoArr)
+	if err == nil && len(infoArr) > 0 {
+		info = infoArr[0]
+	}
+	return
 }
 
 // SendEmail for comment
@@ -256,9 +218,9 @@ func SendEmail(url string, raw string, html string, replyObjectID primitive.Obje
 		return
 	}
 
-	info := GetInfo(url, replyObjectID)
-	if info.Title == "" {
-		info.Title = blogName
+	info, title := GetInfo(url, replyObjectID)
+	if title == "" {
+		title = blogName
 	}
 
 	to := []string{emailAddr}
@@ -266,14 +228,14 @@ func SendEmail(url string, raw string, html string, replyObjectID primitive.Obje
 		to = append(to, info.Email)
 	}
 
-	go serverchan.Notify("新评论提醒", fmt.Sprintf("%s 在 [%s](%s) 发布了一条评论\n\n\n\n%s", info.Email, info.Title, root+url, raw))
+	go serverchan.Notify("新评论提醒", fmt.Sprintf("%s 在 [%s](%s) 发布了一条评论\n\n\n\n%s", info.Email, title, root+url, raw))
 
 	output.Debug("Send email to %+v", to)
 	err = email.Send(
 		address, username, user, password, ssl, "博客评论通知",
 		fmt.Sprintf(
 			"<html><body>您在<a href='%s'>《%s》</a>( %s )的评论收到一条回复<br><br>%s</body></html>",
-			root+url, info.Title, root+url, html,
+			root+url, title, root+url, html,
 		),
 		to...,
 	)

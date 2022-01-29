@@ -2,6 +2,7 @@ package email
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"net/smtp"
@@ -65,10 +66,11 @@ func Send(hostWithPort, username, user, password string, ssl bool, subject, body
 		return
 	}
 	msg := []byte(fmt.Sprintf(
-		"To: %s\r\nFrom: %s<%s>\r\nSubject: =?UTF-8?Q?%s?=\r\nContent-Type: text/html;charset=UTF-8\r\n\r\n%s",
+		"To: %s\r\nFrom: %s\r\nSubject: %s\r\nContent-Type: text/html;charset=UTF-8\r\n\r\n%s",
 		strings.Join(to, ","),
-		username, user,
-		subject, body,
+		fmt.Sprintf("=?UTF-8?B?%s?=<%s>", base64.StdEncoding.EncodeToString([]byte(username)), user),
+		fmt.Sprintf("=?UTF-8?B?%s?=", base64.StdEncoding.EncodeToString([]byte(subject))),
+		body,
 	))
 	if _, err = w.Write(msg); err != nil {
 		return
