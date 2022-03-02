@@ -1,11 +1,14 @@
 package spider
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/friends"
 )
+
+var ignoreIllegalCharacter = regexp.MustCompile(`[\x00-\x09\x0b\x0c\x0e-\x1f]`)
 
 func Do(link string, retry int) (posts []friends.FriendPost) {
 	posts = make([]friends.FriendPost, 0)
@@ -23,12 +26,15 @@ func Do(link string, retry int) (posts []friends.FriendPost) {
 		return
 	}
 
-	if strings.Index(link, "rss") != -1 ||
-		strings.Index(link, "atom") != -1 ||
-		strings.Index(link, "feed") != -1 ||
-		strings.Index(link, "xml") != -1 {
+	// ignore illegal character suchj as BS
+	content = ignoreIllegalCharacter.ReplaceAllString(content, "")
+
+	if strings.Contains(link, "rss") ||
+		strings.Contains(link, "atom") ||
+		strings.Contains(link, "feed") ||
+		strings.Contains(link, "xml") {
 		posts = readRSS(link, content)
-	} else if isJSON || strings.Index(link, "json") != -1 {
+	} else if isJSON || strings.Contains(link, "json") {
 		posts = readJSON(link, content)
 	} else {
 		posts = readHTML(link, content)
