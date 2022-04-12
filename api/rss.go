@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/OhYee/blotter/api/pkg/post"
+	"github.com/OhYee/blotter/api/pkg/tag"
 	"github.com/OhYee/blotter/api/pkg/variable"
 	"github.com/OhYee/blotter/register"
 )
@@ -45,8 +46,15 @@ func RSSXML(context register.HandleContext) (err error) {
 	email, _ := variables.GetString("email")
 	blogName, _ := variables.GetString("blog_name")
 	author, _ := variables.GetString("author")
-
-	total, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "", []string{})
+	withoutTags := []string{}
+	hidden_tags, err := tag.GetHidden()
+	if err != nil {
+		return
+	}
+	for _, tag := range hidden_tags {
+		withoutTags = append(withoutTags, tag.ID)
+	}
+	total, posts, err := post.GetCardPosts(0, 0, []string{}, withoutTags, "", 0, "", []string{})
 	if err != nil {
 		return
 	}

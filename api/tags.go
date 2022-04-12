@@ -16,6 +16,7 @@ type TagsRequest struct {
 	Number    int64  `json:"number"`
 	SortField string `json:"sort_field"`
 	SortInc   bool   `json:"sort_inc"`
+	All       bool   `json:"all"`
 }
 
 // TagsResponse request without keyword
@@ -31,7 +32,7 @@ func Tags(context register.HandleContext) (err error) {
 
 	context.RequestArgs(args)
 
-	res.Total, res.Tags, err = tag.GetTags(args.Keyword, args.Offset, args.Number, args.SortField, args.SortInc)
+	res.Total, res.Tags, err = tag.GetTags(args.Keyword, args.Offset, args.Number, args.SortField, args.SortInc, !(args.All && context.GetUser().HasPermission()))
 	if err != nil {
 		return
 	}
@@ -48,6 +49,7 @@ type TagEditRequest struct {
 	Color       string `json:"color"`
 	Icon        string `json:"icon"`
 	Description string `json:"description"`
+	Hide        bool   `json:"hide"`
 }
 
 // TagEditResponse response of TagEdit api
@@ -67,7 +69,7 @@ func TagEdit(context register.HandleContext) (err error) {
 	res.Success = true
 	if args.ID == "" {
 		res.Title = ""
-		if err = tag.New(args.Name, args.Short, args.Color, args.Icon, args.Description); err == nil {
+		if err = tag.New(args.Name, args.Short, args.Color, args.Icon, args.Description, args.Hide); err == nil {
 			res.Title = "新标签添加成功"
 		} else {
 			res.Success = false
@@ -76,7 +78,7 @@ func TagEdit(context register.HandleContext) (err error) {
 		}
 
 	} else {
-		if err = tag.Update(args.ID, args.Name, args.Short, args.Color, args.Icon, args.Description); err == nil {
+		if err = tag.Update(args.ID, args.Name, args.Short, args.Color, args.Icon, args.Description, args.Hide); err == nil {
 			res.Title = "修改标签成功"
 		} else {
 			res.Success = false

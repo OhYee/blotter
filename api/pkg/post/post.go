@@ -237,6 +237,7 @@ func GetCardPosts(
 	searchWord string, searchFields []string,
 ) (total int64, posts []CardField, err error) {
 	postsDB := make([]CardField, 0)
+
 	total, err = getPosts(2, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
 
 	posts = make([]CardField, len(postsDB))
