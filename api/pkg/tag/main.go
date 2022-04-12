@@ -9,10 +9,14 @@ import (
 )
 
 // GetTags get all tags with count
-func GetTags(keyword string, offset int64, number int64, sortField string, sortInc bool) (total int64, res []WithCount, err error) {
+func GetTags(keyword string, offset int64, number int64, sortField string, sortInc bool, hiddenFilter bool) (total int64, res []WithCount, err error) {
 	res = make([]WithCount, 0)
 
 	pipeline := []bson.M{}
+	if hiddenFilter {
+		// Filter hidden tag is not equal true
+		pipeline = append(pipeline, bson.M{"$match": bson.M{"hide": bson.M{"$ne": true}}})
+	}
 	if keyword != "" {
 		pipeline = append(
 			pipeline,
@@ -60,7 +64,7 @@ func GetTags(keyword string, offset int64, number int64, sortField string, sortI
 }
 
 // New tag
-func New(name string, short string, color string, icon string, description string) (err error) {
+func New(name string, short string, color string, icon string, description string, hide bool) (err error) {
 	exist, err := Existed(primitive.NilObjectID.Hex(), short)
 	if err != nil {
 		return
@@ -81,13 +85,14 @@ func New(name string, short string, color string, icon string, description strin
 			"color":       color,
 			"icon":        icon,
 			"description": description,
+			"hide":        hide,
 		},
 	)
 	return
 }
 
 // Update tag data
-func Update(id string, name string, short string, color string, icon string, description string) (err error) {
+func Update(id string, name string, short string, color string, icon string, description string, hide bool) (err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return
@@ -113,6 +118,7 @@ func Update(id string, name string, short string, color string, icon string, des
 				"color":       color,
 				"icon":        icon,
 				"description": description,
+				"hide":        hide,
 			},
 		},
 		nil,
@@ -181,4 +187,18 @@ func Get(short string) (tag Type, err error) {
 	}
 	tag = tags[0]
 	return
+}
+
+// Get tag that should be hidden
+func GetHidden() (tags []Type, err error) {
+	tags = make([]Type, 0)
+
+	_, err = mongo.Find("blotter", "tags", bson.M{
+		"hide": true,
+	}, nil, &tags)
+
+	if err != nil {
+		return
+	}
+	return tags, nil
 }

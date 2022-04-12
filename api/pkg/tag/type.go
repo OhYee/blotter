@@ -8,6 +8,7 @@ type Type struct {
 	Icon        string `json:"icon" bson:"icon"`
 	Color       string `json:"color" bson:"color"`
 	Description string `json:"description" bson:"description"`
+	Hide        bool   `json:"hide" bson:"hide"`
 }
 
 // WithCount tag type with count

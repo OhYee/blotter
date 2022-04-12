@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/post"
+	"github.com/OhYee/blotter/api/pkg/tag"
 	"github.com/OhYee/blotter/register"
 )
 
@@ -76,10 +77,17 @@ func Posts(context register.HandleContext) (err error) {
 	args := new(PostsRequest)
 	res := new(PostsResponse)
 	context.RequestArgs(args)
-
+	withoutTags := strings.Split(args.WithoutTags, ",")
+	hidden_tags, err := tag.GetHidden()
+	if err != nil {
+		return
+	}
+	for _, tag := range hidden_tags {
+		withoutTags = append(withoutTags, tag.ID)
+	}
 	res.Total, res.Posts, err = post.GetCardPosts(
 		args.Offset, args.Number,
-		strings.Split(args.WithTags, ","), strings.Split(args.WithoutTags, ","),
+		strings.Split(args.WithTags, ","), withoutTags,
 		args.SortField, args.SortType,
 		args.Search, strings.Split(args.SearchFields, ","),
 	)
