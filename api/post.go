@@ -160,6 +160,7 @@ type PostEditRequest struct {
 	Raw         string   `json:"raw"`
 	Tags        []string `json:"tags"`
 	Images      []string `json:"images"`
+	Poptext     string   `json:"poptext"`
 	// Published   bool     `json:"published"`
 }
 
@@ -210,6 +211,7 @@ func PostEdit(context register.HandleContext) (err error) {
 			args.Status,
 			args.HeadImage,
 			args.Images,
+			args.Poptext,
 		)
 	}
 	if err != nil {

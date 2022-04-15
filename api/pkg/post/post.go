@@ -287,6 +287,7 @@ func NewPost(
 	// published bool,
 	headImage string,
 	images []string,
+	poptext string,
 ) (err error) {
 
 	html, err := markdown.Render(raw, true)
@@ -317,6 +318,7 @@ func NewPost(
 	p.HeadImage = headImage
 	p.Images = images
 	p.Length = int64(CalcPostLength(html))
+	p.PopText = poptext
 
 	if Existed(url) {
 		err = fmt.Errorf("Post with url existed: %s", url)
@@ -343,6 +345,7 @@ func UpdatePost(
 	status int8,
 	headImage string,
 	images []string,
+	poptext string,
 ) (err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -376,6 +379,7 @@ func UpdatePost(
 	p.HeadImage = headImage
 	p.Images = images
 	p.Length = int64(CalcPostLength(html))
+	p.PopText = poptext
 
 	_, err = mongo.Update("blotter", "posts", bson.M{
 		"_id": objectID,
