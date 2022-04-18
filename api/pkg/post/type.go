@@ -47,6 +47,7 @@ type CardProps struct {
 	URL         string `json:"url" bson:"url"`
 	HeadImage   string `json:"head_image" bson:"head_image"`
 	Length      int64  `json:"length" bson:"length"`
+	PopText     string `json:"poptext" bson:"poptext"`
 }
 
 // PublicProps extra props of public post

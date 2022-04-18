@@ -54,3 +54,38 @@ func VariablesSet(context register.HandleContext) (err error) {
 	err = context.ReturnJSON(res)
 	return
 }
+
+type PostEasterEggRequest struct {
+	Word string `json:"word"`
+}
+type PostEasterEggResponse struct {
+	Success   bool   `json:"success"`
+	Minlength int    `json:"minlength"`
+	Maxlength int    `json:"maxlength"`
+	Url       string `json:"url"`
+}
+
+func EasterEggCheck(context register.HandleContext) (err error) {
+	var resUrl string = ""
+	var miL int = 0
+	var maL int = 0
+	var success bool = false
+
+	args := new(PostEasterEggRequest)
+	res := new(PostEasterEggResponse)
+	context.RequestArgs(args)
+	resUrl, miL, maL, err = variable.CheckEasterEgg(args.Word)
+	res.Minlength = miL
+	res.Maxlength = maL
+
+	if err != nil {
+		return
+	}
+	if resUrl != "" {
+		success = true
+		res.Success = success
+		res.Url = resUrl
+	}
+	context.ReturnJSON(res)
+	return
+}

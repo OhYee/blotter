@@ -55,6 +55,7 @@ func RSSXML(context register.HandleContext) (err error) {
 		withoutTags = append(withoutTags, tag.ID)
 	}
 	total, posts, err := post.GetCardPosts(0, 0, []string{}, withoutTags, "", 0, "", []string{})
+
 	if err != nil {
 		return
 	}
@@ -63,12 +64,11 @@ func RSSXML(context register.HandleContext) (err error) {
 	for idx, post := range posts {
 		t := time.Unix(post.PublishTime, 0).Local()
 		datetime := t.Format("Mon, 02 Jan 2006 15:04:05 -0700")
-
 		data[idx] = fmt.Sprintf(
 			postFormat,
-			post.Title,
+			htmlEscape(post.Title),
 			fmt.Sprintf("%s/post/%s", root, post.URL),
-			post.Abstract,
+			htmlEscape(post.Abstract),
 			datetime,
 		)
 	}
@@ -87,4 +87,11 @@ func RSSXML(context register.HandleContext) (err error) {
 		),
 	)
 	return
+}
+
+func htmlEscape(s string) string {
+	s = strings.Replace(s, "&", "&amp;", -1)
+	s = strings.Replace(s, "<", "&lt;", -1)
+	s = strings.Replace(s, ">", "&gt;", -1)
+	return s
 }

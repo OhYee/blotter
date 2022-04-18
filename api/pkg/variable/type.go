@@ -195,7 +195,7 @@ type BlotterVariables struct {
 	Vmess             string       `json:"vmess" bson:"vmess"`
 	Zhihu             string       `json:"zhihu" bson:"zhihu"`
 	ServerChan        string       `json:"server_chan" bson:"server_chan"`
-	EasterEgg         string       `json:"easter_egg"`
+	EasterEgg         string       `json:"easter_egg" bson:"easter_egg"`
 	Notification      string       `json:"notification"`
 	Footer            string       `json:"footer"`
 }
