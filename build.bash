@@ -18,7 +18,7 @@ done
 
 DEPS_IMAGE="ohyee/blotter:deps_${DEPS_VERSION}"
 BASE_IMAGE="ohyee/blotter:base_${BASE_VERSION}"
-PROD_IMAGE="ooordinary/blotter:${PROD_VERSION}"
+PROD_IMAGE="ohyee/blotter:${PROD_VERSION}"
 
 echo -e "DEPS VERSION:  $DEPS_IMAGE \t\t `if [[ -n \"$BUILD_DEPS\" ]]; then echo '√'; fi`"
 echo -e "BASE VERSION:  $BASE_IMAGE \t\t `if [[ -n \"$BUILD_BASE\" ]]; then echo '√'; fi`"
