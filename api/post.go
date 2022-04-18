@@ -189,6 +189,7 @@ func PostEdit(context register.HandleContext) (err error) {
 			args.Status,
 			args.HeadImage,
 			args.Images,
+			args.Poptext,
 		)
 		if err != nil && strings.HasPrefix(err.Error(), "Post with url existed") {
 			res.Success = false

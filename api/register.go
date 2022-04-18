@@ -242,4 +242,8 @@ func Register() {
 		"admin/comments/avatar",
 		AdminCommentsAvatar,
 	)
+	register.Register(
+		"eggs",
+		EasterEggCheck,
+	)
 }

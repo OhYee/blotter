@@ -59,7 +59,7 @@ func Layout(context register.HandleContext) (err error) {
 	m, err := variable.Get(
 		"beian", "view", "blog_name", "email", "github", "qq", "grey", "root",
 		"author", "avatar", "from", "head", "ad_inner", "ad_show", "ad_text",
-		"easter_egg", "notification", "footer",
+		"notification", "footer",
 	)
 	if err != nil {
 		return
@@ -113,9 +113,9 @@ func Layout(context register.HandleContext) (err error) {
 	if err = m.SetString("ad_text", &res.ADText); err != nil {
 		log.Error.Println(err)
 	}
-	if err = m.SetString("easter_egg", &res.EasterEgg); err != nil {
-		log.Error.Println(err)
-	}
+	// if err = m.SetString("easter_egg", &res.EasterEgg); err != nil {
+	// 	log.Error.Println(err)
+	// }
 	if err = m.SetString("notification", &res.Notification); err != nil {
 		log.Error.Println(err)
 	}
