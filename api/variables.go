@@ -59,21 +59,25 @@ type PostEasterEggRequest struct {
 	Word string `json:"word"`
 }
 type PostEasterEggResponse struct {
-	Success bool   `json:"success"`
-	Length  int    `json:"length"`
-	Url     string `json:"url"`
+	Success   bool   `json:"success"`
+	Minlength int    `json:"minlength"`
+	Maxlength int    `json:"maxlength"`
+	Url       string `json:"url"`
 }
 
 func EasterEggCheck(context register.HandleContext) (err error) {
 	var resUrl string = ""
-	var length int = 0
+	var miL int = 0
+	var maL int = 0
 	var success bool = false
 
 	args := new(PostEasterEggRequest)
 	res := new(PostEasterEggResponse)
 	context.RequestArgs(args)
-	resUrl, length, err = variable.CheckEasterEgg(args.Word)
-	res.Length = length
+	resUrl, miL, maL, err = variable.CheckEasterEgg(args.Word)
+	res.Minlength = miL
+	res.Maxlength = maL
+
 	if err != nil {
 		return
 	}
