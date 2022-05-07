@@ -14,12 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-const checkName = "easter_egg"
-
-var eggFilter = bson.M{
-	"hide": true,
-}
-
 func min(a, b int64) int64 {
 	if a < b {
 		return a
@@ -133,21 +127,6 @@ func getPosts(
 	searchWord string, searchFields []string,
 	res interface{},
 ) (total int64, err error) {
-	var keyList []primitive.ObjectID
-	temp := make([]map[string]interface{}, 0)
-
-	if _, err = mongo.Find(
-		"blotter",
-		"tags",
-		eggFilter,
-		nil,
-		&temp,
-	); err != nil {
-		return
-	}
-	if keyList, err = GetKey(temp); err != nil {
-		return
-	}
 	if number < 0 {
 		number = 0
 	}
@@ -167,7 +146,6 @@ func getPosts(
 
 	withTagsID := mongo.StringToObjectIDs(withTags...)
 	withoutTagsID := mongo.StringToObjectIDs(withoutTags...)
-	withoutTagsID = append(withoutTagsID, keyList...)
 	if len(withTagsID) != 0 {
 		pipeline = append(
 			pipeline,
@@ -179,7 +157,6 @@ func getPosts(
 			pipeline,
 			bson.M{"$match": bson.M{"tags": bson.M{"$nin": withoutTagsID}}},
 		)
-		fmt.Println('w', withoutTagsID)
 	}
 
 	words := fp.FilterString(func(s string, idx int) bool {
@@ -430,14 +407,4 @@ func Delete(id string) {
 			"_id": objectID,
 		}, nil)
 	}
-}
-
-// split the string with space and return the dict
-// where the key is the first word and value is the second word
-func GetKey(findRes []map[string]interface{}) (res []primitive.ObjectID, err error) {
-	res = make([]primitive.ObjectID, len(findRes))
-	for i := 0; i < len(findRes); i++ {
-		res = append(res, findRes[i]["_id"].(primitive.ObjectID))
-	}
-	return
 }
