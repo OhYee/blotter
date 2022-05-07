@@ -31,7 +31,7 @@ func BaiduPush() {
 
 	// 生成链接文件
 	buf := bytes.NewBufferString("")
-	_, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "", []string{})
+	_, posts, err := post.GetCardPosts(0, 0, []string{}, []string{}, "", 0, "", []string{}, true)
 	if err != nil {
 		return
 	}

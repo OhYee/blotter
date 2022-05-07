@@ -177,7 +177,7 @@ func Tag(context register.HandleContext) (err error) {
 	if res.Total, res.Posts, err = post.GetCardPosts(
 		args.Offset, args.Number,
 		[]string{res.Tag.ID}, []string{},
-		"", -1, "", []string{},
+		"", -1, "", []string{}, false,
 	); err != nil {
 		return
 	}
