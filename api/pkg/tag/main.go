@@ -192,13 +192,12 @@ func Get(short string) (tag Type, err error) {
 // Get tag that should be hidden
 func GetHidden() (tags []Type, err error) {
 	tags = make([]Type, 0)
-	
+
 	_, err = mongo.Find("blotter", "tags", bson.M{
 		"hide": true,
 	}, nil, &tags)
 
 	if err != nil {
-		err = errors.NewErr(err)
 		return
 	}
 	return tags, nil
