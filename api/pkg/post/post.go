@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/OhYee/blotter/api/pkg/markdown"
+	"github.com/OhYee/blotter/api/pkg/tag"
 	"github.com/OhYee/blotter/mongo"
 	"github.com/OhYee/blotter/output"
 	fp "github.com/OhYee/goutils/functional"
@@ -235,9 +236,19 @@ func GetCardPosts(
 	withTags []string, withoutTags []string,
 	sortField string, sortType int,
 	searchWord string, searchFields []string,
+	hidden bool,
 ) (total int64, posts []CardField, err error) {
 	postsDB := make([]CardField, 0)
-
+	if hidden {
+		var hidden_tags []tag.Type
+		hidden_tags, err = tag.GetHidden()
+		if err != nil {
+			return
+		}
+		for _, tag := range hidden_tags {
+			withoutTags = append(withoutTags, tag.ID)
+		}
+	}
 	total, err = getPosts(2, offset, number, withTags, withoutTags, sortField, sortType, searchWord, searchFields, &postsDB)
 
 	posts = make([]CardField, len(postsDB))
