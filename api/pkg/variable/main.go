@@ -103,6 +103,10 @@ func CheckEasterEgg(key string) (link string, miL int, maL int, err error) {
 	fmt.Println(key)
 	// take the value of "easteregg" from the result of mongo
 	oriEgg := temp[0]
+	if(oriEgg["value"].(string)==""){
+		miL = 100
+		return 
+	}
 	eggDict, miL, maL, err = SplitString(oriEgg["value"].(string))
 	for k, v := range eggDict {
 		tmpLength := len(k)
