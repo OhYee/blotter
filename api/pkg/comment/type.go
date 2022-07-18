@@ -11,17 +11,19 @@ import (
 
 // TypeDB comment type in database
 type TypeDB struct {
-	ID      primitive.ObjectID `json:"id" bson:"_id"`
-	Email   string             `json:"email" bson:"email"`
-	Avatar  string             `json:"avatar" bson:"avatar"`
-	Time    int64              `json:"time" bson:"time"`
-	Raw     string             `json:"raw" bson:"raw"`
-	Content string             `json:"content" bson:"content"`
-	Reply   primitive.ObjectID `json:"reply" bson:"reply"`
-	URL     string             `json:"url" bson:"url"`
-	Ad      bool               `json:"ad" bson:"ad"`
-	Show    bool               `json:"show" bson:"show"`
-	Recv    bool               `json:"recv" bson:"recv"`
+	ID       primitive.ObjectID `json:"id" bson:"_id"`
+	Email    string             `json:"email" bson:"email"`
+	Avatar   string             `json:"avatar" bson:"avatar"`
+	Time     int64              `json:"time" bson:"time"`
+	Raw      string             `json:"raw" bson:"raw"`
+	Content  string             `json:"content" bson:"content"`
+	Reply    primitive.ObjectID `json:"reply" bson:"reply"`
+	URL      string             `json:"url" bson:"url"`
+	Ad       bool               `json:"ad" bson:"ad"`
+	Show     bool               `json:"show" bson:"show"`
+	Recv     bool               `json:"recv" bson:"recv"`
+	IP       string             `json:"ip" bson:"ip"`
+	Position string             `json:"position" bson:"position"`
 }
 
 // ToComment transfer CommentDB to comment
@@ -37,6 +39,7 @@ func (cm *TypeDB) ToComment() *Type {
 		Ad:       cm.Ad,
 		Show:     cm.Show,
 		Recv:     cm.Recv,
+		Position: cm.Position,
 	}
 }
 
@@ -52,6 +55,7 @@ type Type struct {
 	Ad       bool               `json:"ad" bson:"ad"`
 	Show     bool               `json:"show" bson:"show"`
 	Recv     bool               `json:"recv" bson:"recv"`
+	Position string             `json:"position" bson:"position"`
 }
 
 func (c *Type) UpdateAvatar() (err error) {
@@ -91,6 +95,7 @@ func (comment AdminDB) ToAdmin() *Admin {
 		ReplyComment: *comment.ReplyComment.ToComment(),
 		Title:        comment.Title,
 		URL:          comment.TypeDB.URL,
+		IP:           comment.IP,
 	}
 }
 
@@ -100,6 +105,7 @@ type Admin struct {
 	ReplyComment Type   `json:"reply_comment" bson:"reply_comment"`
 	URL          string `json:"url" bson:"url"`
 	Title        string `json:"title" bson:"title"`
+	IP           string `json:"ip" bson:"ip"`
 }
 
 // Info base info of comment

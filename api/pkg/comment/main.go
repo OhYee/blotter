@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/OhYee/blotter/output"
+	"github.com/OhYee/blotter/utils/geoip"
 	pool "github.com/OhYee/blotter/utils/goroutine_pool"
 	"github.com/OhYee/blotter/utils/lru"
 	"github.com/OhYee/rainbow/errors"
@@ -148,7 +149,7 @@ func MakeRelation(_comments []TypeDB) (comments []*Type) {
 }
 
 // Add a new comment
-func Add(url string, reply string, email string, recv bool, raw string) (err error) {
+func Add(url string, reply string, email string, recv bool, raw string, ip string) (err error) {
 	if antiShake(url, email, raw) {
 		// shake!
 		return ErrShake
@@ -165,17 +166,19 @@ func Add(url string, reply string, email string, recv bool, raw string) (err err
 	}
 
 	_, err = mongo.Add("blotter", "comments", nil, TypeDB{
-		ID:      primitive.NewObjectID(),
-		Avatar:  avatar.Get(email),
-		Email:   email,
-		Reply:   replyObjectID,
-		URL:     url,
-		Recv:    recv,
-		Raw:     raw,
-		Content: html,
-		Time:    time.Now().Unix(),
-		Ad:      false,
-		Show:    true,
+		ID:       primitive.NewObjectID(),
+		Avatar:   avatar.Get(email),
+		Email:    email,
+		Reply:    replyObjectID,
+		URL:      url,
+		Recv:     recv,
+		Raw:      raw,
+		Content:  html,
+		Time:     time.Now().Unix(),
+		Ad:       false,
+		Show:     true,
+		IP:       ip,
+		Position: geoip.GetPositionFromIP(ip),
 	})
 	if err != nil {
 		return
