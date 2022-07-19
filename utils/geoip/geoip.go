@@ -15,7 +15,12 @@ import (
 func GetIPFromHeader(header *http.Header) string {
 	xForwardedFor := header.Values("X-Forwarded-For")
 	if len(xForwardedFor) > 0 {
-		return xForwardedFor[0]
+		remoteIP := xForwardedFor[0]
+		arr := strings.Split(remoteIP, ",")
+		if len(arr) > 0 {
+			return strings.ReplaceAll(arr[0], " ", "")
+		}
+		return ""
 	}
 	return ""
 }
