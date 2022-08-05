@@ -205,3 +205,12 @@ func (context *HTTPContext) GetUser() *user.TypeDB {
 func (context *HTTPContext) GetContext(key string) (value interface{}, ok bool) {
 	return GetContext(key)
 }
+
+// GetClientIP returns client ip
+func (context *HTTPContext) GetClientIP() string {
+	clientIP := getIPFromHeader(&context.Request.Header, X_Real_IP)
+	if clientIP == "" {
+		clientIP = getIPFromHeader(&context.Request.Header, X_FORWARDED_FOR)
+	}
+	return clientIP
+}

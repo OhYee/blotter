@@ -50,4 +50,7 @@ type HandleContext interface {
 
 	// GetContext get global context
 	GetContext(key string) (interface{}, bool)
+
+	// GetClientIP
+	GetClientIP() string
 }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/OhYee/blotter/api/pkg/comment"
 	"github.com/OhYee/blotter/register"
-	"github.com/OhYee/blotter/utils/geoip"
 )
 
 // CommentsRequest request of comments api
@@ -62,8 +61,7 @@ func CommentAdd(context register.HandleContext) (err error) {
 		return
 	}
 
-	req := context.GetRequest()
-	ipAddr := geoip.GetIPFromHeader(&req.Header)
+	ipAddr := context.GetClientIP()
 
 	if err = comment.Add(args.URL, args.Reply, args.Email, args.Recv, args.Raw, ipAddr); err != nil {
 		if errors.Is(err, comment.ErrShake) {

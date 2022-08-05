@@ -54,14 +54,15 @@ func Call(name string, context *HTTPContext) (err error) {
 	defer func() {
 		rec := recover()
 		if rec != nil {
-			err = fmt.Errorf("Recover error: %+v", rec)
+			err = fmt.Errorf("recover error: %+v", rec)
 			output.ErrOutput.Println(err)
 		}
 	}()
 
-	output.Log("%s:%s [%s] %s\nCall api %s, %s, %s [%s]",
+	output.Log("%s:%s [%s] %s %s\nCall api %s, %s, %s [%s]",
 		context.Request.Method,
 		context.Request.Host,
+		context.GetClientIP(),
 		context.Request.Header.Get("nginx"),
 		context.Request.UserAgent(),
 		name,

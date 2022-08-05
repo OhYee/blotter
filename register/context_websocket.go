@@ -124,3 +124,12 @@ func (context *WebSocketContext) GetUser() *user.TypeDB {
 func (context *WebSocketContext) GetContext(key string) (value interface{}, ok bool) {
 	return GetContext(key)
 }
+
+// GetClientIP returns client ip
+func (context *WebSocketContext) GetClientIP() string {
+	clientIP := getIPFromHeader(&context.Request.Header, X_Real_IP)
+	if clientIP == "" {
+		clientIP = getIPFromHeader(&context.Request.Header, X_FORWARDED_FOR)
+	}
+	return clientIP
+}
