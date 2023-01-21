@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"syscall"
 
 	"github.com/OhYee/blotter/output"
 	"github.com/chromedp/chromedp"
@@ -113,5 +114,12 @@ func getHTMLWithJS(u string) string {
 	if err != nil {
 		output.ErrOutput.Println(u, err)
 	}
+
+	defer func() {
+		if process := chromedp.FromContext(ctx3).Browser.Process(); process != nil {
+			fmt.Println(process.Signal(syscall.SIGTERM))
+		}
+	}()
+
 	return res
 }

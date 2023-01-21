@@ -12,6 +12,7 @@ import (
 	"github.com/OhYee/blotter/output"
 	"github.com/OhYee/blotter/register"
 	"github.com/OhYee/blotter/utils/initial"
+	"github.com/OhYee/blotter/utils/reaper"
 )
 
 var (
@@ -44,6 +45,8 @@ func parseFlags() {
 }
 
 func main() {
+	go reaper.Reap()
+
 	parseFlags()
 	register.SetContext("version", _version)
 	register.SetContext("spiderURL", url)
