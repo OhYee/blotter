@@ -79,7 +79,7 @@ type githubUserInfo struct {
 
 // GetGithubAvatar get the github avatar of the email
 func GetGithubAvatar(email string) (avatar string) {
-	rep, err := makeHTTPClient().Get(fmt.Sprintf("https://api.github.com/search/users?q=%s", email))
+	rep, err := makeHTTPClient().Get(fmt.Sprintf("https://proxy.ohyee.cc/api.github.com/search/users?q=%s", email))
 	if err != nil {
 		return
 	}

@@ -35,7 +35,7 @@ func githubRepo(username string, page int) (res []map[string]interface{}, err er
 		client = http.DefaultClient
 	}
 
-	resp, err := client.Get(fmt.Sprintf("https://api.github.com/users/%s/repos?page=%d", username, page))
+	resp, err := client.Get(fmt.Sprintf("https://proxy.ohyee.cc/api.github.com/users/%s/repos?page=%d", username, page))
 	if err != nil {
 		return
 	}
